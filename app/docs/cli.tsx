@@ -1,15 +1,28 @@
+import React from "react";
 import CodeBlock from "@/components/CodeBlock";
 import { Section, type TocGroup } from "./shared";
+
+/** Render a single <Section> by id, or the whole reference when no id is given. */
+function pickSection(all: React.ReactElement, section?: string) {
+  if (!section) return all;
+  const children = (all.props as { children?: React.ReactNode }).children;
+  const match = React.Children.toArray(children).find(
+    (k) => React.isValidElement(k) && (k.props as { id?: string }).id === section,
+  );
+  return <>{match ?? all}</>;
+}
 
 export const cliToc: TocGroup = {
   title: "cosmo CLI",
   items: [
     { href: "#cli-overview", label: "Overview" },
+    { href: "#cli-init", label: "cosmo init" },
     { href: "#cli-synapse", label: "cosmo synapse" },
     { href: "#cli-doppler", label: "cosmo doppler" },
     { href: "#cli-validate", label: "cosmo validate" },
-    { href: "#cli-dispatch", label: "cosmo dispatch (v0.3)" },
-    { href: "#cli-registry", label: "cosmo registry (v0.3)" },
+    { href: "#cli-completion", label: "cosmo completion" },
+    { href: "#cli-dispatch", label: "cosmo dispatch (planned)" },
+    { href: "#cli-registry", label: "cosmo registry (planned)" },
     { href: "#cli-config", label: "Configuration & env" },
     { href: "#cli-exit-codes", label: "Exit codes" },
   ],
@@ -28,11 +41,35 @@ Options
   <span class="tk-op">--</span>help      Show this message and exit.
 
 Commands
-  doppler    Attach a read-only Doppler to a Synapse namespace.
-  synapse    Manage Cosmonapse synapse servers (start / view / stop).
-  validate   Validate Signal envelopes against the spec.
+  completion   Print a shell-completion script (bash / zsh / fish).
+  doppler      Attach a read-only Doppler to a Synapse namespace.
+  init         Scaffold a minimal Axon + Dendrite project.
+  synapse      Manage Cosmonapse synapse servers (start / view / stop).
+  validate     Validate Signal envelopes against the spec.
 
-<span class="tk-cm"># Planned for v0.3: dispatch, registry.</span>`;
+<span class="tk-cm"># Planned for v0.2: dispatch, registry.</span>`;
+
+const cliInitSnippet = `<span class="tk-op">$</span> cosmo init my-app <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
+
+Scaffolded my-app in /path/to/my-app
+  <span class="tk-op">+</span> worker.py
+  <span class="tk-op">+</span> orchestrator.py
+  <span class="tk-op">+</span> README.md
+
+Next steps:
+  cd my-app
+  cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
+  python worker.py        <span class="tk-cm"># in a second terminal</span>
+  python orchestrator.py  <span class="tk-cm"># in a third terminal</span>`;
+
+const cliCompletionSnippet = `<span class="tk-cm"># Load completions in the current shell:</span>
+<span class="tk-op">$</span> <span class="tk-kw">eval</span> <span class="tk-str">"$(cosmo completion bash)"</span>
+<span class="tk-op">$</span> <span class="tk-kw">eval</span> <span class="tk-str">"$(cosmo completion zsh)"</span>
+
+<span class="tk-cm"># Or install permanently:</span>
+<span class="tk-op">$</span> cosmo completion bash <span class="tk-op">&gt;</span> ~/.local/share/bash-completion/completions/cosmo
+<span class="tk-op">$</span> cosmo completion zsh <span class="tk-op">&gt;</span> ~/.zfunc/_cosmo
+<span class="tk-op">$</span> cosmo completion fish <span class="tk-op">&gt;</span> ~/.config/fish/completions/cosmo.fish`;
 
 const cliSynapseSnippet = `<span class="tk-op">$</span> cosmo synapse <span class="tk-op">--</span>help
 
@@ -82,11 +119,12 @@ const cliDopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span clas
 Attach a read-only Doppler to a Synapse namespace and stream Signals.
 
 Usage
-  cosmo doppler <span class="tk-op">--</span>synapse <span class="tk-op">&lt;</span>url/namespace<span class="tk-op">&gt;</span> [filters] [output]
+  cosmo doppler <span class="tk-op">--</span>url <span class="tk-op">&lt;</span>url<span class="tk-op">&gt;</span> <span class="tk-op">--</span>namespace <span class="tk-op">&lt;</span>ns<span class="tk-op">&gt;</span> [filters] [output]
 
 Options
-  <span class="tk-op">--</span>synapse <span class="tk-op">&lt;</span>url/ns<span class="tk-op">&gt;</span>      REQUIRED. Synapse URL incl. namespace,
-                          e.g. cosmo://127.0.0.1:7070/dev
+  <span class="tk-op">--</span>url <span class="tk-op">&lt;</span>url<span class="tk-op">&gt;</span>             Synapse URL, e.g. cosmo://127.0.0.1:7070
+  <span class="tk-op">--</span>namespace, <span class="tk-op">-n</span> <span class="tk-op">&lt;</span>ns<span class="tk-op">&gt;</span>   Namespace to observe.       Default: dev
+  <span class="tk-op">--</span>synapse <span class="tk-op">&lt;</span>url/ns<span class="tk-op">&gt;</span>      Legacy combined form (path-encoded namespace).
   <span class="tk-op">--</span>type <span class="tk-op">&lt;</span>TYPE<span class="tk-op">&gt;</span>            Filter to specific signal types. Repeatable.
   <span class="tk-op">--</span>trace <span class="tk-op">&lt;</span>trc_…<span class="tk-op">&gt;</span>          Filter to a single trace_id.
   <span class="tk-op">--</span>neuron <span class="tk-op">&lt;</span>id<span class="tk-op">&gt;</span>            Filter to a single neuron id.
@@ -97,14 +135,14 @@ Options
 
 Examples
 
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>synapse<span class="tk-op">=</span>cosmo://127.0.0.1:7070/quickstart
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
   REGISTER      neuron<span class="tk-op">=</span>hello-neuron
   TASK          trace<span class="tk-op">=</span>trc_…  neuron<span class="tk-op">=</span>hello-neuron
   AGENT_OUTPUT  trace<span class="tk-op">=</span>trc_…  neuron<span class="tk-op">=</span>hello-neuron
 
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>synapse<span class="tk-op">=</span>cosmo://127.0.0.1:7070/dev <span class="tk-op">--</span>type<span class="tk-op">=</span>AGENT_OUTPUT <span class="tk-op">--</span>type<span class="tk-op">=</span>ERROR
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>synapse<span class="tk-op">=</span>cosmo://127.0.0.1:7070/dev <span class="tk-op">--</span>trace<span class="tk-op">=</span>trc_01JV…
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>synapse<span class="tk-op">=</span>cosmo://127.0.0.1:7070/dev <span class="tk-op">--</span>json <span class="tk-op">|</span> jq <span class="tk-str">'select(.type=="ERROR")'</span>`;
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>type<span class="tk-op">=</span>AGENT_OUTPUT <span class="tk-op">--</span>type<span class="tk-op">=</span>ERROR
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>trace<span class="tk-op">=</span>trc_01JV…
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>json <span class="tk-op">|</span> jq <span class="tk-str">'select(.type=="ERROR")'</span>`;
 
 const cliValidateSnippet = `<span class="tk-op">$</span> cosmo validate <span class="tk-op">--</span>help
 
@@ -132,18 +170,18 @@ Examples
 
 <span class="tk-op">$</span> cosmo validate <span class="tk-op">--</span>live <span class="tk-op">--</span>namespace<span class="tk-op">=</span>dev <span class="tk-op">--</span>strict`;
 
-const cliDispatchSnippet = `<span class="tk-cm"># cosmo dispatch — planned for v0.3.</span>
+const cliDispatchSnippet = `<span class="tk-cm"># cosmo dispatch — planned for v0.2.</span>
 <span class="tk-cm"># Will fire a single TASK from the shell and optionally wait for FINAL / ERROR.</span>
-<span class="tk-cm"># Not available in v0.2 — dispatch from Python instead:</span>
+<span class="tk-cm"># Not available in v0.1 — dispatch from Python instead:</span>
 
 <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(
     neuron<span class="tk-op">=</span><span class="tk-str">"answerer"</span>,
     input<span class="tk-op">=</span>{<span class="tk-str">"q"</span>: <span class="tk-str">"hi"</span>},
 )`;
 
-const cliRegistrySnippet = `<span class="tk-cm"># cosmo registry — planned for v0.3.</span>
+const cliRegistrySnippet = `<span class="tk-cm"># cosmo registry — planned for v0.2.</span>
 <span class="tk-cm"># Will inspect / query a RegistryStore (list, show, capabilities, prune)</span>
-<span class="tk-cm"># without writing Python. Not available in v0.2 — read the registry from</span>
+<span class="tk-cm"># without writing Python. Not available in v0.1 — read the registry from</span>
 <span class="tk-cm"># a Dendrite instead:</span>
 
 snapshot <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">registry_snapshot</span>(include_deregistered<span class="tk-op">=</span><span class="tk-kw">True</span>)
@@ -157,7 +195,7 @@ const exitCodesSnippet = `<span class="tk-cm"># cosmo commands use a small, conv
   2    Invalid usage / arguments          <span class="tk-cm"># bad flags (from Click)</span>
   130  Interrupted by Ctrl-C              <span class="tk-cm"># standard POSIX SIGINT</span>`;
 
-const configSnippet = `<span class="tk-cm"># v0.2 has no TOML config file yet — flags are passed explicitly.</span>
+const configSnippet = `<span class="tk-cm"># v0.1 has no TOML config file yet — flags are passed explicitly.</span>
 <span class="tk-cm"># The only environment variable the CLI reads today:</span>
 
   COSMONAPSE_STATE_DIR    <span class="tk-cm"># where 'cosmo synapse' keeps its run state.</span>
@@ -168,8 +206,47 @@ const configSnippet = `<span class="tk-cm"># v0.2 has no TOML config file yet �
 
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
 
-export default function CliDocs() {
+/** Prominent callout marking a command that does not exist in the current release. */
+function NotYetAvailable() {
   return (
+    <div
+      role="note"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.6rem",
+        margin: "0 0 1rem",
+        padding: "0.6rem 0.9rem",
+        borderRadius: "8px",
+        border: "1px solid rgba(251, 191, 36, 0.45)",
+        background: "rgba(251, 191, 36, 0.10)",
+        color: "#92400e",
+        fontSize: "0.85rem",
+        fontWeight: 600,
+      }}
+    >
+      <span
+        style={{
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+          fontSize: "0.7rem",
+          padding: "0.1rem 0.5rem",
+          borderRadius: "999px",
+          background: "rgba(251, 191, 36, 0.25)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Not yet available
+      </span>
+      <span style={{ fontWeight: 500 }}>
+        Planned for v0.2 — not installed by the current release.
+      </span>
+    </div>
+  );
+}
+
+export default function CliDocs({ section }: { section?: string }) {
+  const all = (
     <>
       <div className="docs-megasection">
         <div className="docs-megasection-label">cosmo CLI</div>
@@ -179,7 +256,7 @@ export default function CliDocs() {
         <p className="docs-megasection-sub">
           <code className="inline">cosmo</code> is the operator&rsquo;s entry point: boot a dev
           synapse, tail traffic, and validate envelopes. It is a Click application installed
-          alongside the Python SDK. Dispatch and registry subcommands are planned for v0.3.
+          alongside the Python SDK. Dispatch and registry subcommands are planned for v0.2.
         </p>
       </div>
 
@@ -188,13 +265,29 @@ export default function CliDocs() {
           <code className="inline">cosmo</code> is installed when you{" "}
           <code className="inline">pip install cosmonapse</code> — the CLI ships inside that single
           distribution (entry point <code className="inline">cosmo.main:cli</code>). Once installed,
-          the binary is on your <code className="inline">PATH</code>. In v0.2 it exposes three
-          commands.
+          the binary is on your <code className="inline">PATH</code>. In v0.1 it exposes{" "}
+          <code className="inline">init</code>, <code className="inline">synapse</code>,{" "}
+          <code className="inline">doppler</code>, <code className="inline">validate</code>, and{" "}
+          <code className="inline">completion</code>.
         </p>
         <CodeBlock html={cliRootSnippet} maxWidth={820} />
       </Section>
 
-      <Section id="cli-synapse" eyebrow="CLI · 02" title="cosmo synapse">
+      <Section id="cli-init" eyebrow="CLI · 02" title="cosmo init">
+        <p className="docs-p">
+          Scaffold a minimal, runnable project — a worker{" "}
+          <code className="inline">Dendrite</code> hosting an <code className="inline">Axon</code>, and
+          an orchestrator that dispatches one task and prints the result. Three files
+          (<code className="inline">worker.py</code>, <code className="inline">orchestrator.py</code>,{" "}
+          <code className="inline">README.md</code>) are written into{" "}
+          <code className="inline">./NAME</code>; pass <code className="inline">--namespace</code> to
+          choose the namespace and <code className="inline">--force</code> to write into a non-empty
+          directory.
+        </p>
+        <CodeBlock html={cliInitSnippet} maxWidth={820} />
+      </Section>
+
+      <Section id="cli-synapse" eyebrow="CLI · 03" title="cosmo synapse">
         <p className="docs-p">
           Boot the local dev synapse — a zero-dependency TCP + NDJSON broker — and stream every
           Signal that crosses it. The same subject-matching semantics as MemorySynapse and NATS, so
@@ -210,20 +303,21 @@ export default function CliDocs() {
         </p>
       </Section>
 
-      <Section id="cli-doppler" eyebrow="CLI · 03" title="cosmo doppler">
+      <Section id="cli-doppler" eyebrow="CLI · 04" title="cosmo doppler">
         <p className="docs-p">
           A Doppler is any process that subscribes to the channel as a passive, read-only consumer.{" "}
           <code className="inline">cosmo doppler</code> is the built-in one — it tails every envelope,
           applies filters, and renders to stdout (or a browser UI with{" "}
           <code className="inline">--ui</code>). Pass <code className="inline">--json</code> to emit
-          one JSON object per line for piping to <code className="inline">jq</code>. The{" "}
-          <code className="inline">--synapse</code> flag is required and carries the namespace as its
-          path segment.
+          one JSON object per line for piping to <code className="inline">jq</code>. Give it a{" "}
+          <code className="inline">--url</code> and a <code className="inline">--namespace</code> (the
+          same shape as <code className="inline">cosmo synapse</code>); the legacy{" "}
+          <code className="inline">--synapse=url/namespace</code> form is still accepted.
         </p>
         <CodeBlock html={cliDopplerSnippet} maxWidth={860} />
       </Section>
 
-      <Section id="cli-validate" eyebrow="CLI · 04" title="cosmo validate">
+      <Section id="cli-validate" eyebrow="CLI · 05" title="cosmo validate">
         <p className="docs-p">
           Validate Signal envelopes against the spec. Pass a JSON file as the positional argument, or
           pipe one in on stdin; add <code className="inline">--live</code> to validate signals as they
@@ -233,34 +327,49 @@ export default function CliDocs() {
         <CodeBlock html={cliValidateSnippet} maxWidth={820} />
       </Section>
 
-      <Section id="cli-dispatch" eyebrow="CLI · 05" title="cosmo dispatch — planned (v0.3)">
+      <Section id="cli-completion" eyebrow="CLI · 06" title="cosmo completion">
         <p className="docs-p">
-          A one-off TASK from the shell is on the roadmap for v0.3. Until then, dispatch from Python
-          with <code className="inline">dispatch_task()</code>.
+          Print a shell-completion script for <code className="inline">bash</code>,{" "}
+          <code className="inline">zsh</code>, or <code className="inline">fish</code>.{" "}
+          <code className="inline">eval</code> it to enable completion for the current shell, or
+          redirect it into your shell&rsquo;s completion directory to install it permanently.
+        </p>
+        <CodeBlock html={cliCompletionSnippet} maxWidth={820} />
+      </Section>
+
+      <Section id="cli-dispatch" eyebrow="CLI · 07" title="cosmo dispatch">
+        <NotYetAvailable />
+        <p className="docs-p">
+          A one-off TASK from the shell is on the roadmap for v0.2. It is{" "}
+          <strong>not a command in v0.1</strong> — running <code className="inline">cosmo dispatch</code>{" "}
+          today exits with &ldquo;no such command.&rdquo; Until it ships, dispatch from Python with{" "}
+          <code className="inline">dispatch_task()</code>.
         </p>
         <CodeBlock html={cliDispatchSnippet} maxWidth={820} />
       </Section>
 
-      <Section id="cli-registry" eyebrow="CLI · 06" title="cosmo registry — planned (v0.3)">
+      <Section id="cli-registry" eyebrow="CLI · 08" title="cosmo registry">
+        <NotYetAvailable />
         <p className="docs-p">
           A registry inspector (<code className="inline">list</code> / <code className="inline">show</code>{" "}
           / <code className="inline">capabilities</code> / <code className="inline">prune</code>) is
-          also planned for v0.3. For now, read the registry from a Dendrite that was given a{" "}
+          also planned for v0.2 and is <strong>not a command in v0.1</strong>. For now, read the
+          registry from a Dendrite that was given a{" "}
           <code className="inline">registry_store</code>.
         </p>
         <CodeBlock html={cliRegistrySnippet} maxWidth={820} />
       </Section>
 
-      <Section id="cli-config" eyebrow="CLI · 07" title="Configuration & environment">
+      <Section id="cli-config" eyebrow="CLI · 09" title="Configuration & environment">
         <p className="docs-p">
-          v0.2 keeps configuration explicit — every option is a command-line flag. There is no TOML
+          v0.1 keeps configuration explicit — every option is a command-line flag. There is no TOML
           config file yet (a layered config file is a future addition). The one environment variable
           the CLI honours today controls where the dev synapse stores its run state.
         </p>
         <CodeBlock filename="env" html={configSnippet} maxWidth={820} />
       </Section>
 
-      <Section id="cli-exit-codes" eyebrow="CLI · 08" title="Exit codes">
+      <Section id="cli-exit-codes" eyebrow="CLI · 10" title="Exit codes">
         <p className="docs-p">
           <code className="inline">cosmo</code> uses a small, conventional set of exit codes so CI
           scripts and shell pipelines stay predictable.
@@ -269,4 +378,5 @@ export default function CliDocs() {
       </Section>
     </>
   );
+  return pickSection(all, section);
 }

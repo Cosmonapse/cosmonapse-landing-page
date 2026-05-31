@@ -1,15 +1,24 @@
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
+import BuildOnCosmonapse from "@/components/BuildOnCosmonapse";
 
-const heroSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, connect_synapse
+const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
-<span class="tk-cm"># 1. Write a Neuron — a pure function, zero protocol knowledge.</span>
-<span class="tk-kw">async def</span> <span class="tk-fn">hello_neuron</span>(input, context):
-    <span class="tk-kw">return</span> {<span class="tk-str">"message"</span>: <span class="tk-fn">f</span><span class="tk-str">"Hello, {input['name']}!"</span>}
+const heroSnippet = `<span class="tk-kw">import</span> os
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, Neuron, connect_synapse
 
-<span class="tk-cm"># 2. Wrap it in an Axon — the agent-side tool.</span>
+<span class="tk-cm"># 1. A Neuron — backed by Hugging Face. Same shape as a plain async fn.</span>
+hello_neuron <span class="tk-op">=</span> Neuron(
+    source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
+    endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
+    model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
+    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>,
+)
+
+<span class="tk-cm"># 2. Wrap it in an Axon — the agent-side tool. Doesn't know it's an LLM.</span>
 axon <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"hello-neuron"</span>, neuron_fn<span class="tk-op">=</span>hello_neuron,
-           capabilities<span class="tk-op">=</span>[<span class="tk-str">"greet"</span>])
+           capabilities<span class="tk-op">=</span>[<span class="tk-str">"text-generation"</span>, <span class="tk-str">"chat"</span>])
 
 <span class="tk-cm"># 3. Attach to a Dendrite — the only thing that touches the Synapse.</span>
 synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
@@ -17,8 +26,10 @@ dendrite <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</spa
 dendrite.<span class="tk-fn">attach_axon</span>(axon)
 
 <span class="tk-kw">async with</span> dendrite:
-    <span class="tk-cm"># REGISTER → HEARTBEAT → route TASKs → DEREGISTER. Done.</span>
-    ...`;
+    <span class="tk-cm"># Registered and serving: REGISTER → HEARTBEAT → route inbound TASKs.</span>
+    <span class="tk-cm"># Dispatch one — the reply comes back as an AGENT_OUTPUT Signal.</span>
+    <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(
+        neuron<span class="tk-op">=</span><span class="tk-str">"hello-neuron"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: <span class="tk-str">"Say hello to Cosmonapse."</span>})`;
 
 type Status = "active" | "scoping" | "not-planned";
 
@@ -46,15 +57,6 @@ const products: {
   status: Status;
   concepts: string[];
   desc: string;
-  subProject?: {
-    name: string;
-    short: string;
-    tagline: string;
-    color: string;
-    status: Status;
-    concepts: string[];
-    desc: string;
-  };
 }[] = [
   {
     name: "Cosmonapse Core",
@@ -62,7 +64,7 @@ const products: {
     tagline: "Distributed cognition runtime",
     color: "var(--accent)",
     status: "active",
-    concepts: ["Brain", "Neuron", "Dendrite", "Synapse", "Signal"],
+    concepts: ["Brain", "Neuron", "Axon", "Dendrite", "Synapse", "Signal", "Pathway"],
     desc: "The open protocol and SDK. One envelope, one Synapse, replaceable Neurons. Everything else is built on top.",
   },
   {
@@ -70,27 +72,18 @@ const products: {
     short: "Engram",
     tagline: "Context, memory & persistence",
     color: "#a78bfa",
-    status: "scoping",
+    status: "active",
     concepts: ["Recall", "Echo", "Imprint"],
-    desc: "Semantic memory for agent systems — vector search over context, snapshot replay, and durable cross-Neuron state.",
+    desc: "Shared memory for agent systems. Recall and Imprint primitives ship in 0.1.0 with InMemory, SQLite, and Postgres backends. Vector search and snapshot replay (Echo) are next.",
   },
   {
     name: "Cosmonapse Doppler",
     short: "Doppler",
-    tagline: "Observability & telemetry",
+    tagline: "Observability, telemetry & cognition analytics",
     color: "#22d3ee",
     status: "active",
-    concepts: ["Pulse", "Prism"],
-    desc: "Live telemetry and visualization over the Signal stream. Reads the wave without disturbing the source.",
-    subProject: {
-      name: "Cosmonapse Resonance",
-      short: "Resonance",
-      tagline: "Cognition analytics",
-      color: "#818cf8",
-      status: "scoping",
-      concepts: ["Flux", "Field", "Topology", "Affinity", "Coherence"],
-      desc: "Cognition analytics built on the Doppler stream. Analyzes how Neurons influence each other, how Signals propagate through a Brain, and surfaces emergent patterns, collaboration efficiency, and cognitive synchronization.",
-    },
+    concepts: ["Pulse", "Prism", "Resonance"],
+    desc: "Live telemetry and visualization over the Signal stream, reading the wave without disturbing the source. Pulse streams metrics, Prism turns them into dashboards, and Resonance adds cognition analytics — how Neurons influence each other and how Signals propagate through a Brain.",
   },
   {
     name: "Cosmonapse Immune",
@@ -119,7 +112,7 @@ export default function HomePage() {
         <div className="container">
           <div className="badge">
             <span className="dot" />
-            v0.2 — Research preview
+            v0.1 — Research preview
           </div>
           <h1 className="hero-title">
             The nervous system
@@ -127,18 +120,32 @@ export default function HomePage() {
             for <span className="gradient-text">autonomous AI agents</span>.
           </h1>
           <p className="hero-lead">
-            Cosmonapse is a distributed cognition platform. Start with the open protocol — one
-            envelope, one Synapse, replaceable Neurons. Layer in memory, observability, security, and
-            managed infrastructure as you scale.
+            Cosmonapse is an open protocol and SDK for autonomous AI agents. Start with the Core today —
+            one envelope, one Synapse, replaceable Neurons, and a CLI that boots a local broker in
+            seconds. Memory, observability, security, and managed infrastructure are on the roadmap.
           </p>
           <div className="hero-ctas">
             <Link href="/quickstart" className="btn btn-primary">
-              Read the quickstart <span className="arrow">→</span>
+              Get started <span className="arrow">→</span>
             </Link>
+            <a href={GITHUB} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+              <span aria-hidden>★</span> Star on GitHub
+            </a>
             <Link href="/protocol" className="btn btn-ghost">
               View envelope spec
             </Link>
           </div>
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 12.5,
+              color: "var(--text-faint)",
+              letterSpacing: "0.04em",
+              marginBottom: 36,
+            }}
+          >
+            Open source · MIT licensed · Python + TypeScript SDK
+          </p>
 
           <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "left" }}>
             <CodeBlock filename="main.py" html={heroSnippet} variant="elevated" />
@@ -146,15 +153,18 @@ export default function HomePage() {
         </div>
       </header>
 
+      {/* Build on Cosmonapse — three transports, one program */}
+      <BuildOnCosmonapse />
+
       {/* Product line */}
       <section className="section">
         <div className="container">
           <div className="section-eyebrow">// Product line</div>
           <h2 className="section-title">Five layers. One nervous system.</h2>
           <p className="section-sub">
-            Cosmonapse Core ships today as an open protocol and SDK. Engram, Doppler, Immune, and
-            Cloud extend it — each a self-contained product with its own primitives, all speaking the
-            same Signal envelope.
+            Cosmonapse Core ships today as an open protocol and SDK, with Engram primitives
+            landed in 0.1.0. Doppler, Immune, and Cloud extend it — each a self-contained product
+            with its own primitives, all speaking the same Signal envelope.
           </p>
           <div
             style={{
@@ -273,107 +283,6 @@ export default function HomePage() {
                       </span>
                     ))}
                   </div>
-
-                  {p.subProject && (
-                    <div
-                      style={{
-                        marginTop: 20,
-                        paddingTop: 18,
-                        borderTop: `1px solid ${p.subProject.color}33`,
-                      }}
-                    >
-                      {/* Sub-project status + label row */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontFamily: "var(--font-mono)",
-                            color: p.subProject.color,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.1em",
-                          }}
-                        >
-                          {p.subProject.short}
-                        </span>
-                        <span
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 5,
-                            fontSize: 10,
-                            fontFamily: "var(--font-mono)",
-                            color: STATUS_COLOR[p.subProject.status],
-                            background: STATUS_COLOR[p.subProject.status] + "18",
-                            border: `1px solid ${STATUS_COLOR[p.subProject.status]}44`,
-                            padding: "2px 8px",
-                            borderRadius: 20,
-                            letterSpacing: "0.04em",
-                          }}
-                        >
-                          <span
-                            style={{
-                              width: 5,
-                              height: 5,
-                              borderRadius: "50%",
-                              background: STATUS_COLOR[p.subProject.status],
-                              display: "inline-block",
-                              flexShrink: 0,
-                            }}
-                          />
-                          {STATUS_LABEL[p.subProject.status]}
-                        </span>
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 15,
-                          fontWeight: 600,
-                          color: "var(--text)",
-                          marginBottom: 4,
-                        }}
-                      >
-                        {p.subProject.name}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          fontFamily: "var(--font-mono)",
-                          color: "var(--text-dim)",
-                          letterSpacing: "0.05em",
-                          marginBottom: 10,
-                        }}
-                      >
-                        {p.subProject.tagline}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: "var(--text-dim)",
-                          lineHeight: 1.6,
-                          marginBottom: 12,
-                        }}
-                      >
-                        {p.subProject.desc}
-                      </div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                        {p.subProject.concepts.map((c) => (
-                          <span
-                            key={c}
-                            style={{
-                              fontSize: 11,
-                              fontFamily: "var(--font-mono)",
-                              padding: "3px 9px",
-                              borderRadius: 5,
-                              background: p.subProject!.color + "12",
-                              border: `1px solid ${p.subProject!.color}33`,
-                              color: p.subProject!.color + "cc",
-                            }}
-                          >
-                            {c}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -464,22 +373,22 @@ export default function HomePage() {
             <div className="card">
               <h3>Memory is a product layer</h3>
               <p>
-                The Core protocol defines <code className="inline">MEMORY_APPEND</code> and{" "}
-                <code className="inline">CONTEXT_SYNC</code> signals. Cosmonapse Engram — Recall,
-                Echo, and Imprint — is the full implementation. Bring your own context layer, or let
-                Engram handle it.
+                The Core protocol defines <code className="inline">MEMORY_APPEND</code>,{" "}
+                <code className="inline">CONTEXT_SYNC</code>,{" "}
+                <code className="inline">RECALL</code>, and <code className="inline">IMPRINT</code>{" "}
+                signals. Cosmonapse Engram ships the Recall and Imprint primitives in 0.1.0 with
+                InMemory, SQLite, and Postgres backends; Echo (snapshot replay) is next. Bring
+                your own context layer, or let Engram handle it.
               </p>
             </div>
             <div className="card">
               <h3>Observability & cognition analytics</h3>
               <p>
-                Doppler is a non-competing read-only tap on the Synapse. Pulse streams live
-                telemetry — latency, throughput, cost per Neuron. Prism turns it into dashboards and
-                traces. Resonance builds on the Doppler stream to go deeper — mapping how Neurons
-                influence each other (Field), tracking Signal propagation (Flux), detecting emergent
-                Brain patterns (Topology), scoring collaboration efficiency (Affinity), and measuring
-                cognitive synchronization (Coherence). If Doppler is observability, Resonance is
-                cognition analytics.
+                Doppler is a non-competing read-only tap on the Synapse, with three features. Pulse
+                streams live telemetry — latency, throughput, cost per Neuron. Prism turns it into
+                dashboards and traces. Resonance is the cognition-analytics layer — mapping how Neurons
+                influence each other, tracking Signal propagation, detecting emergent Brain patterns,
+                and scoring collaboration efficiency across the same stream.
               </p>
             </div>
             <div className="card">
@@ -500,12 +409,13 @@ export default function HomePage() {
           <div className="cta-card">
             <h2>Build the substrate for agent swarms.</h2>
             <p>
-              Cosmonapse Core is in research preview — the protocol is drafted, the SDK is taking
-              shape, and the first five minutes work today. Engram and Doppler are next.
+              Cosmonapse Core 0.1.0 is in research preview — the protocol is drafted, the SDK
+              ships with Engram, Pathway, capability-routed dispatch, and competitive bidding.
+              Doppler is next.
             </p>
             <div className="hero-ctas" style={{ marginBottom: 0 }}>
               <Link href="/quickstart" className="btn btn-primary">
-                Try the quickstart <span className="arrow">→</span>
+                Get started <span className="arrow">→</span>
               </Link>
               <Link href="/concepts" className="btn btn-ghost">
                 Explore the product line

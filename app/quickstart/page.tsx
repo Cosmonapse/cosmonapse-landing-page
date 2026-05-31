@@ -41,11 +41,17 @@ const axonDendriteSnippet = `<span class="tk-kw">import</span> asyncio
     <span class="tk-cm"># 2. Connect to the Synapse.</span>
     synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
 
-    <span class="tk-cm"># 3. Build a Dendrite and attach the Axon.</span>
-    dendrite <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>)
-    dendrite.<span class="tk-fn">attach_axon</span>(axon)
+    <span class="tk-cm"># 3. Build a worker Dendrite and attach the Axon.</span>
+    <span class="tk-cm">#    role="worker" — workers host Axons and reply to TASKs, but</span>
+    <span class="tk-cm">#    cannot dispatch new ones (the role guard sits on emit()).</span>
+    worker <span class="tk-op">=</span> Dendrite(
+        synapse<span class="tk-op">=</span>synapse,
+        namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>,
+        role<span class="tk-op">=</span><span class="tk-str">"worker"</span>,
+    )
+    worker.<span class="tk-fn">attach_axon</span>(axon)
 
-    <span class="tk-kw">async with</span> dendrite:
+    <span class="tk-kw">async with</span> worker:
         <span class="tk-kw">await</span> asyncio.<span class="tk-fn">sleep</span>(<span class="tk-fn">float</span>(<span class="tk-str">"inf"</span>))  <span class="tk-cm"># run until cancelled</span>
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
@@ -73,6 +79,9 @@ orch: Dendrite <span class="tk-op">=</span> <span class="tk-kw">None</span>
 
     <span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>()
 
+<span class="tk-cm"># NEW: orch.dispatch_and_wait(...) is now the preferred RPC shape.</span>
+<span class="tk-cm"># The Future/dict pattern above predates Pathway; new code should just do:</span>
+<span class="tk-cm">#   sig = await orch.dispatch_and_wait(neuron="hello-neuron", input=..., timeout_s=5)</span>
 asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(<span class="tk-fn">setup</span>(), loop).<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">10</span>)
 
 app <span class="tk-op">=</span> <span class="tk-fn">Flask</span>(__name__)
@@ -92,14 +101,14 @@ app <span class="tk-op">=</span> <span class="tk-fn">Flask</span>(__name__)
 
 app.<span class="tk-fn">run</span>(port<span class="tk-op">=</span><span class="tk-num">5000</span>)`;
 
-const dopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>synapse<span class="tk-op">=</span>cosmo://127.0.0.1:7070/quickstart
+const dopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart
 
 <span class="tk-cm">  REGISTER      neuron=hello-neuron  capabilities=['greet']</span>
 <span class="tk-cm">  TASK          trace=trc_…  neuron=hello-neuron</span>
 <span class="tk-cm">  AGENT_OUTPUT  trace=trc_…  neuron=hello-neuron  → {message: Hello, Cosmonapse!}</span>
 
 <span class="tk-cm"># filter to specific types</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>synapse<span class="tk-op">=</span>cosmo://127.0.0.1:7070/quickstart <span class="tk-op">--</span>type TASK <span class="tk-op">--</span>type AGENT_OUTPUT`;
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart <span class="tk-op">--</span>type TASK <span class="tk-op">--</span>type AGENT_OUTPUT`;
 
 const testSnippet = `<span class="tk-op">$</span> curl <span class="tk-op">-s</span> <span class="tk-op">-X</span> POST http://localhost:5000/task <span class="tk-op">\\</span>
        <span class="tk-op">-H</span> <span class="tk-str">"Content-Type: application/json"</span> <span class="tk-op">\\</span>
@@ -136,8 +145,9 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">02 · Start a Synapse</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON broker and
-            streams every Signal that crosses it to stdout — no Docker, no NATS, no Postgres. The{" "}
+            <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON broker —
+            no Docker, no NATS, no Postgres. To watch Signals crossing the bus, attach{" "}
+            <code className="inline">cosmo doppler</code> in another terminal (Step 06). The{" "}
             <code className="inline">--namespace</code> flag scopes all Signals so multiple projects can
             share the same server.
           </p>
@@ -236,7 +246,7 @@ export default function QuickstartPage() {
             <Link href="/roadmap" className="card">
               <div className="card-icon">→</div>
               <h3>Roadmap</h3>
-              <p>v0.2 manual SDK · v0.3 Axon-as-MCP · v0.4 declarative router · v0.5 router agent.</p>
+              <p>v0.1 manual SDK · v0.2 Axon-as-MCP · v0.3 declarative router · v0.4 router agent.</p>
             </Link>
           </div>
         </div>

@@ -64,12 +64,17 @@ const productLine: {
       {
         name: "Dendrite",
         map: "Synapse-side connector",
-        desc: "The only component that touches the Synapse. Hosts Axons, emits REGISTER / HEARTBEAT / DEREGISTER per attached Axon, routes inbound TASKs, and exposes orchestration primitives.",
+        desc: "The only component that touches the Synapse. Hosts Axons, owns routing decisions, exposes the aggregate of its Axons' capabilities, and emits REGISTER / HEARTBEAT / DEREGISTER per attached Axon. Has a role: orchestrator (can dispatch TASKs) or worker (hosts Axons only). Workers are guarded — they can serve TASKs and bid in capability routing, but can't emit orchestration signals.",
+      },
+      {
+        name: "Pathway",
+        map: "Per-trace event handle",
+        desc: "Returned by dendrite.dispatch(...). A single primitive with three consumption shapes: await pw.wait() for sequential request/reply, @pw.on(SignalType.X) for reactive trace-scoped callbacks, and async for sig in pw: for streaming. Pathway(scope=\"terminal\") filters to FINAL / ERROR / CLARIFICATION only — the decentralised pattern where the Cortex only wakes for events that need attention. observe_pathway(trace_id) opens one in observer role to watch a trace another peer started.",
       },
       {
         name: "Synapse",
         map: "Channel / stream",
-        desc: "The transport layer all Signals cross. Pluggable: MemorySynapse for tests, DevSynapse for local multi-process dev, NatsSynapse or KafkaSynapse for production.",
+        desc: "The transport layer all Signals cross. Pluggable: MemorySynapse for tests, DevSynapse for local multi-process dev, NatsSynapse or KafkaSynapse for production. Capability-routed TASKs publish on cosmonapse.<ns>.TASK.routed with queue groups so the broker delivers each one exactly once within a matching cap profile.",
       },
       {
         name: "Signal",
@@ -82,22 +87,22 @@ const productLine: {
     product: "Cosmonapse Engram",
     tagline: "Context, memory & persistence",
     color: "#a78bfa",
-    status: "scoping",
+    status: "active",
     concepts: [
       {
         name: "Recall",
-        map: "Semantic context search",
-        desc: "Vector-backed retrieval over stored Engrams. Lets any Neuron query for the most relevant context from shared memory before processing a task.",
-      },
-      {
-        name: "Echo",
-        map: "Replay & snapshots",
-        desc: "Records and replays Signal streams and Engram states. Enables time-travel debugging, snapshot diffing, and deterministic re-runs of any workflow.",
+        map: "Read path · RECALL signal",
+        desc: "Reads bound memory before a Neuron acts. The Axon emits a RECALL signal; the Engram replies with RECALLED carrying Hits. EngramClient.recall() is the in-Neuron API. Ships in 0.1.0 with InMemory, SQLite, and Postgres backends. Vector-backed semantic search is on the Echo roadmap.",
       },
       {
         name: "Imprint",
-        map: "Persistent writes",
-        desc: "The write path for durable Engram state. Handles MEMORY_APPEND operations, conflict resolution, and cross-Neuron context propagation.",
+        map: "Write path · IMPRINT signal",
+        desc: "Durable writes to bound memory. The Axon emits an IMPRINT signal; the Engram replies with IMPRINTED carrying a receipt. EngramClient.imprint() is the in-Neuron API. Operations: add, append, merge, upsert, delete. Ships in 0.1.0.",
+      },
+      {
+        name: "Echo",
+        map: "Replay & snapshots (next)",
+        desc: "Records and replays Signal streams and Engram states. Time-travel debugging, snapshot diffing, deterministic re-runs of any workflow. Planned for a follow-up release.",
       },
     ],
   },

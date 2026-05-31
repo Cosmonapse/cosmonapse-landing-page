@@ -1,4 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
+import mark from "@/app/assets/mark.png";
+
+const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
 export default function Footer() {
   return (
@@ -7,12 +11,12 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-brand">
             <Link href="/" className="logo">
-              <span className="logo-mark" aria-hidden />
+              <Image src={mark} alt="" width={24} height={24} className="logo-mark-img" />
               Cosmonapse
             </Link>
             <p>
               Distributed cognition protocol for autonomous AI agents. One envelope. One channel. Replaceable
-              neurons.
+              neurons. Open source under the MIT license.
             </p>
           </div>
           <div className="footer-col">
@@ -24,9 +28,6 @@ export default function Footer() {
               <li>
                 <Link href="/concepts">Terminology</Link>
               </li>
-              <li>
-                <Link href="/decisions">Decisions</Link>
-              </li>
             </ul>
           </div>
           <div className="footer-col">
@@ -36,13 +37,15 @@ export default function Footer() {
                 <Link href="/quickstart">Quickstart</Link>
               </li>
               <li>
-                <Link href="/docs">SDK &amp; CLI docs</Link>
+                <Link href="/docs">Docs</Link>
               </li>
               <li>
                 <Link href="/roadmap">Roadmap</Link>
               </li>
               <li>
-                <a href="#">GitHub</a>
+                <a href={GITHUB} target="_blank" rel="noopener noreferrer">
+                  GitHub
+                </a>
               </li>
             </ul>
           </div>
@@ -50,13 +53,42 @@ export default function Footer() {
             <h5>Project</h5>
             <ul>
               <li>
-                <a href="#">Status</a>
+                <a href={`${GITHUB}/releases`} target="_blank" rel="noopener noreferrer">
+                  Changelog
+                </a>
               </li>
               <li>
-                <a href="#">Changelog</a>
+                <a href={`${GITHUB}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer">
+                  License — MIT
+                </a>
               </li>
               <li>
-                <a href="mailto:aqibkhan026@gmail.com">Contact</a>
+                <a href="mailto:dev@cosmonapse.com">Contact</a>
+              </li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h5>Community</h5>
+            <ul>
+              <li>
+                <a href="https://discord.gg/PGU5PFy3" target="_blank" rel="noopener noreferrer">
+                  Discord
+                </a>
+              </li>
+              <li>
+                <a href="https://x.com/Cosmonapse" target="_blank" rel="noopener noreferrer">
+                  X / Twitter
+                </a>
+              </li>
+              <li>
+                <a href="https://www.reddit.com/r/cosmonapse/" target="_blank" rel="noopener noreferrer">
+                  Reddit
+                </a>
+              </li>
+              <li>
+                <a href={`${GITHUB}/discussions`} target="_blank" rel="noopener noreferrer">
+                  Discussions
+                </a>
               </li>
             </ul>
           </div>

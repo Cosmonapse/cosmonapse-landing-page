@@ -107,6 +107,13 @@ a { color: inherit; text-decoration: none; }
   border-radius: 3px;
   background: var(--bg);
 }
+.logo-mark-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px var(--glow));
+  flex-shrink: 0;
+}
 .nav-links {
   display: flex;
   gap: 32px;
@@ -133,6 +140,178 @@ a { color: inherit; text-decoration: none; }
   transition: all 0.15s;
 }
 .nav-cta:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.18); }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.nav-star:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.04); }
+.nav-star svg { display: block; flex-shrink: 0; }
+
+/* Docs dropdown */
+.nav-dropdown { position: relative; }
+.nav-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-dim);
+  font-size: 14px;
+  transition: color 0.15s;
+}
+.nav-dropdown-trigger:hover,
+.nav-dropdown-trigger.active { color: var(--text); }
+.nav-caret { transition: transform 0.18s ease; opacity: 0.7; }
+.nav-dropdown:hover .nav-caret { transform: rotate(180deg); }
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  min-width: 188px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(13, 15, 21, 0.96);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  z-index: 200;
+}
+/* Hover bridge so the menu doesn't close in the gap */
+.nav-dropdown::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(8px);
+}
+.nav-dropdown-menu a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+.nav-dropdown-menu a:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+.nav-dropdown-menu a.active { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+
+/* Cross-page reference switcher in the docs sidebar */
+.docs-pagenav { list-style: none; padding: 0; margin: 0; }
+.docs-pagenav li { margin-bottom: 4px; }
+.docs-pagenav a {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+  border: 1px solid transparent;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.docs-pagenav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
+.docs-pagenav a.docs-pagenav-active {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-strong);
+}
+
+/* Accordion reference rail */
+.docs-refnav-list { list-style: none; padding: 0; margin: 6px 0 0; }
+.docs-refnav-item { margin-bottom: 2px; }
+.docs-refnav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border-radius: 7px;
+  padding-right: 4px;
+  transition: background 0.12s;
+}
+.docs-refnav-head:hover { background: rgba(255, 255, 255, 0.04); }
+.docs-refnav-head.active { background: rgba(255, 255, 255, 0.05); }
+.docs-refnav-link {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  transition: color 0.12s;
+}
+.docs-refnav-head:hover .docs-refnav-link,
+.docs-refnav-head.active .docs-refnav-link { color: var(--text); }
+.docs-refnav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.docs-refnav-toggle:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+.docs-refnav-toggle svg { transition: transform 0.18s ease; }
+.docs-refnav-toggle.open svg { transform: rotate(180deg); }
+.docs-refnav-sub {
+  list-style: none;
+  margin: 2px 0 6px;
+  padding: 2px 0 2px 12px;
+  border-left: 1px solid var(--border);
+  margin-left: 10px;
+}
+.docs-refnav-sub li { margin-bottom: 1px; }
+.docs-refnav-sub a {
+  display: block;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+  transition: background 0.12s, color 0.12s;
+}
+.docs-refnav-sub a:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
+.docs-refnav-sub a.docs-refnav-current {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 500;
+}
+
+/* Inline accent links inside docs prose */
+.inline-link {
+  color: var(--accent-2, #8b9bff);
+  border-bottom: 1px solid rgba(139, 155, 255, 0.35);
+  transition: border-color 0.12s, color 0.12s;
+}
+.inline-link:hover { color: var(--text); border-bottom-color: var(--text); }
+
 @media (max-width: 760px) {
   .nav-links { display: none; }
 }
@@ -794,8 +973,8 @@ code.inline {
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr;
+  gap: 32px;
   margin-bottom: 32px;
 }
 .footer-brand p {
@@ -833,6 +1012,10 @@ code.inline {
   color: var(--text-faint);
   font-size: 12.5px;
   font-family: var(--font-mono);
+}
+@media (max-width: 1024px) {
+  .footer-grid { grid-template-columns: 1.6fr 1fr 1fr; gap: 28px; }
+  .footer-brand { grid-column: span 3; }
 }
 @media (max-width: 720px) {
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }

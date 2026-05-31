@@ -1,6 +1,17 @@
+import React from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 import { Section, ApiCard, type TocGroup } from "./shared";
+
+/** Render a single <Section> by id, or the whole reference when no id is given. */
+function pickSection(all: React.ReactElement, section?: string) {
+  if (!section) return all;
+  const children = (all.props as { children?: React.ReactNode }).children;
+  const match = React.Children.toArray(children).find(
+    (k) => React.isValidElement(k) && (k.props as { id?: string }).id === section,
+  );
+  return <>{match ?? all}</>;
+}
 
 export const typescriptToc: TocGroup = {
   title: "TypeScript SDK",
@@ -300,8 +311,8 @@ const errorsSnippet = `<span class="tk-kw">import</span> { DendriteProtocolError
 
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
 
-export default function TypeScriptDocs() {
-  return (
+export default function TypeScriptDocs({ section }: { section?: string }) {
+  const all = (
     <>
       <div className="docs-megasection">
         <div className="docs-megasection-label">TypeScript SDK</div>
@@ -312,7 +323,7 @@ export default function TypeScriptDocs() {
           <code className="inline">@cosmonapse/sdk</code> is the 1:1 TypeScript port of the Python
           envelope protocol and runtime. The shapes are identical on the wire — only the surface is
           idiomatic: <code className="inline">camelCase</code> names, options-object constructors, and
-          classes you instantiate with <code className="inline">new</code>. This is a v0.2 port; see{" "}
+          classes you instantiate with <code className="inline">new</code>. This is a v0.1 port; see{" "}
           <Link href="#ts-parity">Parity with Python</Link> for what isn&rsquo;t carried over yet.
         </p>
       </div>
@@ -589,7 +600,7 @@ export default function TypeScriptDocs() {
           The envelope, signal builders, <code className="inline">MemorySynapse</code>,{" "}
           <code className="inline">NatsSynapse</code>, the in-memory registry, Neuron, Axon, and
           Dendrite are all ported and functional. A few Python features are intentionally not in this
-          v0.2 port yet:
+          v0.1 port yet:
         </p>
         <table className="spec-table">
           <thead>
@@ -610,4 +621,5 @@ export default function TypeScriptDocs() {
       </Section>
     </>
   );
+  return pickSection(all, section);
 }

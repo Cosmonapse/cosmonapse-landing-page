@@ -1,6 +1,17 @@
+import React from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 import { Section, ApiCard, type TocGroup } from "./shared";
+
+/** Render a single <Section> by id, or the whole reference when no id is given. */
+function pickSection(all: React.ReactElement, section?: string) {
+  if (!section) return all;
+  const children = (all.props as { children?: React.ReactNode }).children;
+  const match = React.Children.toArray(children).find(
+    (k) => React.isValidElement(k) && (k.props as { id?: string }).id === section,
+  );
+  return <>{match ?? all}</>;
+}
 
 export const pythonToc: TocGroup = {
   title: "Python SDK",
@@ -10,6 +21,8 @@ export const pythonToc: TocGroup = {
     { href: "#neuron", label: "Neuron — sources" },
     { href: "#axon", label: "Axon" },
     { href: "#dendrite", label: "Dendrite" },
+    { href: "#pathway", label: "Pathway" },
+    { href: "#engram", label: "Engram (shared memory)" },
     { href: "#cortex", label: "Cortex (alias)" },
     { href: "#lifecycle", label: "Lifecycle hooks" },
     { href: "#synapse", label: "Synapse" },
@@ -25,13 +38,14 @@ export const pythonToc: TocGroup = {
 const installSnippet = `<span class="tk-cm"># Python 3.11 or newer required.</span>
 <span class="tk-op">$</span> pip install cosmonapse
 
-<span class="tk-cm"># Optional extra (declared in pyproject):</span>
-<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[nats]"</span>   <span class="tk-cm"># NatsSynapse (pulls in nats-py)</span>
+<span class="tk-cm"># Optional extras (declared in pyproject):</span>
+<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[nats]"</span>      <span class="tk-cm"># NatsSynapse (nats-py)</span>
+<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[kafka]"</span>     <span class="tk-cm"># KafkaSynapse (aiokafka)</span>
+<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[postgres]"</span>  <span class="tk-cm"># PostgresRegistryStore + PostgresEngram (asyncpg)</span>
+<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[flask]"</span>     <span class="tk-cm"># Flask / WSGI Neuron factory</span>
 
-<span class="tk-cm"># The Kafka and Postgres backends ship in the package, but their</span>
-<span class="tk-cm"># drivers are not declared extras yet — install them yourself:</span>
-<span class="tk-op">$</span> pip install aiokafka      <span class="tk-cm"># KafkaSynapse</span>
-<span class="tk-op">$</span> pip install asyncpg       <span class="tk-cm"># PostgresRegistryStore</span>
+<span class="tk-cm"># Provider-backed Neurons (Ollama / HuggingFace) need httpx:</span>
+<span class="tk-op">$</span> pip install httpx
 
 <span class="tk-cm"># From source (editable). The cosmo CLI ships inside this one package.</span>
 <span class="tk-op">$</span> pip install <span class="tk-op">-e</span> cosmonapse-core/packages/python-sdk`;
@@ -58,6 +72,23 @@ const topImportSnippet = `<span class="tk-kw">from</span> cosmonapse <span class
     PostgresRegistryStore,
     NeuronRecord,
 
+    <span class="tk-cm"># Pathway — per-trace event handle</span>
+    Pathway,
+    PathwayClosedError,
+    PATHWAY_TYPES,
+
+    <span class="tk-cm"># Engram — shared memory (RECALL / IMPRINT)</span>
+    Engram,
+    EngramBinding,
+    EngramClient,
+    InMemoryEngram,
+    SqliteEngram,
+    PostgresEngram,
+    Hit,
+    RecallResult,
+    ImprintReceipt,
+    new_engram_id,
+
     <span class="tk-cm"># Envelope + helpers</span>
     Signal,
     SignalType,
@@ -66,9 +97,14 @@ const topImportSnippet = `<span class="tk-kw">from</span> cosmonapse <span class
     new_trace_id,
     new_event_id,
 
-    <span class="tk-cm"># The only SDK-raised exception</span>
+    <span class="tk-cm"># SDK-raised exceptions</span>
     DendriteProtocolError,
     CortexProtocolError,          <span class="tk-cm"># alias of the above</span>
+    EngramError,
+    EngramTimeout,
+    EngramCancelled,
+    EngramNotBound,
+    EngramOverloaded,
 )`;
 
 const neuronSourceSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Neuron
@@ -144,7 +180,15 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
         dendrite_id:     str  <span class="tk-op">=</span> <span class="tk-str">"dendrite"</span>,
         heartbeat_s:             float <span class="tk-op">=</span> <span class="tk-num">30.0</span>,
         reregister_on_heartbeat: bool  <span class="tk-op">=</span> <span class="tk-kw">True</span>,
+        role:            str   <span class="tk-op">=</span> <span class="tk-str">"orchestrator"</span>,  <span class="tk-cm"># or "worker"</span>
     ) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+
+    <span class="tk-cm"># Aggregate of every attached Axon's capabilities (sorted, deduped).</span>
+    <span class="tk-op">@</span>property
+    <span class="tk-kw">def</span> <span class="tk-fn">capabilities</span>(self) <span class="tk-op">-></span> list[str]: ...
+
+    <span class="tk-op">@</span>property
+    <span class="tk-kw">def</span> <span class="tk-fn">role</span>(self) <span class="tk-op">-></span> str: ...           <span class="tk-cm"># "orchestrator" | "worker"</span>
 
     <span class="tk-cm"># No Dendrite.connect() — build the synapse yourself, then pass it in:</span>
     <span class="tk-cm">#   synapse = await connect_synapse("cosmo://127.0.0.1:7070")</span>
@@ -158,22 +202,79 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
     <span class="tk-kw">async def</span> __aenter__(self) <span class="tk-op">-></span> <span class="tk-str">"Dendrite"</span>: ...
     <span class="tk-kw">async def</span> __aexit__(self, <span class="tk-op">*</span>exc) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
 
-    <span class="tk-cm"># ── Orchestration primitives ────────────────────────────────</span>
+    <span class="tk-cm"># ── Dispatch (orchestrator-role only) ───────────────────────</span>
+    <span class="tk-cm"># Addressed (neuron=) or capability-routed (capabilities=); at least one required.</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">dispatch_task</span>(
         self, *,
-        neuron:      str,
-        input:       dict,
-        trace_id:    str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
-        parent_id:   str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
-        context_ref: str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        neuron:       str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        input:        dict,
+        trace_id:     str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        parent_id:    str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        context_ref:  str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
         capabilities: list[str] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
-        meta:        dict <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        meta:         dict <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+    ) <span class="tk-op">-></span> Signal: ...        <span class="tk-cm"># fire-and-forget; returns the emitted TASK</span>
+
+    <span class="tk-cm"># Returns a Pathway scoped to the trace. scope="all" or "terminal".</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">dispatch</span>(
+        self, *,
+        neuron:       str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        input:        dict,
+        capabilities: list[str] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        scope:        str  <span class="tk-op">=</span> <span class="tk-str">"all"</span>,
+        <span class="tk-cm"># ... trace_id, parent_id, context_ref, meta as above ...</span>
+    ) <span class="tk-op">-></span> Pathway: ...
+
+    <span class="tk-cm"># Sugar: dispatch, block until terminal Signal, close, return Signal.</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">dispatch_and_wait</span>(
+        self, *, neuron<span class="tk-op">=</span><span class="tk-kw">None</span>, input, capabilities<span class="tk-op">=</span><span class="tk-kw">None</span>,
+        timeout_s: float <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-num">30.0</span>, scope<span class="tk-op">=</span><span class="tk-str">"all"</span>, <span class="tk-op">**</span>kw,
     ) <span class="tk-op">-></span> Signal: ...
 
+    <span class="tk-cm"># Sugar: dispatch, return the live Pathway (caller wires @pw.on(...)).</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">dispatch_and_subscribe</span>(
+        self, *, neuron<span class="tk-op">=</span><span class="tk-kw">None</span>, input, capabilities<span class="tk-op">=</span><span class="tk-kw">None</span>, scope<span class="tk-op">=</span><span class="tk-str">"all"</span>, <span class="tk-op">**</span>kw,
+    ) <span class="tk-op">-></span> Pathway: ...
+
+    <span class="tk-cm"># Competitive bidding via TASK_OFFER / BID / TASK_AWARDED.</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">dispatch_offer</span>(
+        self, *,
+        input:        dict,
+        capabilities: list[str] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        deadline_ms:  int  <span class="tk-op">=</span> <span class="tk-num">250</span>,
+        select:       str  <span class="tk-op">=</span> <span class="tk-str">"first_bid"</span>,  <span class="tk-cm"># lowest_cost | highest_confidence</span>
+        scope:        str  <span class="tk-op">=</span> <span class="tk-str">"all"</span>,
+        <span class="tk-op">**</span>kw,
+    ) <span class="tk-op">-></span> Pathway: ...
+
+    <span class="tk-cm"># Watch a trace another peer started (no TASK emitted).</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">observe_pathway</span>(self, trace_id: str) <span class="tk-op">-></span> Pathway: ...
+
+    <span class="tk-cm"># Worker side: react to TASK_OFFER + emit a BID (bypasses role guard).</span>
+    <span class="tk-kw">def</span>       <span class="tk-fn">on_task_offer</span>(self, fn<span class="tk-op">=</span><span class="tk-kw">None</span>, *, capability<span class="tk-op">=</span><span class="tk-kw">None</span>, trace_id<span class="tk-op">=</span><span class="tk-kw">None</span>): ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">bid</span>(
+        self, offer: Signal, *,
+        neuron: str, cost: float,
+        eta_ms: int <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        confidence: float <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+    ) <span class="tk-op">-></span> Signal: ...
+
+    <span class="tk-cm"># ── Cognition emitters (orchestrator-role; funnel through emit()) ──</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_final</span>(self, *, trace_id, parent_id, result, meta<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> Signal: ...
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_error</span>(self, *, trace_id, parent_id, code, message, recoverable<span class="tk-op">=</span><span class="tk-kw">False</span>, meta<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_plan</span>(self, *, trace_id, parent_id, steps, rationale<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_thought_delta</span>(self, *, trace_id, parent_id, delta, seq<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_tool_call</span>(self, *, trace_id, parent_id, tool, args, call_id<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_tool_result</span>(self, *, trace_id, parent_id, tool, result<span class="tk-op">=</span><span class="tk-kw">None</span>, error<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_memory_append</span>(self, *, trace_id, parent_id, key, value, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_critique</span>(self, *, trace_id, parent_id, target_event_id, issues, verdict, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_escalation</span>(self, *, trace_id, parent_id, reason, target<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_consensus</span>(self, *, trace_id, parent_id, members, verdict, votes<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_context_sync</span>(self, *, trace_id, parent_id, snapshot, version<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+
     <span class="tk-kw">async def</span> <span class="tk-fn">emit</span>(self, signal: Signal) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
-    <span class="tk-cm"># emit() raises DendriteProtocolError for any type not in SYNAPSE_TYPES.</span>
+    <span class="tk-cm"># emit() enforces role guard (workers raise DendriteProtocolError) and</span>
+    <span class="tk-cm"># type guard (only SYNAPSE_TYPES accepted). bid() uses _publish to bypass.</span>
 
     <span class="tk-cm"># ── Inbound handler decorators ──────────────────────────────</span>
     <span class="tk-op">@</span>dendrite.on_agent_output
@@ -219,6 +320,60 @@ const dendriteUseSnippet = `<span class="tk-kw">import</span> asyncio
     <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>()
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
+
+const pathwayClassSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Pathway</span>:
+    <span class="tk-cm"># A per-trace event handle. Open via dendrite.dispatch(...) or</span>
+    <span class="tk-cm"># dendrite.observe_pathway(trace_id). Three consumption shapes on</span>
+    <span class="tk-cm"># the same primitive - pick whichever fits the workflow.</span>
+
+    <span class="tk-op">@</span>property
+    <span class="tk-kw">def</span> <span class="tk-fn">trace_id</span>(self) <span class="tk-op">-></span> str: ...
+    <span class="tk-op">@</span>property
+    <span class="tk-kw">def</span> <span class="tk-fn">role</span>(self) <span class="tk-op">-></span> str: ...        <span class="tk-cm"># "originator" | "observer"</span>
+    <span class="tk-op">@</span>property
+    <span class="tk-kw">def</span> <span class="tk-fn">scope</span>(self) <span class="tk-op">-></span> str: ...       <span class="tk-cm"># "all" | "terminal"</span>
+    <span class="tk-op">@</span>property
+    <span class="tk-kw">def</span> <span class="tk-fn">closed</span>(self) <span class="tk-op">-></span> bool: ...
+
+    <span class="tk-cm"># Shape 1 - sequential / request-reply</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">wait</span>(self, timeout_s: float <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">wait_for</span>(self, signal_type: SignalType, timeout_s<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> Signal: ...
+
+    <span class="tk-cm"># Shape 2 - reactive callbacks (trace-scoped)</span>
+    <span class="tk-kw">def</span> <span class="tk-fn">on</span>(self, signal_type: SignalType): ...    <span class="tk-cm"># decorator</span>
+
+    <span class="tk-cm"># Shape 3 - async iteration</span>
+    <span class="tk-kw">def</span> __aiter__(self) <span class="tk-op">-></span> <span class="tk-str">"Pathway"</span>: ...
+    <span class="tk-kw">async def</span> __anext__(self) <span class="tk-op">-></span> Signal: ...
+
+    <span class="tk-cm"># Lifecycle - auto-closes on FINAL / ERROR; close() is idempotent.</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">close</span>(self) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+    <span class="tk-kw">async def</span> __aenter__(self) <span class="tk-op">-></span> <span class="tk-str">"Pathway"</span>: ...
+    <span class="tk-kw">async def</span> __aexit__(self, <span class="tk-op">*</span>exc) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...`;
+
+const pathwayUseSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, SignalType, connect_synapse
+
+<span class="tk-kw">async def</span> <span class="tk-fn">main</span>():
+    synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
+    orch <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"prod"</span>)
+
+    <span class="tk-kw">async with</span> orch:
+        <span class="tk-cm"># Shape 1 - sequential</span>
+        sig <span class="tk-op">=</span> <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatch_and_wait</span>(
+            capabilities<span class="tk-op">=</span>[<span class="tk-str">"summarize"</span>], input<span class="tk-op">=</span>{<span class="tk-str">"text"</span>: <span class="tk-str">"..."</span>}, timeout_s<span class="tk-op">=</span><span class="tk-num">5.0</span>,
+        )
+
+        <span class="tk-cm"># Shape 2 - reactive</span>
+        pw <span class="tk-op">=</span> <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatch_and_subscribe</span>(
+            capabilities<span class="tk-op">=</span>[<span class="tk-str">"plan"</span>], input<span class="tk-op">=</span>{<span class="tk-str">"goal"</span>: <span class="tk-str">"..."</span>},
+        )
+        <span class="tk-op">@</span>pw.<span class="tk-fn">on</span>(SignalType.PLAN)
+        <span class="tk-kw">async def</span> <span class="tk-fn">on_plan</span>(s): <span class="tk-fn">print</span>(s.payload[<span class="tk-str">"steps"</span>])
+
+        <span class="tk-cm"># Shape 3 - streaming</span>
+        <span class="tk-kw">async with</span> <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatch</span>(neuron<span class="tk-op">=</span><span class="tk-str">"agent"</span>, input<span class="tk-op">=</span>{}) <span class="tk-kw">as</span> pw:
+            <span class="tk-kw">async for</span> s <span class="tk-kw">in</span> pw:
+                <span class="tk-kw">if</span> s.type <span class="tk-kw">is</span> SignalType.AGENT_OUTPUT: <span class="tk-kw">break</span>`;
 
 const lifecycleSnippet = `<span class="tk-cm"># 1. Announce on connect</span>
 <span class="tk-op">@</span>dendrite.<span class="tk-fn">on_connect</span>
@@ -383,8 +538,8 @@ CortexProtocolError <span class="tk-op">=</span> DendriteProtocolError   <span c
 
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
 
-export default function PythonDocs() {
-  return (
+export default function PythonDocs({ section }: { section?: string }) {
+  const all = (
     <>
       <div className="docs-megasection">
         <div className="docs-megasection-label">Python SDK</div>
@@ -650,8 +805,80 @@ export default function PythonDocs() {
         <CodeBlock filename="worker.py" html={dendriteUseSnippet} maxWidth={880} />
       </Section>
 
+      {/* ─── Pathway ─── */}
+      <Section id="pathway" eyebrow="SDK · 06" title="Pathway — per-trace event handle">
+        <p className="docs-p">
+          A <strong>Pathway</strong> is the client-side observation surface for one logical workflow,
+          identified by its <code className="inline">trace_id</code>. It supports{" "}
+          <strong>three consumption shapes on the same primitive</strong>, so the developer picks the
+          shape that fits the workflow rather than the SDK forcing a style.
+        </p>
+        <table className="spec-table">
+          <thead>
+            <tr><th>Shape</th><th>When to use</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code className="inline">await pw.wait()</code></td>
+              <td>Sequential request/reply. Blocks until the first AGENT_OUTPUT / CLARIFICATION / ERROR / FINAL.</td>
+            </tr>
+            <tr>
+              <td><code className="inline">@pw.on(SignalType.X)</code></td>
+              <td>Reactive trace-scoped callbacks. Useful for streams like THOUGHT_DELTA or PLAN/TOOL_CALL.</td>
+            </tr>
+            <tr>
+              <td><code className="inline">async for sig in pw:</code></td>
+              <td>Streaming iteration over every Signal on the trace until close.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="docs-p" style={{ marginTop: 24 }}>
+          <strong>Scope filter.</strong>{" "}
+          <code className="inline">Pathway(scope=&quot;all&quot;)</code> (default, centralised pattern)
+          delivers every PATHWAY_TYPES Signal on the trace.{" "}
+          <code className="inline">scope=&quot;terminal&quot;</code> (decentralised pattern) delivers
+          only FINAL / ERROR / CLARIFICATION — intermediate orchestration is handled peer-to-peer by
+          other Dendrites and the Cortex only wakes for events that need attention. FINAL and ERROR
+          always reach auto-close regardless of scope.
+        </p>
+        <p className="docs-p">
+          <strong>Originator vs observer.</strong>{" "}
+          <code className="inline">dendrite.dispatch(...)</code> returns a Pathway in{" "}
+          <em>originator</em> role.{" "}
+          <code className="inline">dendrite.observe_pathway(trace_id)</code> opens one in{" "}
+          <em>observer</em> role — watch a trace another peer started, without emitting a TASK.
+        </p>
+        <CodeBlock filename="pathway.pyi" html={pathwayClassSnippet} maxWidth={880} />
+        <h3 className="docs-h3">Example</h3>
+        <CodeBlock filename="three_shapes.py" html={pathwayUseSnippet} maxWidth={880} />
+      </Section>
+
+      {/* ─── Engram pointer ─── */}
+      <Section id="engram" eyebrow="SDK · 06b" title="Engram — shared memory">
+        <p className="docs-p">
+          The Engram subsystem (the <code className="inline">cosmonapse.engram</code> package:{" "}
+          <code className="inline">Engram</code>, <code className="inline">EngramBinding</code>,{" "}
+          <code className="inline">EngramClient</code>, and the{" "}
+          <code className="inline">InMemoryEngram</code> /{" "}
+          <code className="inline">SqliteEngram</code> /{" "}
+          <code className="inline">PostgresEngram</code> backends) is large enough to warrant its own
+          reference. It covers how a Neuron addresses memory through{" "}
+          <code className="inline">recall(...)</code> and <code className="inline">imprint(...)</code>,
+          how Engrams are mounted on a Dendrite with{" "}
+          <code className="inline">attach_engram(...)</code>, the{" "}
+          <code className="inline">RECALL</code> / <code className="inline">IMPRINT</code> signals on
+          the wire, and the full backend API.
+        </p>
+        <p className="docs-p">
+          Read it on the dedicated page:{" "}
+          <Link href="/docs/engram" className="inline-link">
+            Engram reference →
+          </Link>
+        </p>
+      </Section>
+
       {/* ─── Cortex alias ─── */}
-      <Section id="cortex" eyebrow="SDK · 06" title="Cortex — back-compat alias">
+      <Section id="cortex" eyebrow="SDK · 07" title="Cortex — back-compat alias">
         <p className="docs-p">
           <code className="inline">cosmonapse.Cortex</code> is an alias of{" "}
           <code className="inline">cosmonapse.Dendrite</code>, and{" "}
@@ -842,7 +1069,7 @@ export default function PythonDocs() {
         <CodeBlock html={helpersSnippet} maxWidth={760} />
       </Section>
 
-      {/* ─── Errors ─── */}
+      {/* ─── Errors (protocol exceptions) ─── */}
       <Section id="errors" eyebrow="SDK · 12" title="Protocol errors">
         <p className="docs-p">
           The SDK is deliberately thin on bespoke exceptions. The only custom type is{" "}
@@ -865,10 +1092,11 @@ export default function PythonDocs() {
             <tr><td>CortexProtocolError</td><td>Alias of the above, for v0.1-era code.</td></tr>
             <tr><td>pydantic.ValidationError</td><td>A Signal is constructed or decoded with malformed fields.</td></tr>
             <tr><td>ValueError</td><td>An envelope id lacks its evt_ / trc_ prefix, or <code className="inline">synapse_from_url</code> gets an unknown scheme.</td></tr>
-            <tr><td>TypeError</td><td>A Dendrite is built without a <code className="inline">synapse</code>.</td></tr>
+            <tr><td>TypeError</td><td>A Dendrite is built without a <code className="inline">synapse</code>, or a required argument is missing.</td></tr>
           </tbody>
         </table>
       </Section>
     </>
   );
+  return pickSection(all, section);
 }

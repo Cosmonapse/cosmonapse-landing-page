@@ -1,12 +1,7 @@
-import type { Metadata } from "next";
-import DocsClient from "./DocsClient";
-
-export const metadata: Metadata = {
-  title: "Documentation — Cosmonapse Python, TypeScript & CLI Reference",
-  description:
-    "Complete reference for the Cosmonapse Python SDK, the @cosmonapse/sdk TypeScript SDK, and the cosmo command-line interface. Classes, methods, signatures, flags, exit codes, and worked examples.",
-};
+import { redirect } from "next/navigation";
 
 export default function DocsPage() {
-  return <DocsClient />;
+  // Docs are split per-surface (Python / TypeScript / Engram / CLI), each its
+  // own page. Land on the Python SDK reference by default.
+  redirect("/docs/python");
 }

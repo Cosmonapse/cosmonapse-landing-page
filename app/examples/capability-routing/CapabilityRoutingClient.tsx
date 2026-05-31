@@ -522,6 +522,42 @@ export default function CapabilityRoutingClient() {
             no hard-coded address lists. The same code runs over five language ×
             transport stacks — pick one below.
           </p>
+
+          <div
+            style={{
+              marginTop: 28,
+              padding: "18px 22px",
+              borderRadius: 10,
+              border: "1px solid rgba(34, 211, 238, 0.28)",
+              background: "rgba(34, 211, 238, 0.06)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontFamily: "var(--font-mono, ui-monospace, monospace)",
+                color: "var(--accent-2)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
+              New · Once-only routing at the transport layer
+            </div>
+            <p style={{ margin: 0, color: "var(--text-dim)", lineHeight: 1.65 }}>
+              The SDK now supports capability dispatch{" "}
+              <strong>without an explicit RegistryStore lookup</strong>:{" "}
+              <code className="inline">await orch.dispatch(capabilities=[&quot;summarize&quot;], input=...)</code>{" "}
+              publishes on a separate subject{" "}
+              <code className="inline">cosmonapse.&lt;ns&gt;.TASK.routed</code> with a
+              queue group keyed on each Dendrite&rsquo;s aggregate capabilities. The
+              broker delivers each TASK <strong>exactly once</strong> within a matching
+              cap profile — no router-side discovery code needed. Use the
+              RegistryStore-based pattern below when you need richer selection (preferred
+              version, locality, cost) or use <Link href="/examples/bidding" className="inline-link">bidding</Link>{" "}
+              for atomic claim across heterogeneous workers.
+            </p>
+          </div>
         </div>
       </header>
 

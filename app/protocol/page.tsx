@@ -235,10 +235,15 @@ export default function ProtocolPage() {
             <div className="layer highlight">
               <div className="layer-name">Dendrite — synapse-side connector + orchestration</div>
               <div className="layer-desc">
-                The only component that touches the Synapse. Hosts Axons; emits REGISTER / HEARTBEAT /
-                DEREGISTER; routes inbound TASKs; exposes all orchestration primitives (dispatch_task,
-                emit_final, on_agent_output, …). Every Dendrite can orchestrate — there is no separate
-                Cortex class.
+                The only component that touches the Synapse. Hosts Axons; owns routing decisions; exposes
+                the aggregate of its Axons&rsquo; capabilities; emits REGISTER / HEARTBEAT / DEREGISTER;
+                routes inbound TASKs (addressed by neuron_id or by capabilities); opens Pathways. A
+                Dendrite has a <code className="inline">role</code>: <code className="inline">&quot;orchestrator&quot;</code>{" "}
+                (full dispatch / emit surface) or <code className="inline">&quot;worker&quot;</code>{" "}
+                (hosts Axons and bids in capability routing, but cannot emit TASK or any cognition signal).
+                The role guard sits on <code className="inline">emit()</code> itself — every cognition
+                emitter funnels through it. Every orchestrator-role Dendrite can drive workflows; there is
+                no separate Cortex class.
               </div>
             </div>
             <div className="layer-arrow">↕</div>
@@ -307,6 +312,50 @@ export default function ProtocolPage() {
               </tr>
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* ── Transport routing ── */}
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">Subjects &amp; delivery</div>
+          <h2 className="sub-title">Two TASK subjects. Two delivery modes.</h2>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, lineHeight: 1.65 }}>
+            The protocol exposes two transport-level routing modes for TASKs. The mode is chosen at
+            dispatch time; both ride the same envelope.
+          </p>
+          <table className="spec-table">
+            <thead>
+              <tr>
+                <th>Mode</th>
+                <th>Subject</th>
+                <th>Delivery</th>
+                <th>Selected when</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Addressed</td>
+                <td><code className="inline">cosmonapse.&lt;ns&gt;.TASK</code></td>
+                <td>Broadcast (every Dendrite subscribes, only the named host acts)</td>
+                <td>TASK carries a <code className="inline">neuron</code> field</td>
+              </tr>
+              <tr>
+                <td>Capability-routed</td>
+                <td><code className="inline">cosmonapse.&lt;ns&gt;.TASK.routed</code></td>
+                <td>Queue group <code className="inline">caps:&lt;sorted-aggregate&gt;</code> — broker delivers exactly once per matching cap profile</td>
+                <td>TASK omits <code className="inline">neuron</code> and sets <code className="inline">payload.capabilities</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, lineHeight: 1.65, marginTop: 24 }}>
+            The split exists because a single queue group on a shared subject would break addressed
+            routing (the broker could deliver an addressed TASK to a Dendrite that doesn&rsquo;t host
+            the target Axon, which would silently drop it). With two subjects, addressed broadcast
+            and capability load-balancing coexist cleanly. Heterogeneous deployments — Dendrites with
+            different but overlapping cap profiles — still get at-least-once across profiles; for
+            atomic claim use TASK_OFFER / BID / TASK_AWARDED instead.
+          </p>
         </div>
       </section>
 
@@ -418,37 +467,18 @@ export default function ProtocolPage() {
         </div>
       </section>
 
-      {/* ── ENGRAM message types ── */}
+      {/* ── COORDINATION & MEMORY (Core) message types ── */}
       <section className="section-sm">
         <div className="container">
-          <ProductTag label="Cosmonapse Engram" color="#a78bfa" status="Scoping" statusColor="#fbbf24" />
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Memory &amp; Coordination</div>
-          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 16 }}>
-            The protocol-level surface for Cosmonapse Engram — Recall, Echo, and Imprint. These signals
-            are defined in the Core envelope spec so any Dendrite can emit them; the full Engram product
-            provides the storage, retrieval, and replay implementation. The Neuron never writes to the
-            context fabric directly.
+          <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Coordination &amp; Memory</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
+            Optional signals the orchestrating Dendrite emits to coordinate across peers and to flag
+            in-trace memory writes. Workers consume them but never emit them.
           </p>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: 12,
-              color: "#a78bfa",
-              background: "#a78bfa14",
-              border: "1px solid #a78bfa36",
-              padding: "6px 14px",
-              borderRadius: 8,
-              marginBottom: 32,
-              fontFamily: "var(--font-mono)",
-            }}
-          >
-            Engram primitives → Recall · Echo · Imprint
-          </div>
           <div className="msg-grid">
             <Msg name="MEMORY_APPEND" by="Dendrite">
-              Appends an entry to the bound Engram (context). Processed by Imprint. Payload:{" "}
+              Appends an entry to the bound Engram. Processed by Imprint. Payload:{" "}
               <code className="inline">{`{ entry, embed? }`}</code>
             </Msg>
             <Msg name="CONTEXT_SYNC" by="Dendrite">
@@ -472,6 +502,67 @@ export default function ProtocolPage() {
               The Axon recognises a clarification signal in the agent&rsquo;s raw output and emits this
               directly. The Dendrite never has to inspect AGENT_OUTPUT for it. Payload:{" "}
               <code className="inline">{`{ questions, context? }`}</code>
+            </Msg>
+            <Msg name="DISCOVER" by="Dendrite">
+              Capability discovery probe. Peers that match respond on the discovery subject; the originator
+              aggregates them into a registry snapshot.
+            </Msg>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ENGRAM message types ── */}
+      <section className="section-sm">
+        <div className="container">
+          <ProductTag label="Cosmonapse Engram" color="#a78bfa" status="Active Development" statusColor="#4ade80" />
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Engram (shared memory)</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 16 }}>
+            The Engram surface is request/reply: an Axon asks for context with{" "}
+            <code className="inline">RECALL</code> or commits a write with{" "}
+            <code className="inline">IMPRINT</code>, and the bound backend replies with{" "}
+            <code className="inline">RECALLED</code> or <code className="inline">IMPRINTED</code>.
+            Identifiers use the <code className="inline">eng_</code> ULID prefix. The Neuron never
+            writes to the memory fabric directly — <code className="inline">EngramClient</code> is the
+            in-Neuron API.
+          </p>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: 12,
+              color: "#a78bfa",
+              background: "#a78bfa14",
+              border: "1px solid #a78bfa36",
+              padding: "6px 14px",
+              borderRadius: 8,
+              marginBottom: 32,
+              fontFamily: "var(--font-mono)",
+            }}
+          >
+            Engram primitives → Recall · Imprint &nbsp;|&nbsp; Echo (next)
+          </div>
+          <div className="msg-grid">
+            <Msg name="RECALL" by="Axon (via EngramClient)">
+              Asks the bound Engram to return relevant context for a Neuron. Payload:{" "}
+              <code className="inline">{`{ engram_id, query, mode?, k?, deadline_ms? }`}</code>
+              {" "}where <code className="inline">mode</code> is{" "}
+              <code className="inline">first | merge | all</code>.
+            </Msg>
+            <Msg name="RECALLED" by="Engram backend">
+              Reply to a RECALL, parent_id pointing at the original request. Payload:{" "}
+              <code className="inline">{`{ hits, partial? }`}</code> where each Hit carries{" "}
+              <code className="inline">{`{ id, content, score?, tags? }`}</code>.
+            </Msg>
+            <Msg name="IMPRINT" by="Axon (via EngramClient)">
+              Commits a write to the bound Engram. Payload:{" "}
+              <code className="inline">{`{ engram_id, op, entry, deadline_ms? }`}</code>
+              {" "}where <code className="inline">op</code> is{" "}
+              <code className="inline">add | append | merge | upsert | delete</code>.
+            </Msg>
+            <Msg name="IMPRINTED" by="Engram backend">
+              Reply to an IMPRINT. Payload:{" "}
+              <code className="inline">{`{ id, ok, error? }`}</code>.
             </Msg>
           </div>
         </div>
