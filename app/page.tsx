@@ -147,9 +147,9 @@ export default function HomePage() {
             Open source · MIT licensed · Python + TypeScript SDK
           </p>
 
-          <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "left" }}>
+          {/* <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "left" }}>
             <CodeBlock filename="main.py" html={heroSnippet} variant="elevated" />
-          </div>
+          </div> */}
         </div>
       </header>
 

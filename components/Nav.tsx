@@ -16,7 +16,6 @@ const links = [
 const docsLinks = [
   { href: "/docs/python", label: "Python SDK" },
   { href: "/docs/typescript", label: "TypeScript SDK" },
-  { href: "/docs/python/engram", label: "Engram" },
   { href: "/docs/cli", label: "cosmo CLI" },
 ];
 

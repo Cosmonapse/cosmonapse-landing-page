@@ -127,7 +127,7 @@ export default function ProtocolPage() {
               Signal types by product →
             </span>
             {[
-              { label: "Core", color: "var(--accent)", desc: "Lifecycle · Routing · Cognition · Agent management" },
+              { label: "Core", color: "var(--accent)", desc: "Lifecycle · Cognition · Agent management" },
               { label: "Engram", color: "#a78bfa", desc: "Memory · Context" },
               { label: "Doppler", color: "#22d3ee", desc: "Observability surface" },
               { label: "Immune", color: "#f87171", desc: "Identity · Security (planned)" },
@@ -386,16 +386,6 @@ export default function ProtocolPage() {
               Task failure — agent exception, timeout, no-capable-agent, budget exceeded. First terminal event
               wins. Payload: <code className="inline">{`{ kind, message, retriable? }`}</code>
             </Msg>
-          </div>
-
-          <div style={{ marginTop: 56 }}>
-            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
-          </div>
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Routing</div>
-          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
-            All produced and consumed by the orchestrating Dendrite. The Axon and Neuron never see these.
-          </p>
-          <div className="msg-grid">
             <Msg name="TASK_OFFER" by="Dendrite">
               Broadcast to candidates capable of handling an intent. Agents respond with BID or stay silent.
               Payload: includes <code className="inline">required_caps</code>,{" "}
@@ -439,6 +429,27 @@ export default function ProtocolPage() {
               Tool response, parent_id pointing to the corresponding TOOL_CALL. Payload:{" "}
               <code className="inline">{`{ call_id, ok, value?, error? }`}</code>
             </Msg>
+            <Msg name="ESCALATION" by="Dendrite">
+              Agent cannot complete and is requesting re-dispatch to a more capable agent. Caller is excluded
+              from the new candidate set. Payload: <code className="inline">{`{ reason, hints? }`}</code>
+            </Msg>
+            <Msg name="CONSENSUS" by="Dendrite">
+              Publishes the outcome of a multi-agent vote. Payload:{" "}
+              <code className="inline">{`{ proposal_id, outcome, votes, threshold? }`}</code>
+            </Msg>
+            <Msg name="CRITIQUE" by="Dendrite">
+              A review of another envelope&rsquo;s output, pinned via target_event_id. Payload:{" "}
+              <code className="inline">{`{ target_event_id, severity, note }`}</code>
+            </Msg>
+            <Msg name="CLARIFICATION" by="Dendrite (Axon data)">
+              The Axon recognises a clarification signal in the agent&rsquo;s raw output and emits this
+              directly. The Dendrite never has to inspect AGENT_OUTPUT for it. Payload:{" "}
+              <code className="inline">{`{ questions, context? }`}</code>
+            </Msg>
+            <Msg name="DISCOVER" by="Dendrite">
+              Capability discovery probe. Peers that match respond on the discovery subject; the originator
+              aggregates them into a registry snapshot.
+            </Msg>
           </div>
 
           <div style={{ marginTop: 56 }}>
@@ -462,50 +473,6 @@ export default function ProtocolPage() {
             <Msg name="HEARTBEAT" by="Dendrite (Axon data)">
               Periodic liveness. Missing N (default 3) consecutive heartbeats = treated as dead. Payload:{" "}
               <code className="inline">{`{ status, load?, in_flight? }`}</code>
-            </Msg>
-          </div>
-        </div>
-      </section>
-
-      {/* ── COORDINATION & MEMORY (Core) message types ── */}
-      <section className="section-sm">
-        <div className="container">
-          <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Coordination &amp; Memory</div>
-          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
-            Optional signals the orchestrating Dendrite emits to coordinate across peers and to flag
-            in-trace memory writes. Workers consume them but never emit them.
-          </p>
-          <div className="msg-grid">
-            <Msg name="MEMORY_APPEND" by="Dendrite">
-              Appends an entry to the bound Engram. Processed by Imprint. Payload:{" "}
-              <code className="inline">{`{ entry, embed? }`}</code>
-            </Msg>
-            <Msg name="CONTEXT_SYNC" by="Dendrite">
-              Updates the active context reference — replace or merge. Watchers (Doppler, Recall) track
-              which Engram is live in a trace. Payload:{" "}
-              <code className="inline">{`{ ref, mode }`}</code>
-            </Msg>
-            <Msg name="ESCALATION" by="Dendrite">
-              Agent cannot complete and is requesting re-dispatch to a more capable agent. Caller is excluded
-              from the new candidate set. Payload: <code className="inline">{`{ reason, hints? }`}</code>
-            </Msg>
-            <Msg name="CONSENSUS" by="Dendrite">
-              Publishes the outcome of a multi-agent vote. Payload:{" "}
-              <code className="inline">{`{ proposal_id, outcome, votes, threshold? }`}</code>
-            </Msg>
-            <Msg name="CRITIQUE" by="Dendrite">
-              A review of another envelope&rsquo;s output, pinned via target_event_id. Payload:{" "}
-              <code className="inline">{`{ target_event_id, severity, note }`}</code>
-            </Msg>
-            <Msg name="CLARIFICATION" by="Dendrite (Axon data)">
-              The Axon recognises a clarification signal in the agent&rsquo;s raw output and emits this
-              directly. The Dendrite never has to inspect AGENT_OUTPUT for it. Payload:{" "}
-              <code className="inline">{`{ questions, context? }`}</code>
-            </Msg>
-            <Msg name="DISCOVER" by="Dendrite">
-              Capability discovery probe. Peers that match respond on the discovery subject; the originator
-              aggregates them into a registry snapshot.
             </Msg>
           </div>
         </div>
