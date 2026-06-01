@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import mark from "@/app/assets/mark.png";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
@@ -27,6 +28,21 @@ const trailingLinks = [
 export default function Nav() {
   const pathname = usePathname();
   const docsActive = pathname?.startsWith("/docs");
+  const [open, setOpen] = useState(false);
+
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll while the mobile menu is open.
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   return (
     <nav className="nav">
       <div className="container nav-inner">
@@ -94,7 +110,54 @@ export default function Nav() {
             Get started
             <span className="arrow">→</span>
           </Link>
+          <button
+            type="button"
+            className={`nav-toggle${open ? " open" : ""}`}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
+      </div>
+
+      {/* Mobile menu */}
+      <div className={`nav-mobile${open ? " open" : ""}`}>
+        <ul className="nav-mobile-links">
+          {links.map((l) => (
+            <li key={l.href}>
+              <Link href={l.href} className={pathname?.startsWith(l.href) ? "active" : ""}>
+                {l.label}
+              </Link>
+            </li>
+          ))}
+          <li className="nav-mobile-group-label">Docs</li>
+          {docsLinks.map((d) => (
+            <li key={d.href}>
+              <Link
+                href={d.href}
+                className={`nav-mobile-sub${pathname?.startsWith(d.href) ? " active" : ""}`}
+              >
+                {d.label}
+              </Link>
+            </li>
+          ))}
+          {trailingLinks.map((l) => (
+            <li key={l.href}>
+              <Link href={l.href} className={pathname?.startsWith(l.href) ? "active" : ""}>
+                {l.label}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <a href={GITHUB} target="_blank" rel="noopener noreferrer">
+              GitHub ↗
+            </a>
+          </li>
+        </ul>
       </div>
     </nav>
   );
