@@ -222,7 +222,7 @@ final = <span class="tk-kw">await</span> pw.wait_for(SignalType.FINAL, timeout_s
   {
     number: 6,
     title: "Neuron factory — wrap anything real-world",
-    surface: "Neuron(source=...) · ollama · huggingface · flask · mcp",
+    surface: "Neuron(source=...) · huggingface · ollama · flask · mcp",
     tier: "core",
     note: (
       <>
@@ -236,13 +236,16 @@ final = <span class="tk-kw">await</span> pw.wait_for(SignalType.FINAL, timeout_s
       {
         html: `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Neuron
 
-<span class="tk-cm"># Local Ollama daemon</span>
+<span class="tk-cm"># HuggingFace Inference Providers router (set HF_TOKEN)</span>
 Axon(neuron_id=<span class="tk-str">"chat"</span>,
-     neuron_fn=Neuron(source=<span class="tk-str">"ollama"</span>, model=<span class="tk-str">"llama3"</span>))
+     neuron_fn=Neuron(source=<span class="tk-str">"huggingface"</span>,
+                      endpoint=<span class="tk-str">"https://router.huggingface.co"</span>,
+                      model=<span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+                      api_key=os.environ[<span class="tk-str">"HF_TOKEN"</span>], use_chat_api=True))
 
-<span class="tk-cm"># HuggingFace TGI / vLLM / LM Studio</span>
+<span class="tk-cm"># Same Axon, local model — just swap the source to Ollama</span>
 Axon(neuron_id=<span class="tk-str">"summarise"</span>,
-     neuron_fn=Neuron(source=<span class="tk-str">"huggingface"</span>, endpoint=<span class="tk-str">"http://localhost:8080"</span>))
+     neuron_fn=Neuron(source=<span class="tk-str">"ollama"</span>, model=<span class="tk-str">"llama3"</span>))
 
 <span class="tk-cm"># Existing Flask app — becomes a Neuron with zero rewrites</span>
 Axon(neuron_id=<span class="tk-str">"legacy-api"</span>,

@@ -479,8 +479,9 @@ function extendBody(combo: Combo): React.ReactNode {
       </p>
       <p>
         <strong>Mix in LLMs.</strong> Add a third worker with{" "}
-        <code className="inline">Neuron(source=&quot;ollama&quot;)</code> — the Cortex
-        dispatches to it the same way. Route by{" "}
+        <code className="inline">Neuron(source=&quot;huggingface&quot;, model=&quot;meta-llama/Llama-3.1-8B-Instruct&quot;)</code>{" "}
+        — or swap <code className="inline">source=&quot;ollama&quot;</code> for a local
+        model. The Cortex dispatches to it the same way. Route by{" "}
         <code className="inline">capabilities</code> to pick the right kind of
         Neuron per task.
       </p>
@@ -562,8 +563,8 @@ export default function RealWorldNeuronsClient() {
               <div className="card-icon">→</div>
               <h3>Neuron sources</h3>
               <p>
-                The full source reference — ollama, flask/wsgi, mcp, and the TS
-                expressNeuron / mcpNeuron factories.
+                The full source reference — huggingface, ollama, flask/wsgi,
+                mcp, and the TS expressNeuron / mcpNeuron factories.
               </p>
             </Link>
             <Link href="/concepts" className="card">

@@ -111,6 +111,9 @@ export function brokerStep(combo: Combo): Step | null {
           <>
             One bus, one namespace. The CLI also streams every Signal that
             crosses it to stdout, so the synapse terminal doubles as a Doppler.
+            For a live view, open <strong>Prism</strong> in a second terminal
+            right after the Synapse is up — every Signal animates across the bus
+            in your browser as the workers below come online.
           </>
         ),
         maxWidth: 760,
@@ -119,7 +122,10 @@ export function brokerStep(combo: Combo): Step | null {
 <span class="tk-cm">  URL:        cosmo://127.0.0.1:7070</span>
 <span class="tk-cm">  Namespace:  quickstart</span>
 <span class="tk-cm">  Transport:  TCP + NDJSON  (single-host dev only)</span>
-<span class="tk-cm">  ────────────────────────────────────────────────</span>`,
+<span class="tk-cm">  ────────────────────────────────────────────────</span>
+
+<span class="tk-cm"># terminal 2 — live browser visualization (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart`,
       };
     case "py-nats":
     case "ts-nats":
