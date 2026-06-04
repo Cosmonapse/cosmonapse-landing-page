@@ -319,8 +319,8 @@ export default function CliDocs({ section }: { section?: string }) {
         <p className="docs-p">
           A Doppler is any process that subscribes to the channel as a passive, read-only consumer.{" "}
           <code className="inline">cosmo doppler</code> is the built-in one — it tails every envelope,
-          applies filters, and renders to stdout (or the Prism browser UI with{" "}
-          <code className="inline">--prism</code>, documented below). Pass <code className="inline">--json</code> to emit
+          applies filters, and renders to stdout (or a browser UI with{" "}
+          <code className="inline">--ui</code>). Pass <code className="inline">--json</code> to emit
           one JSON object per line for piping to <code className="inline">jq</code>. Give it a{" "}
           <code className="inline">--url</code> and a <code className="inline">--namespace</code> (the
           same shape as <code className="inline">cosmo synapse</code>); the legacy{" "}
@@ -390,20 +390,4 @@ export default function CliDocs({ section }: { section?: string }) {
         <p className="docs-p">
           v0.1 keeps configuration explicit — every option is a command-line flag. There is no TOML
           config file yet (a layered config file is a future addition). The one environment variable
-          the CLI honours today controls where the dev synapse stores its run state.
-        </p>
-        <CodeBlock html={configSnippet} maxWidth={820} />
-      </Section>
-
-      <Section id="cli-exit-codes" eyebrow="CLI · 10" title="Exit codes">
-        <p className="docs-p">
-          <code className="inline">cosmo</code> uses a small, conventional set of exit codes so CI
-          scripts and shell pipelines stay predictable.
-        </p>
-        <CodeBlock html={exitCodesSnippet} maxWidth={760} />
-      </Section>
-    </>
-  );
-
-  return pickSection(all, section);
-}
+          the CLI honours today controls where the dev synapse

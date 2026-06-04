@@ -58,7 +58,6 @@ export const DOC_REFS: DocRef[] = [
       { slug: "init", id: "cli-init", label: "cosmo init" },
       { slug: "synapse", id: "cli-synapse", label: "cosmo synapse" },
       { slug: "doppler", id: "cli-doppler", label: "cosmo doppler" },
-      { slug: "prism", id: "cli-prism", label: "cosmo doppler --prism" },
       { slug: "validate", id: "cli-validate", label: "cosmo validate" },
       { slug: "completion", id: "cli-completion", label: "cosmo completion" },
       { slug: "dispatch", id: "cli-dispatch", label: "cosmo dispatch (planned)" },

@@ -394,6 +394,48 @@ a { color: inherit; text-decoration: none; }
   .container { padding: 0 18px; }
 }
 
+/* ─────────  Overflow containment: code blocks & tables  ───────── */
+/* Code cards never exceed their column; the <pre> scrolls internally. */
+.code-card,
+.code-card-flat {
+  max-width: 100%;
+  min-width: 0;
+}
+/* Grid/flex children must be allowed to shrink, otherwise a wide <pre>
+   or <table> stretches the column and forces page-level overflow. */
+.boc-code,
+.boc-grid > *,
+.grid-2 > *,
+.grid-3 > *,
+.grid-4 > *,
+.docs-content,
+.docs-content > * {
+  min-width: 0;
+}
+
+/* Tables scroll within their own box instead of stretching the page.
+   Wrap any table in <div class="table-scroll"> for the cleanest result. */
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 720px) {
+  .spec-table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  pre.codeblock {
+    font-size: 12px;
+    padding: 18px 16px;
+  }
+}
+
 /* Page header (sub-pages) */
 .page-header {
   padding: 80px 0 40px;

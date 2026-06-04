@@ -390,7 +390,7 @@ export default function CliDocs({ section }: { section?: string }) {
         <p className="docs-p">
           v0.1 keeps configuration explicit — every option is a command-line flag. There is no TOML
           config file yet (a layered config file is a future addition). The one environment variable
-          the CLI honours today controls where the dev synapse stores its run state.
+          the CLI honours today controls where the dev synapse          stores its run state.
         </p>
         <CodeBlock html={configSnippet} maxWidth={820} />
       </Section>
