@@ -360,3 +360,34 @@ export default function ExamplesPage() {
           letter-spacing: 0.08em;
           text-transform: uppercase;
           margin-bottom: 6px;
+        }
+        .ex-cat-cta-title {
+          font-size: 19px;
+          font-weight: 600;
+          color: var(--text);
+          margin: 0 0 8px;
+          letter-spacing: -0.01em;
+        }
+        .ex-cat-cta-desc {
+          font-size: 13px;
+          color: var(--text-dim);
+          line-height: 1.6;
+          margin: 0;
+          max-width: 60ch;
+        }
+        .ex-cat-cta-arrow {
+          font-size: 22px;
+          color: var(--accent-2);
+          flex-shrink: 0;
+        }
+        @media (max-width: 560px) {
+          .ex-cat-cta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
