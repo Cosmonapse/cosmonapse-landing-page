@@ -783,4 +783,12 @@ export default function ConceptsPage() {
           </table>
           <p className="prose" style={{ marginTop: 24, fontSize: 13, color: "var(--text-faint)" }}>
             Note: <strong>Cortex</strong> is kept as a back-compat alias for Dendrite. New code
-            should use Dendrite directly. <strong>Axon</strong> (the agent-side t
+            should use Dendrite directly. <strong>Axon</strong> (the agent-side tool that wraps a
+            Neuron) remains part of the Core runtime but is an implementation detail  -  applications
+            interact with Dendrites and Neurons directly.
+          </p>
+        </div>
+      </section>
+    </>
+  );
+}

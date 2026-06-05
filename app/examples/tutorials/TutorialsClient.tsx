@@ -871,4 +871,16 @@ export default function TutorialsClient() {
 
         @media (max-width: 720px) {
           .ex-tut-head {
-            grid-template-c
+            grid-template-columns: 32px 1fr auto;
+          }
+          .ex-tut-sub {
+            font-size: 11px;
+          }
+          .ex-badge {
+            display: none;
+          }
+        }
+      `}</style>
+    </>
+  );
+}

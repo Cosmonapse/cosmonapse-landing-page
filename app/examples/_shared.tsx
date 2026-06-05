@@ -201,4 +201,21 @@ export function runStep(
     n += 1;
   }
   return {
-    e
+    eyebrow: "Run the topology",
+    prose:
+      combo === "ts-dev" ? (
+        <>
+          One process. <code className="inline">MemorySynapse</code> wires
+          everything together in-memory  -  no terminals to juggle. For a
+          multi-process version, switch to the NATS tab.
+        </>
+      ) : (
+        <>
+          Separate terminals, one Synapse shared by all. Start the bus first,
+          then the workers, then the driver.
+        </>
+      ),
+    maxWidth: 760,
+    html: blocks.join("\n\n"),
+  };
+}
