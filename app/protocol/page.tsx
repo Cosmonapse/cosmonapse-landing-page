@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import CodeBlock from "@/components/CodeBlock";
 
 export const metadata: Metadata = {
-  title: "Envelope Specification — Cosmonapse Protocol",
+  title: "Envelope Specification  -  Cosmonapse Protocol",
   description:
     "The envelope is the single shared contract of Cosmonapse. Every Signal on the channel is a valid envelope.",
 };
@@ -105,7 +105,7 @@ export default function ProtocolPage() {
           <h1 className="page-title">Envelope specification</h1>
           <p className="page-sub">
             The envelope is the single shared contract of Cosmonapse. Every Signal crossing a Synapse
-            is a valid envelope — regardless of which Neuron produced it, which Synapse carries it,
+            is a valid envelope  -  regardless of which Neuron produced it, which Synapse carries it,
             or which Dendrite is on the other side.
           </p>
 
@@ -173,7 +173,7 @@ export default function ProtocolPage() {
                   id<span className="req">●</span>
                 </div>
                 <div className="field-desc">
-                  Unique event ID — prefixed ULID. Consumers dedupe by this within a 60s window.
+                  Unique event ID  -  prefixed ULID. Consumers dedupe by this within a 60s window.
                 </div>
               </div>
               <div className="field">
@@ -233,7 +233,7 @@ export default function ProtocolPage() {
           </p>
           <div className="layer-stack">
             <div className="layer highlight">
-              <div className="layer-name">Dendrite — synapse-side connector + orchestration</div>
+              <div className="layer-name">Dendrite  -  synapse-side connector + orchestration</div>
               <div className="layer-desc">
                 The only component that touches the Synapse. Hosts Axons; owns routing decisions; exposes
                 the aggregate of its Axons&rsquo; capabilities; emits REGISTER / HEARTBEAT / DEREGISTER;
@@ -241,14 +241,14 @@ export default function ProtocolPage() {
                 Dendrite has a <code className="inline">role</code>: <code className="inline">&quot;orchestrator&quot;</code>{" "}
                 (full dispatch / emit surface) or <code className="inline">&quot;worker&quot;</code>{" "}
                 (hosts Axons and bids in capability routing, but cannot emit TASK or any cognition signal).
-                The role guard sits on <code className="inline">emit()</code> itself — every cognition
+                The role guard sits on <code className="inline">emit()</code> itself  -  every cognition
                 emitter funnels through it. Every orchestrator-role Dendrite can drive workflows; there is
                 no separate Cortex class.
               </div>
             </div>
             <div className="layer-arrow">↕</div>
             <div className="layer">
-              <div className="layer-name">Axon — agent-side tool</div>
+              <div className="layer-name">Axon  -  agent-side tool</div>
               <div className="layer-desc">
                 Unwraps TASK → calls Neuron. Wraps Neuron output → AGENT_OUTPUT / CLARIFICATION / ERROR →
                 returns to Dendrite. Never touches the Synapse directly.
@@ -256,7 +256,7 @@ export default function ProtocolPage() {
             </div>
             <div className="layer-arrow">↕</div>
             <div className="layer">
-              <div className="layer-name">Neuron — pure function</div>
+              <div className="layer-name">Neuron  -  pure function</div>
               <div className="layer-desc">
                 async fn(input, context) → output. No protocol knowledge. Fully testable in isolation.
               </div>
@@ -343,7 +343,7 @@ export default function ProtocolPage() {
               <tr>
                 <td>Capability-routed</td>
                 <td><code className="inline">cosmonapse.&lt;ns&gt;.TASK.routed</code></td>
-                <td>Queue group <code className="inline">caps:&lt;sorted-aggregate&gt;</code> — broker delivers exactly once per matching cap profile</td>
+                <td>Queue group <code className="inline">caps:&lt;sorted-aggregate&gt;</code>  -  broker delivers exactly once per matching cap profile</td>
                 <td>TASK omits <code className="inline">neuron</code> and sets <code className="inline">payload.capabilities</code></td>
               </tr>
             </tbody>
@@ -352,8 +352,8 @@ export default function ProtocolPage() {
             The split exists because a single queue group on a shared subject would break addressed
             routing (the broker could deliver an addressed TASK to a Dendrite that doesn&rsquo;t host
             the target Axon, which would silently drop it). With two subjects, addressed broadcast
-            and capability load-balancing coexist cleanly. Heterogeneous deployments — Dendrites with
-            different but overlapping cap profiles — still get at-least-once across profiles; for
+            and capability load-balancing coexist cleanly. Heterogeneous deployments  -  Dendrites with
+            different but overlapping cap profiles  -  still get at-least-once across profiles; for
             atomic claim use TASK_OFFER / BID / TASK_AWARDED instead.
           </p>
         </div>
@@ -364,7 +364,7 @@ export default function ProtocolPage() {
         <div className="container">
 
           <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Lifecycle</div>
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Lifecycle</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
             The mandatory types. Any compliant implementation must handle all of them.
           </p>
@@ -374,7 +374,7 @@ export default function ProtocolPage() {
               Payload: <code className="inline">{`{ intent, input, context_ref?, deadline?, budget_usd? }`}</code>
             </Msg>
             <Msg name="AGENT_OUTPUT" by="Dendrite (Axon data)">
-              The Axon&rsquo;s only output envelope for normal agent work. Neutral — workflow-semantic-free.
+              The Axon&rsquo;s only output envelope for normal agent work. Neutral  -  workflow-semantic-free.
               The orchestrating Dendrite decides what it becomes. Payload:{" "}
               <code className="inline">{`{ output }`}</code>
             </Msg>
@@ -383,7 +383,7 @@ export default function ProtocolPage() {
               Payload: <code className="inline">{`{ result }`}</code>
             </Msg>
             <Msg name="ERROR" by="Axon · Dendrite">
-              Task failure — agent exception, timeout, no-capable-agent, budget exceeded. First terminal event
+              Task failure  -  agent exception, timeout, no-capable-agent, budget exceeded. First terminal event
               wins. Payload: <code className="inline">{`{ kind, message, retriable? }`}</code>
             </Msg>
             <Msg name="TASK_OFFER" by="Dendrite">
@@ -400,16 +400,16 @@ export default function ProtocolPage() {
               <code className="inline">{`{ offer_id }`}</code>
             </Msg>
             <Msg name="TASK_DECLINED" by="Dendrite">
-              Sent to the losers — signal to discard any speculative work.
+              Sent to the losers  -  signal to discard any speculative work.
             </Msg>
           </div>
 
           <div style={{ marginTop: 56 }}>
             <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
           </div>
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Cognition</div>
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Cognition</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
-            Produced by the Dendrite, not the Axon or Neuron. Optional — a Dendrite that simply forwards
+            Produced by the Dendrite, not the Axon or Neuron. Optional  -  a Dendrite that simply forwards
             TASK → FINAL with no intermediate events is fully compliant.
           </p>
           <div className="msg-grid">
@@ -455,7 +455,7 @@ export default function ProtocolPage() {
           <div style={{ marginTop: 56 }}>
             <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
           </div>
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Agent management</div>
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Agent management</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
             Emitted by the <strong style={{ color: "var(--text)" }}>Dendrite</strong> on behalf of each
             attached Axon. The Axon owns the metadata (neuron_id, capabilities, version); the Dendrite
@@ -482,14 +482,14 @@ export default function ProtocolPage() {
       <section className="section-sm">
         <div className="container">
           <ProductTag label="Cosmonapse Engram" color="#a78bfa" status="Active Development" statusColor="#4ade80" />
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types — Engram (shared memory)</div>
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Engram (shared memory)</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 16 }}>
             The Engram surface is request/reply: an Axon asks for context with{" "}
             <code className="inline">RECALL</code> or commits a write with{" "}
             <code className="inline">IMPRINT</code>, and the bound backend replies with{" "}
             <code className="inline">RECALLED</code> or <code className="inline">IMPRINTED</code>.
             Identifiers use the <code className="inline">eng_</code> ULID prefix. The Neuron never
-            writes to the memory fabric directly — <code className="inline">EngramClient</code> is the
+            writes to the memory fabric directly  -  <code className="inline">EngramClient</code> is the
             in-Neuron API.
           </p>
           <div
@@ -542,7 +542,7 @@ export default function ProtocolPage() {
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Observability surface</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
             Doppler is a non-competing, read-only consumer of the Synapse. It does not define its own
-            Signal types — it taps every Signal emitted by Core and Engram. Pulse streams the raw
+            Signal types  -  it taps every Signal emitted by Core and Engram. Pulse streams the raw
             telemetry; Prism renders it as dashboards and trace graphs.{" "}
             <code className="inline">cosmo doppler</code> in the CLI is the baseline implementation.
           </p>
@@ -557,10 +557,10 @@ export default function ProtocolPage() {
               lineHeight: 1.65,
             }}
           >
-            <strong style={{ color: "#22d3ee" }}>Pulse</strong> — real-time Signal metrics: latency,
+            <strong style={{ color: "#22d3ee" }}>Pulse</strong>  -  real-time Signal metrics: latency,
             throughput, error rates, cost per Neuron.{" "}
-            <strong style={{ color: "#22d3ee" }}>Prism</strong> — the visualization layer: trace graphs,
-            audit logs, dashboard views. Both build on the existing Synapse subscription model — no new
+            <strong style={{ color: "#22d3ee" }}>Prism</strong>  -  the visualization layer: trace graphs,
+            audit logs, dashboard views. Both build on the existing Synapse subscription model  -  no new
             envelope types required.
           </div>
 
@@ -587,18 +587,18 @@ export default function ProtocolPage() {
           >
             <div style={{ marginBottom: 12 }}>
               <strong style={{ color: "#f87171", fontFamily: "var(--font-mono)" }}>Immune</strong>{" "}
-              — Genome · Myelin · Reflex · AntiBody
+               -  Genome · Myelin · Reflex · AntiBody
             </div>
             <div>
-              Planned signal types include <code className="inline">IDENTITY_ASSERT</code> (Genome — neuron
-              identity proof), <code className="inline">KEY_ROTATE</code> (Myelin — in-band key refresh),
-              and <code className="inline">THREAT_SIGNAL</code> (Reflex/AntiBody — anomaly broadcast). These
+              Planned signal types include <code className="inline">IDENTITY_ASSERT</code> (Genome  -  neuron
+              identity proof), <code className="inline">KEY_ROTATE</code> (Myelin  -  in-band key refresh),
+              and <code className="inline">THREAT_SIGNAL</code> (Reflex/AntiBody  -  anomaly broadcast). These
               will extend the envelope spec in a future revision and remain backwards-compatible with v1
               consumers.
             </div>
             <div style={{ marginTop: 16 }}>
               <strong style={{ color: "#fb923c", fontFamily: "var(--font-mono)" }}>Cloud</strong>{" "}
-              — Membrane
+               -  Membrane
             </div>
             <div style={{ marginTop: 4 }}>
               Membrane isolation signals are infrastructure-layer only and will not appear on the application
@@ -643,7 +643,7 @@ export default function ProtocolPage() {
           </ol>
           <p className="prose" style={{ marginTop: 16 }}>
             <code className="inline">cosmo validate</code> checks these rules against a stream of envelopes.
-            Validity is purely structural — Cosmonapse does not enforce sequencing or lifecycle rules. What
+            Validity is purely structural  -  Cosmonapse does not enforce sequencing or lifecycle rules. What
             constitutes a completed task, what happens after an error, and how envelopes flow over time are
             decisions you make in your Dendrite.
           </p>

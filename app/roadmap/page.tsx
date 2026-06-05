@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Roadmap — Cosmonapse",
+  title: "Roadmap  -  Cosmonapse",
   description:
     "0.1.0 public alpha → 1.0.0 stable. The 0.x line is about stabilisation: CI, a frozen machine-checkable spec, real broker integration tests, and TypeScript parity.",
 };
@@ -27,7 +27,7 @@ export default function RoadmapPage() {
         <div className="container container-narrow">
           <div className="timeline">
             <div className="timeline-item current">
-              <div className="timeline-version">0.1.0 · current — public alpha</div>
+              <div className="timeline-version">0.1.0 · current  -  public alpha</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>
@@ -39,9 +39,9 @@ export default function RoadmapPage() {
                 <p>What 0.1.0 ships:</p>
                 <ul>
                   <li>Envelope codec (Pydantic) and <code className="inline">cosmo validate</code></li>
-                  <li>Axon — agent-side tool, in-process</li>
-                  <li>Dendrite — synapse-side connector + all orchestration primitives</li>
-                  <li>RegistryStore — memory / SQLite / Postgres backends</li>
+                  <li>Axon  -  agent-side tool, in-process</li>
+                  <li>Dendrite  -  synapse-side connector + all orchestration primitives</li>
+                  <li>RegistryStore  -  memory / SQLite / Postgres backends</li>
                   <li>MemorySynapse, DevSynapse (TCP+NDJSON), NatsSynapse, KafkaSynapse</li>
                   <li>
                     <code className="inline">cosmo init</code> (project scaffolding),{" "}
@@ -51,34 +51,34 @@ export default function RoadmapPage() {
                     <code className="inline">cosmo completion</code> (bash / zsh / fish)
                   </li>
                   <li>
-                    <strong>Prism</strong> — a local browser frontend for monitoring a live Synapse,
+                    <strong>Prism</strong>  -  a local browser frontend for monitoring a live Synapse,
                     served by <code className="inline">cosmo doppler --prism</code>. A hero form picks the
                     Synapse URL + namespace, then an animated view streams every Signal on the wildcard
                     subject over a WebSocket in real time
                   </li>
-                  <li>LifecycleHooks — on_connect / on_refresh / on_schedule</li>
-                  <li><code className="inline">connect_synapse(url)</code> — build + connect a Synapse in one call</li>
-                  <li>Neuron provider factories — Ollama, HuggingFace / vLLM (via httpx)</li>
+                  <li>LifecycleHooks  -  on_connect / on_refresh / on_schedule</li>
+                  <li><code className="inline">connect_synapse(url)</code>  -  build + connect a Synapse in one call</li>
+                  <li>Neuron provider factories  -  Ollama, HuggingFace / vLLM (via httpx)</li>
                   <li>
-                    <strong>Engram (shared memory)</strong> — RECALL / IMPRINT signals,{" "}
+                    <strong>Engram (shared memory)</strong>  -  RECALL / IMPRINT signals,{" "}
                     <code className="inline">EngramBinding</code> + <code className="inline">EngramClient</code>,
                     and three backends (InMemory / SQLite / Postgres)
                   </li>
                   <li>
-                    <strong>Pathway</strong> — per-trace event handle with three consumption
+                    <strong>Pathway</strong>  -  per-trace event handle with three consumption
                     shapes (<code className="inline">await pw.wait()</code>,{" "}
                     <code className="inline">@pw.on(...)</code>,{" "}
                     <code className="inline">async for sig in pw</code>) plus{" "}
                     <code className="inline">scope=&quot;terminal&quot;</code> for the decentralised pattern
                   </li>
                   <li>
-                    <strong>Cognition signal family</strong> — PLAN, THOUGHT_DELTA, TOOL_CALL,
+                    <strong>Cognition signal family</strong>  -  PLAN, THOUGHT_DELTA, TOOL_CALL,
                     TOOL_RESULT, MEMORY_APPEND, CRITIQUE, ESCALATION, CONSENSUS, CONTEXT_SYNC,
                     each with a matching <code className="inline">emit_*</code> /{" "}
                     <code className="inline">on_*</code> pair
                   </li>
                   <li>
-                    <strong>Capability-routed dispatch + competitive bidding</strong> —{" "}
+                    <strong>Capability-routed dispatch + competitive bidding</strong>  - {" "}
                     <code className="inline">dispatch(capabilities=...)</code> with queue-group
                     load-balancing, and <code className="inline">dispatch_offer(...)</code> running
                     TASK_OFFER / BID / TASK_AWARDED with <code className="inline">first_bid</code>,{" "}
@@ -86,11 +86,11 @@ export default function RoadmapPage() {
                     <code className="inline">highest_confidence</code> selection
                   </li>
                   <li>
-                    Dispatch sugar — <code className="inline">dispatch_and_wait(...)</code> and{" "}
+                    Dispatch sugar  -  <code className="inline">dispatch_and_wait(...)</code> and{" "}
                     <code className="inline">dispatch_and_subscribe(...)</code>
                   </li>
                   <li>
-                    TypeScript SDK (preview) — envelope, builders, Axon, Dendrite,
+                    TypeScript SDK (preview)  -  envelope, builders, Axon, Dendrite,
                     MemorySynapse, NatsSynapse, in-memory RegistryStore, and the express / MCP
                     / unified <code className="inline">neuron()</code> factory.{" "}
                     <strong>Not yet in TypeScript:</strong> DevSynapse,{" "}
@@ -98,14 +98,14 @@ export default function RoadmapPage() {
                     HuggingFace neuron sources, KafkaSynapse, SQLite / Postgres RegistryStore,
                     and Engram. Tracked in{" "}
                     <code className="inline">packages/ts-sdk/PORTING_STATUS.md</code> and slated
-                    for 0.5.0 — until then, the Python SDK is the reference implementation.
+                    for 0.5.0  -  until then, the Python SDK is the reference implementation.
                   </li>
                 </ul>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-version">0.2.0 · next — fixes and updates</div>
+              <div className="timeline-version">0.2.0 · next  -  fixes and updates</div>
               <h2 className="timeline-title">Harden what 0.1.0 shipped.</h2>
               <div className="timeline-body">
                 <p>
@@ -115,7 +115,7 @@ export default function RoadmapPage() {
                 <p>What 0.2.0 adds:</p>
                 <ul>
                   <li>Bug fixes and API refinements from early-adopter feedback on 0.1.0</li>
-                  <li>Reworked Prism — the local Synapse monitor frontend</li>
+                  <li>Reworked Prism  -  the local Synapse monitor frontend</li>
                   <li>GitHub Actions running Python tests + ruff + mypy across 3.11 / 3.12 / 3.13, plus TS typecheck / build / test</li>
                   <li>CI required for merge to <code className="inline">main</code> (branch protection)</li>
                   <li>Committed TS lockfile so <code className="inline">npm ci</code> is reproducible</li>
@@ -125,7 +125,7 @@ export default function RoadmapPage() {
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-version">0.3.0 · next — frozen contract</div>
+              <div className="timeline-version">0.3.0 · next  -  frozen contract</div>
               <h2 className="timeline-title">A spec a third party can implement without reading Python.</h2>
               <div className="timeline-body">
                 <p>
@@ -137,13 +137,13 @@ export default function RoadmapPage() {
                   <li>Published JSON Schema for the envelope, generated from / checked against <code className="inline">envelope.py</code></li>
                   <li>CI validation against a golden-envelope corpus (one valid + one invalid fixture per signal type)</li>
                   <li><code className="inline">ENVELOPE_SPEC.md</code> moves from Draft to Stable, with an additive-only compatibility promise within a major <code className="inline">v</code></li>
-                  <li>Cross-language conformance — the same corpus round-trips identically through Python and TypeScript codecs</li>
+                  <li>Cross-language conformance  -  the same corpus round-trips identically through Python and TypeScript codecs</li>
                 </ul>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-version">0.4.0 · future — real transports</div>
+              <div className="timeline-version">0.4.0 · future  -  real transports</div>
               <h2 className="timeline-title">Every backend tested against a real broker.</h2>
               <div className="timeline-body">
                 <p>
@@ -161,7 +161,7 @@ export default function RoadmapPage() {
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-version">0.5.0 · future — parity</div>
+              <div className="timeline-version">0.5.0 · future  -  parity</div>
               <h2 className="timeline-title">TypeScript becomes first-class.</h2>
               <div className="timeline-body">
                 <p>
@@ -170,7 +170,7 @@ export default function RoadmapPage() {
                 </p>
                 <p>What 0.5.0 adds:</p>
                 <ul>
-                  <li>Lifecycle hooks (on_connect / on_refresh / on_schedule) — the headline gap for p2p workflows</li>
+                  <li>Lifecycle hooks (on_connect / on_refresh / on_schedule)  -  the headline gap for p2p workflows</li>
                   <li><code className="inline">connectSynapse(url)</code> URL factory</li>
                   <li>DevSynapse / dev broker client so TS-first users need no Python process</li>
                   <li>LLM provider neuron factories (Ollama, HuggingFace)</li>
@@ -181,7 +181,7 @@ export default function RoadmapPage() {
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-version">1.0.0 · target — stable</div>
+              <div className="timeline-version">1.0.0 · target  -  stable</div>
               <h2 className="timeline-title">A contract you can build a company on.</h2>
               <div className="timeline-body">
                 <p>
@@ -206,14 +206,14 @@ export default function RoadmapPage() {
 
       <section className="section-sm">
         <div className="container container-narrow">
-          <div className="sub-eyebrow">Priority order — 0.1.0 → 1.0.0</div>
+          <div className="sub-eyebrow">Priority order  -  0.1.0 → 1.0.0</div>
           <p className="prose">The order matters. Each milestone lands on the green baseline the last one established.</p>
           <ol className="prose" style={{ paddingLeft: 24 }}>
-            <li>0.2.0 — CI enforced on every commit (provable baseline)</li>
-            <li>0.3.0 — frozen, machine-checkable envelope spec + JSON Schema</li>
-            <li>0.4.0 — integration tests against real NATS / Kafka / Postgres</li>
-            <li>0.5.0 — TypeScript SDK at parity with Python</li>
-            <li>1.0.0 — docs, semver policy, security audit, tag + publish</li>
+            <li>0.2.0  -  CI enforced on every commit (provable baseline)</li>
+            <li>0.3.0  -  frozen, machine-checkable envelope spec + JSON Schema</li>
+            <li>0.4.0  -  integration tests against real NATS / Kafka / Postgres</li>
+            <li>0.5.0  -  TypeScript SDK at parity with Python</li>
+            <li>1.0.0  -  docs, semver policy, security audit, tag + publish</li>
           </ol>
         </div>
       </section>

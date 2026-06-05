@@ -312,7 +312,7 @@ a { color: inherit; text-decoration: none; }
 }
 .inline-link:hover { color: var(--text); border-bottom-color: var(--text); }
 
-/* Hamburger toggle — hidden on desktop */
+/* Hamburger toggle  -  hidden on desktop */
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -1406,7 +1406,7 @@ code.inline {
 /* Content column */
 .docs-content { min-width: 0; }
 
-/* Anchored sections — offset for the sticky nav */
+/* Anchored sections  -  offset for the sticky nav */
 .docs-section {
   scroll-margin-top: 88px;
   padding: 36px 0;

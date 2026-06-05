@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Concepts & Terminology — Cosmonapse",
+  title: "Concepts & Terminology  -  Cosmonapse",
   description:
     "The biological vocabulary of Cosmonapse across the full product line: Core, Engram, Doppler, Immune, and Cloud.",
 };
@@ -53,8 +53,8 @@ const productLine: {
       },
       {
         name: "Neuron",
-        map: "Agent · API · MCP server",
-        desc: "Anything that interacts with the real world, exposed behind a pure-function interface — receives (input, context), returns output, zero protocol knowledge. Not just an LLM agent: it can be an agent, an existing API (a Flask/WSGI or Express app), or an MCP server. The Neuron(source=…) factory turns each into the same callable. Replaceable without touching infrastructure.",
+        map: "Agent · MCP server · function",
+        desc: "Anything that interacts with the real world, exposed behind a pure-function interface  -  receives (input, context), returns output, zero protocol knowledge. Not just an LLM agent: it can be an agent, an MCP server, or a plain async function. The Neuron(source=…) factory turns each into the same callable. An HTTP API is not a Neuron  -  keep your web framework at the edge and dispatch TASKs from its routes via an orchestrator Dendrite. Replaceable without touching infrastructure.",
       },
       {
         name: "Axon",
@@ -64,12 +64,12 @@ const productLine: {
       {
         name: "Dendrite",
         map: "Synapse-side connector",
-        desc: "The only component that touches the Synapse. Hosts Axons, owns routing decisions, exposes the aggregate of its Axons' capabilities, and emits REGISTER / HEARTBEAT / DEREGISTER per attached Axon. Has a role: orchestrator (can dispatch TASKs) or worker (hosts Axons only). Workers are guarded — they can serve TASKs and bid in capability routing, but can't emit orchestration signals.",
+        desc: "The only component that touches the Synapse. Hosts Axons, owns routing decisions, exposes the aggregate of its Axons' capabilities, and emits REGISTER / HEARTBEAT / DEREGISTER per attached Axon. Has a role: orchestrator (can dispatch TASKs) or worker (hosts Axons only). Workers are guarded  -  they can serve TASKs and bid in capability routing, but can't emit orchestration signals.",
       },
       {
         name: "Pathway",
         map: "Per-trace event handle",
-        desc: "Returned by dendrite.dispatch(...). A single primitive with three consumption shapes: await pw.wait() for sequential request/reply, @pw.on(SignalType.X) for reactive trace-scoped callbacks, and async for sig in pw: for streaming. Pathway(scope=\"terminal\") filters to FINAL / ERROR / CLARIFICATION only — the decentralised pattern where the Cortex only wakes for events that need attention. observe_pathway(trace_id) opens one in observer role to watch a trace another peer started.",
+        desc: "Returned by dendrite.dispatch(...). A single primitive with three consumption shapes: await pw.wait() for sequential request/reply, @pw.on(SignalType.X) for reactive trace-scoped callbacks, and async for sig in pw: for streaming. Pathway(scope=\"terminal\") filters to FINAL / ERROR / CLARIFICATION only  -  the decentralised pattern where the Cortex only wakes for events that need attention. observe_pathway(trace_id) opens one in observer role to watch a trace another peer started.",
       },
       {
         name: "Synapse",
@@ -79,7 +79,7 @@ const productLine: {
       {
         name: "Signal",
         map: "Envelope",
-        desc: "A single message crossing the Synapse. The shared contract — two components that produce valid Signals can always interoperate.",
+        desc: "A single message crossing the Synapse. The shared contract  -  two components that produce valid Signals can always interoperate.",
       },
     ],
   },
@@ -115,7 +115,7 @@ const productLine: {
       {
         name: "Pulse",
         map: "Live telemetry",
-        desc: "Real-time stream of Signal metrics — latency, throughput, error rates, and cost per Neuron. Named for the heartbeat of the system.",
+        desc: "Real-time stream of Signal metrics  -  latency, throughput, error rates, and cost per Neuron. Named for the heartbeat of the system.",
       },
       {
         name: "Prism",
@@ -132,27 +132,27 @@ const productLine: {
         {
           name: "Flux",
           map: "Signal propagation analysis",
-          desc: "Tracks how Signals travel through the Brain — measuring path lengths, bottlenecks, and propagation velocity between Neurons.",
+          desc: "Tracks how Signals travel through the Brain  -  measuring path lengths, bottlenecks, and propagation velocity between Neurons.",
         },
         {
           name: "Field",
           map: "Neuron influence mapping",
-          desc: "Models the influence each Neuron exerts on others — building a directed graph of cognitive dependencies from the observed Signal stream.",
+          desc: "Models the influence each Neuron exerts on others  -  building a directed graph of cognitive dependencies from the observed Signal stream.",
         },
         {
           name: "Topology",
           map: "Emergent pattern detection",
-          desc: "Surfaces emergent structural patterns in the Brain — clusters, hubs, and unexpected collaboration paths that arise from Signal behavior over time.",
+          desc: "Surfaces emergent structural patterns in the Brain  -  clusters, hubs, and unexpected collaboration paths that arise from Signal behavior over time.",
         },
         {
           name: "Affinity",
           map: "Collaboration efficiency",
-          desc: "Scores how efficiently pairs and groups of Neurons collaborate — latency, success rate, and resource cost per cognitive handoff.",
+          desc: "Scores how efficiently pairs and groups of Neurons collaborate  -  latency, success rate, and resource cost per cognitive handoff.",
         },
         {
           name: "Coherence",
           map: "Cognitive synchronization",
-          desc: "Measures the degree to which Neurons operate in temporal alignment — detecting desynchronization, phase drift, and coordination breakdowns across the Brain.",
+          desc: "Measures the degree to which Neurons operate in temporal alignment  -  detecting desynchronization, phase drift, and coordination breakdowns across the Brain.",
         },
       ],
     },
@@ -166,7 +166,7 @@ const productLine: {
       {
         name: "Genome",
         map: "Identity management",
-        desc: "Defines and enforces the identity of every Neuron and Brain — API keys, roles, capability scopes, and namespace boundaries.",
+        desc: "Defines and enforces the identity of every Neuron and Brain  -  API keys, roles, capability scopes, and namespace boundaries.",
       },
       {
         name: "Myelin",
@@ -176,7 +176,7 @@ const productLine: {
       {
         name: "Reflex",
         map: "Automated threat response",
-        desc: "Monitors Signal patterns for anomalies and executes pre-defined countermeasures automatically — rate limiting, circuit breaking, Neuron quarantine.",
+        desc: "Monitors Signal patterns for anomalies and executes pre-defined countermeasures automatically  -  rate limiting, circuit breaking, Neuron quarantine.",
       },
       {
         name: "AntiBody",
@@ -194,7 +194,7 @@ const productLine: {
       {
         name: "Membrane",
         map: "Sandboxing & isolation",
-        desc: "The boundary layer in the managed platform. Isolates each Brain in its own execution context — resource quotas, network policies, and credential scoping enforced at the infrastructure level.",
+        desc: "The boundary layer in the managed platform. Isolates each Brain in its own execution context  -  resource quotas, network policies, and credential scoping enforced at the infrastructure level.",
       },
     ],
   },
@@ -209,14 +209,14 @@ export default function ConceptsPage() {
           <h1 className="page-title">The biology of distributed cognition.</h1>
           <p className="page-sub">
             Cosmonapse names its primitives after the parts of a nervous system. The metaphor is
-            precise, not decorative — each term maps exactly to a conventional distributed-systems
+            precise, not decorative  -  each term maps exactly to a conventional distributed-systems
             concept. These names are canonical across the spec, SDK, CLI, docs, and every product in
             the Cosmonapse line.
           </p>
         </div>
       </header>
 
-      {/* Product line — big cards */}
+      {/* Product line  -  big cards */}
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Product line</div>
@@ -535,17 +535,17 @@ export default function ConceptsPage() {
           <h2 className="sub-title">A Brain in motion.</h2>
           <p className="prose">
             A <strong>Brain</strong> is a team of <strong>Neurons</strong>. Each Neuron is reached
-            through a Dendrite — the only component that touches the <strong>Synapse</strong>. The
+            through a Dendrite  -  the only component that touches the <strong>Synapse</strong>. The
             Dendrite carries <strong>Signals</strong> between participants and exposes orchestration
             primitives for whoever needs them.
           </p>
           <p className="prose">
-            Persistent state lives in <strong>Engram</strong> — written via <strong>Imprint</strong>,
+            Persistent state lives in <strong>Engram</strong>  -  written via <strong>Imprint</strong>,
             retrieved via <strong>Recall</strong>, and replayed or snapshotted via{" "}
             <strong>Echo</strong>. Observability comes from <strong>Doppler</strong>:{" "}
             <strong>Pulse</strong> streams live telemetry and <strong>Prism</strong> turns it into
             dashboards and traces. <strong>Resonance</strong>, a sub-project within Doppler, goes
-            deeper — it is cognition analytics for the Brain, analyzing how Neurons influence each
+            deeper  -  it is cognition analytics for the Brain, analyzing how Neurons influence each
             other, how Signals propagate, and surfacing emergent patterns, collaboration efficiency,
             and cognitive synchronization.
           </p>
@@ -554,7 +554,7 @@ export default function ConceptsPage() {
             <strong>Genome</strong> governs identity and access, <strong>Myelin</strong> encrypts
             every path, and <strong>Reflex</strong> with <strong>AntiBody</strong> detect and respond
             to threats automatically. In the managed cloud, <strong>Membrane</strong> wraps the whole
-            runtime in an isolated execution boundary — resource quotas, network policies, and
+            runtime in an isolated execution boundary  -  resource quotas, network policies, and
             credential scoping enforced at the infrastructure level.
           </p>
 
@@ -562,31 +562,33 @@ export default function ConceptsPage() {
             <div className="layer">
               <div className="layer-name">Workflow trigger</div>
               <div className="layer-desc">
-                A user request, a scheduled job, or another Brain — dispatches the root TASK Signal
+                A user request, a scheduled job, or another Brain  -  dispatches the root TASK Signal
                 onto the Synapse.
               </div>
             </div>
             <div className="layer-arrow">↓</div>
             <div className="layer highlight">
-              <div className="layer-name">Dendrite — synapse-side connector + orchestration</div>
+              <div className="layer-name">Dendrite  -  synapse-side connector + orchestration</div>
               <div className="layer-desc">
                 Receives the TASK. Routes it to the attached Axon matching the target neuron_id.
-                Emits FINAL when done. Every Dendrite can orchestrate — no separate Cortex class
+                Emits FINAL when done. Every Dendrite can orchestrate  -  no separate Cortex class
                 (Cortex is a back-compat alias).
               </div>
             </div>
             <div className="layer-arrow">↓</div>
             <div className="layer">
-              <div className="layer-name">Neuron — agent, API, or MCP server</div>
+              <div className="layer-name">Neuron  -  agent, MCP server, or function</div>
               <div className="layer-desc">
                 Receives (input, context). Returns a plain dict. Anything that interacts with the
-                real world — an LLM agent, a Flask/Express app, or a wrapped MCP server — knowing
+                real world  -  an LLM agent, a wrapped MCP server, or a plain function  -  knowing
                 nothing about the Synapse, envelopes, trace IDs, or the rest of this picture.
+                (An HTTP API is not a Neuron; it sits at the edge, in front of an orchestrator
+                Dendrite.)
               </div>
             </div>
             <div className="layer-arrow">↓</div>
             <div className="layer">
-              <div className="layer-name">Engram — Recall · Imprint · Echo</div>
+              <div className="layer-name">Engram  -  Recall · Imprint · Echo</div>
               <div className="layer-desc">
                 Persistent shared state written by Imprint, queried by Recall before each Neuron
                 call, and snapshotted by Echo for replay and debugging.
@@ -594,7 +596,7 @@ export default function ConceptsPage() {
             </div>
             <div className="layer-arrow">↓</div>
             <div className="layer">
-              <div className="layer-name">Immune — Genome · Myelin · Reflex · AntiBody</div>
+              <div className="layer-name">Immune  -  Genome · Myelin · Reflex · AntiBody</div>
               <div className="layer-desc">
                 Identity and access enforced by Genome. Encryption handled by Myelin. Anomalies
                 surfaced by AntiBody and acted on automatically by Reflex.
@@ -605,17 +607,17 @@ export default function ConceptsPage() {
           <p className="prose" style={{ marginTop: 40 }}>
             <strong>Doppler</strong> (Pulse + Prism) sits beside this whole picture, not inside it.
             It subscribes to the Synapse as a non-competing read-only consumer and sees every Signal
-            flow past. <strong>Resonance</strong> — a sub-project of Doppler — builds on that stream
+            flow past. <strong>Resonance</strong>  -  a sub-project of Doppler  -  builds on that stream
             to deliver cognition analytics: Flux maps propagation paths, Field models Neuron
             influence, Topology surfaces emergent structure, Affinity scores collaboration, and
             Coherence measures synchronization. In <strong>Cosmonapse Cloud</strong>, the entire
-            stack runs inside a <strong>Membrane</strong> — sandboxed, quota-enforced, and
+            stack runs inside a <strong>Membrane</strong>  -  sandboxed, quota-enforced, and
             credential-scoped at the infrastructure level.
           </p>
         </div>
       </section>
 
-      {/* Glossary — grouped by product with status rows */}
+      {/* Glossary  -  grouped by product with status rows */}
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Glossary cheatsheet</div>
@@ -781,12 +783,4 @@ export default function ConceptsPage() {
           </table>
           <p className="prose" style={{ marginTop: 24, fontSize: 13, color: "var(--text-faint)" }}>
             Note: <strong>Cortex</strong> is kept as a back-compat alias for Dendrite. New code
-            should use Dendrite directly. <strong>Axon</strong> (the agent-side tool that wraps a
-            Neuron) remains part of the Core runtime but is an implementation detail — applications
-            interact with Dendrites and Neurons directly.
-          </p>
-        </div>
-      </section>
-    </>
-  );
-}
+            should use Dendrite directly. <strong>Axon</strong> (the agent-side t

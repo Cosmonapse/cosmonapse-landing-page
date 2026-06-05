@@ -5,7 +5,7 @@ import type { Combo, Step } from "@/components/ComboExample";
 // Transport-only snippets shared by every worked example.
 //
 // The Install and "start the broker" steps depend only on the transport, not
-// on the topology — so they live here and are reused by round-robin and
+// on the topology  -  so they live here and are reused by round-robin and
 // no-orchestrator alike. The worker / cortex / producer bodies are
 // topology-specific and live in each example's client component.
 //
@@ -31,7 +31,7 @@ pip install <span class="tk-op">-e</span> cosmonapse-core/packages/python-sdk
 pip install <span class="tk-op">-e</span> cosmonapse-core/packages/cli
 pip install httpx
 
-<span class="tk-cm"># Hugging Face token — read scope is enough</span>
+<span class="tk-cm"># Hugging Face token  -  read scope is enough</span>
 <span class="tk-op">$</span> export HF_TOKEN<span class="tk-op">=</span>hf_xxxxxxxxxxxxxxxxxxxxxxxx`,
 
   "py-nats": `<span class="tk-cm"># SDK with the NATS extra + httpx for the HF Neuron</span>
@@ -58,7 +58,7 @@ npm install <span class="tk-op">-D</span> tsx`,
 const INSTALL_PROSE: Record<Combo, React.ReactNode> = {
   "py-dev": (
     <>
-      The dev <code className="inline">devsynapse</code> ships in the CLI — no
+      The dev <code className="inline">devsynapse</code> ships in the CLI  -  no
       external broker to install.
     </>
   ),
@@ -112,7 +112,7 @@ export function brokerStep(combo: Combo): Step | null {
             One bus, one namespace. The CLI also streams every Signal that
             crosses it to stdout, so the synapse terminal doubles as a Doppler.
             For a live view, open <strong>Prism</strong> in a second terminal
-            right after the Synapse is up — every Signal animates across the bus
+            right after the Synapse is up  -  every Signal animates across the bus
             in your browser as the workers below come online.
           </>
         ),
@@ -124,7 +124,7 @@ export function brokerStep(combo: Combo): Step | null {
 <span class="tk-cm">  Transport:  TCP + NDJSON  (single-host dev only)</span>
 <span class="tk-cm">  ────────────────────────────────────────────────</span>
 
-<span class="tk-cm"># terminal 2 — live browser visualization (http://127.0.0.1:7071)</span>
+<span class="tk-cm"># terminal 2  -  live browser visualization (http://127.0.0.1:7071)</span>
 <span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart`,
       };
     case "py-nats":
@@ -133,12 +133,12 @@ export function brokerStep(combo: Combo): Step | null {
         eyebrow: "Start a NATS server",
         prose: (
           <>
-            Any NATS server works — here&apos;s the official image. Subjects,
+            Any NATS server works  -  here&apos;s the official image. Subjects,
             wildcards, queue groups and request/reply all map natively.
           </>
         ),
         maxWidth: 760,
-        html: `<span class="tk-cm"># Plain NATS — no JetStream needed for this example</span>
+        html: `<span class="tk-cm"># Plain NATS  -  no JetStream needed for this example</span>
 <span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10
 
 <span class="tk-cm"># …or, if you have it on PATH:</span>
@@ -156,7 +156,7 @@ export function brokerStep(combo: Combo): Step | null {
           </>
         ),
         maxWidth: 760,
-        html: `<span class="tk-cm"># Redpanda is a single-binary, Kafka-API broker — great for dev</span>
+        html: `<span class="tk-cm"># Redpanda is a single-binary, Kafka-API broker  -  great for dev</span>
 <span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 9092:9092 \\
     redpandadata/redpanda:latest \\
     redpanda start <span class="tk-op">--</span>smp 1 <span class="tk-op">--</span>overprovisioned \\
@@ -174,16 +174,16 @@ export function brokerStep(combo: Combo): Step | null {
 // ---------------------------------------------------------------------------
 
 const brokerRunLine: Record<Combo, string | null> = {
-  "py-dev": `<span class="tk-cm"># terminal 1 — the bus</span>\n<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart`,
-  "py-nats": `<span class="tk-cm"># terminal 1 — the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10`,
-  "py-kafka": `<span class="tk-cm"># terminal 1 — the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 9092:9092 redpandadata/redpanda:latest redpanda start <span class="tk-op">--</span>smp 1`,
+  "py-dev": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart`,
+  "py-nats": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10`,
+  "py-kafka": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 9092:9092 redpandadata/redpanda:latest redpanda start <span class="tk-op">--</span>smp 1`,
   "ts-dev": null,
-  "ts-nats": `<span class="tk-cm"># terminal 1 — the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10`,
+  "ts-nats": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10`,
 };
 
 /**
  * Build the "Run the topology" step.
- * `procs` lists the terminals after the broker — each `cmd` is already
+ * `procs` lists the terminals after the broker  -  each `cmd` is already
  * token-highlighted.
  */
 export function runStep(
@@ -196,26 +196,9 @@ export function runStep(
   if (broker) blocks.push(broker);
   for (const p of procs) {
     blocks.push(
-      `<span class="tk-cm"># terminal ${n} — ${p.label}</span>\n<span class="tk-op">$</span> ${p.cmd}`,
+      `<span class="tk-cm"># terminal ${n}  -  ${p.label}</span>\n<span class="tk-op">$</span> ${p.cmd}`,
     );
     n += 1;
   }
   return {
-    eyebrow: "Run the topology",
-    prose:
-      combo === "ts-dev" ? (
-        <>
-          One process. <code className="inline">MemorySynapse</code> wires
-          everything together in-memory — no terminals to juggle. For a
-          multi-process version, switch to the NATS tab.
-        </>
-      ) : (
-        <>
-          Separate terminals, one Synapse shared by all. Start the bus first,
-          then the workers, then the driver.
-        </>
-      ),
-    maxWidth: 760,
-    html: blocks.join("\n\n"),
-  };
-}
+    e

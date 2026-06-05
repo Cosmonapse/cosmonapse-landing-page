@@ -42,7 +42,7 @@ export default function DocsShell({ title, sub, children }: DocsShellProps) {
               <h2>Have a feature in mind?</h2>
               <p>
                 The protocol, SDKs, and CLI are still pre-1.0. If something here is missing,
-                ambiguous, or wrong — open an issue and propose a change. Every breaking change is
+                ambiguous, or wrong  -  open an issue and propose a change. Every breaking change is
                 debated in <code className="inline">DECISIONS.md</code> first.
               </p>
               <div className="hero-ctas" style={{ marginBottom: 0 }}>

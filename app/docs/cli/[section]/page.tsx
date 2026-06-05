@@ -14,10 +14,10 @@ export function generateMetadata({ params }: { params: { section: string } }): M
   const sec = sectionBySlug(BASE, params.section);
   return {
     title: sec
-      ? `${sec.label} — cosmo CLI Reference — Cosmonapse`
-      : "cosmo CLI Reference — Cosmonapse",
+      ? `${sec.label}  -  cosmo CLI Reference  -  Cosmonapse`
+      : "cosmo CLI Reference  -  Cosmonapse",
     description:
-      "Reference for the cosmo developer CLI — commands, flags, configuration, and exit codes.",
+      "Reference for the cosmo developer CLI  -  commands, flags, configuration, and exit codes.",
   };
 }
 

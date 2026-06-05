@@ -9,7 +9,7 @@ import ComboExample, {
 import { PY_URL, installStep, brokerStep, runStep } from "../_shared";
 
 // ===========================================================================
-// Python — round-robin worker + cortex, parametrised by the Synapse URL.
+// Python  -  round-robin worker + cortex, parametrised by the Synapse URL.
 // Only SYNAPSE_URL changes between dev / NATS / Kafka.
 // ===========================================================================
 
@@ -98,7 +98,7 @@ WORKERS <span class="tk-op">=</span> (<span class="tk-str">"worker-a"</span>, <s
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
 // ===========================================================================
-// TypeScript — NATS variant (cross-process: worker.ts + cortex.ts)
+// TypeScript  -  NATS variant (cross-process: worker.ts + cortex.ts)
 // ===========================================================================
 
 const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
@@ -106,7 +106,7 @@ const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSy
 <span class="tk-kw">const</span> MY_ID <span class="tk-op">=</span> process.argv[<span class="tk-num">2</span>] <span class="tk-op">??</span> <span class="tk-str">"worker-a"</span>;   <span class="tk-cm">// pass the id on the CLI</span>
 <span class="tk-kw">const</span> NAMESPACE <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
 
-<span class="tk-cm">// A Neuron is just an async function — bring your own.</span>
+<span class="tk-cm">// A Neuron is just an async function  -  bring your own.</span>
 <span class="tk-kw">const</span> <span class="tk-fn">haiku</span> <span class="tk-op">=</span> <span class="tk-kw">async</span> (input: any) <span class="tk-op">=&gt;</span> ({
   response: <span class="tk-str">\`[\${MY_ID}] a quiet line about \${input.prompt}\`</span>,
 });
@@ -171,7 +171,7 @@ const tsCortexNats = `<span class="tk-kw">import</span> { Dendrite, NatsSynapse,
 <span class="tk-fn">main</span>();`;
 
 // ===========================================================================
-// TypeScript — devsynapse variant (MemorySynapse, single in-process file)
+// TypeScript  -  devsynapse variant (MemorySynapse, single in-process file)
 // ===========================================================================
 
 const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
@@ -190,7 +190,7 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
 };
 
 <span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">MemorySynapse</span>();   <span class="tk-cm">// in-process — no broker, one terminal</span>
+  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">MemorySynapse</span>();   <span class="tk-cm">// in-process  -  no broker, one terminal</span>
   <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
 
   <span class="tk-cm">// Two workers + one cortex, all sharing the same in-process Synapse.</span>
@@ -220,13 +220,13 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
 
 const outputSnippet = `<span class="tk-op">$</span> python cortex.py
 → dispatched to worker-a
-   ← Golden disc ascends — silence breaks into light.
+   ← Golden disc ascends  -  silence breaks into light.
 → dispatched to worker-b
-   ← Pale lantern in the dark — tides remember her face.
+   ← Pale lantern in the dark  -  tides remember her face.
 → dispatched to worker-a
    ← Salt sighs against stone, an old song the wind forgot.
 → dispatched to worker-b
-   ← Invisible river — it bends the wheat into prayer.`;
+   ← Invisible river  -  it bends the wheat into prayer.`;
 
 // ---------------------------------------------------------------------------
 // Per-combo step assembly
@@ -249,7 +249,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
       installStep(combo),
       ...(broker ? [broker] : []),
       {
-        eyebrow: "Worker — a Neuron behind an Axon",
+        eyebrow: "Worker  -  a Neuron behind an Axon",
         prose: (
           <>
             A Worker Dendrite that hosts a single Axon wrapping a HuggingFace{" "}
@@ -264,7 +264,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
         html: pyWorker(url),
       },
       {
-        eyebrow: "The Cortex — a round-robin Dendrite",
+        eyebrow: "The Cortex  -  a round-robin Dendrite",
         prose: (
           <>
             A Cortex is just a Dendrite that dispatches tasks and collects
@@ -291,10 +291,10 @@ function tsNatsData(): ComboData {
       installStep("ts-nats"),
       ...(broker ? [broker] : []),
       {
-        eyebrow: "Worker — bring-your-own Neuron",
+        eyebrow: "Worker  -  bring-your-own Neuron",
         prose: (
           <>
-            The TS SDK has no provider-backed Neuron — a Neuron is simply an{" "}
+            The TS SDK has no provider-backed Neuron  -  a Neuron is simply an{" "}
             <code className="inline">async (input) =&gt; output</code> function.
             One file serves both workers; pass the id as an argv.
           </>
@@ -303,7 +303,7 @@ function tsNatsData(): ComboData {
         html: tsWorkerNats,
       },
       {
-        eyebrow: "The Cortex — a round-robin Dendrite",
+        eyebrow: "The Cortex  -  a round-robin Dendrite",
         prose: (
           <>
             Identical logic to the Python cortex: a modulo index over{" "}
@@ -335,7 +335,7 @@ function tsDevData(): ComboData {
           <>
             <code className="inline">MemorySynapse</code> is in-process, so the
             two workers and the cortex live in a single Node program. The
-            round-robin logic is unchanged — only the wiring is shorter.
+            round-robin logic is unchanged  -  only the wiring is shorter.
           </>
         ),
         filename: "roundrobin.ts",
@@ -355,12 +355,12 @@ function extendBody(combo: Combo): React.ReactNode {
       <p>
         <strong>More workers.</strong> Add{" "}
         <code className="inline">worker-c</code> and extend the{" "}
-        <code className="inline">WORKERS</code> list — the cycle handles any
+        <code className="inline">WORKERS</code> list  -  the cycle handles any
         length.
       </p>
       <p>
         <strong>Weighted round-robin.</strong> Replace the cycle with a custom
-        sequence — e.g.{" "}
+        sequence  -  e.g.{" "}
         <code className="inline">[&quot;a&quot;, &quot;a&quot;, &quot;b&quot;]</code>{" "}
         to send 2-of-3 to worker A.
       </p>
@@ -368,7 +368,7 @@ function extendBody(combo: Combo): React.ReactNode {
         <strong>Dynamic membership.</strong> Pass a{" "}
         <code className="inline">registry_store</code> to the Cortex and call{" "}
         <code className="inline">find_neurons(capability=&quot;chat&quot;)</code>{" "}
-        instead of a static list — workers can join and leave at runtime.
+        instead of a static list  -  workers can join and leave at runtime.
       </p>
       {combo === "ts-dev" ? (
         <p>
@@ -376,13 +376,13 @@ function extendBody(combo: Combo): React.ReactNode {
           <code className="inline">MemorySynapse</code> for{" "}
           <code className="inline">NatsSynapse</code> (the NATS tab) and split
           the file into <code className="inline">worker.ts</code> +{" "}
-          <code className="inline">cortex.ts</code> — the routing code is
+          <code className="inline">cortex.ts</code>  -  the routing code is
           identical.
         </p>
       ) : (
         <p>
           <strong>Change transport.</strong> Every other tab is the same
-          topology — only the install, the synapse you connect to, and the
+          topology  -  only the install, the synapse you connect to, and the
           launch commands change. The routing logic is byte-for-byte identical.
         </p>
       )}
@@ -425,7 +425,7 @@ export default function RoundRobinClient() {
             <code className="inline">ask(prompt)</code> dispatches the TASK to
             the next worker, then resolves a future when the matching{" "}
             <code className="inline">AGENT_OUTPUT</code> returns. The same code
-            runs over five language × transport stacks — pick one below.
+            runs over five language × transport stacks  -  pick one below.
           </p>
         </div>
       </header>
@@ -440,7 +440,7 @@ export default function RoundRobinClient() {
               <div className="card-icon">→</div>
               <h3>No orchestrator</h3>
               <p>
-                Drop the Cortex — the workers decide who handles each task,
+                Drop the Cortex  -  the workers decide who handles each task,
                 with zero coordination.
               </p>
             </Link>
@@ -452,7 +452,7 @@ export default function RoundRobinClient() {
             <Link href="/concepts" className="card">
               <div className="card-icon">→</div>
               <h3>Concepts</h3>
-              <p>Neuron, Axon, Dendrite, Synapse — what each one is and isn&apos;t.</p>
+              <p>Neuron, Axon, Dendrite, Synapse  -  what each one is and isn&apos;t.</p>
             </Link>
           </div>
         </div>

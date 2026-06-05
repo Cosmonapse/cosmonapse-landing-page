@@ -10,12 +10,12 @@ import ComboExample, {
 import { PY_URL, brokerStep, runStep } from "../_shared";
 
 // ===========================================================================
-// Install — plain-function Neurons (no provider, so no HF_TOKEN / httpx).
+// Install  -  plain-function Neurons (no provider, so no HF_TOKEN / httpx).
 // Only the SDK (+ optional transport driver) and, for TS, tsx.
 // ===========================================================================
 
 const INSTALL_HTML: Record<Combo, string> = {
-  "py-dev": `<span class="tk-cm"># SDK + the bundled cosmo CLE — the devsynapse needs no broker.</span>
+  "py-dev": `<span class="tk-cm"># SDK + the bundled cosmo CLE  -  the devsynapse needs no broker.</span>
 pip install cosmonapse`,
   "py-nats": `<span class="tk-cm"># SDK with the NATS extra.</span>
 pip install <span class="tk-str">"cosmonapse[nats]"</span>`,
@@ -35,7 +35,7 @@ function installStep(combo: Combo): Step {
     eyebrow: "Install",
     prose: (
       <>
-        These workers are plain functions — no model provider — so the only
+        These workers are plain functions  -  no model provider  -  so the only
         dependency is the SDK itself (plus a transport driver where the bus
         isn&apos;t in-process).
       </>
@@ -46,7 +46,7 @@ function installStep(combo: Combo): Step {
 }
 
 // ===========================================================================
-// Python — two specialised workers + a capability router.
+// Python  -  two specialised workers + a capability router.
 // One worker.py serves both roles; the only per-transport change is SYNAPSE_URL.
 // ===========================================================================
 
@@ -57,7 +57,7 @@ SYNAPSE_URL <span class="tk-op">=</span> <span class="tk-str">"${url}"</span>   
 NAMESPACE   <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>
 
 <span class="tk-cm"># A Neuron is just an async function. Each worker advertises a</span>
-<span class="tk-cm"># different capability — swap in a real model when you're ready.</span>
+<span class="tk-cm"># different capability  -  swap in a real model when you're ready.</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">summarize</span>(input, context):
     <span class="tk-kw">return</span> {<span class="tk-str">"result"</span>: <span class="tk-fn">f</span><span class="tk-str">"summary: {input['text'][:40]}…"</span>}
 
@@ -84,7 +84,7 @@ ROLES <span class="tk-op">=</span> {
 
     <span class="tk-kw">try</span>:
         <span class="tk-kw">async with</span> dendrite:
-            <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"{role} ready — advertising {capabilities}"</span>)
+            <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"{role} ready  -  advertising {capabilities}"</span>)
             <span class="tk-kw">await</span> asyncio.<span class="tk-fn">Event</span>().<span class="tk-fn">wait</span>()
     <span class="tk-kw">finally</span>:
         <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>()
@@ -97,7 +97,7 @@ const pyRouter = (url: string) => `<span class="tk-kw">import</span> asyncio
 SYNAPSE_URL <span class="tk-op">=</span> <span class="tk-str">"${url}"</span>
 NAMESPACE   <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>
 
-<span class="tk-cm"># Tasks are tagged with the CAPABILITY they need — never a worker id.</span>
+<span class="tk-cm"># Tasks are tagged with the CAPABILITY they need  -  never a worker id.</span>
 TASKS <span class="tk-op">=</span> [
     {<span class="tk-str">"capability"</span>: <span class="tk-str">"summarize"</span>, <span class="tk-str">"text"</span>: <span class="tk-str">"Cosmonapse is an A2A protocol that…"</span>},
     {<span class="tk-str">"capability"</span>: <span class="tk-str">"translate"</span>, <span class="tk-str">"text"</span>: <span class="tk-str">"Hello, world"</span>},
@@ -106,7 +106,7 @@ TASKS <span class="tk-op">=</span> [
 
 <span class="tk-kw">class</span> <span class="tk-fn">CapabilityRouter</span>:
     <span class="tk-str">"""Routes each task to a worker advertising the required capability,</span>
-<span class="tk-str">    discovered live from the RegistryStore — no hard-coded worker ids."""</span>
+<span class="tk-str">    discovered live from the RegistryStore  -  no hard-coded worker ids."""</span>
 
     <span class="tk-kw">def</span> <span class="tk-fn">__init__</span>(self, dendrite):
         self._dendrite <span class="tk-op">=</span> dendrite
@@ -168,7 +168,7 @@ TASKS <span class="tk-op">=</span> [
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
 // ===========================================================================
-// TypeScript — NATS variant (cross-process: worker.ts + router.ts)
+// TypeScript  -  NATS variant (cross-process: worker.ts + router.ts)
 // ===========================================================================
 
 const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
@@ -194,7 +194,7 @@ const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSy
   dendrite.<span class="tk-fn">attachAxon</span>(<span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({ neuronId: role, neuronFn: fn, capabilities }));
 
   <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${role} ready — advertising \${capabilities.join(", ")}\`</span>);
+  console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${role} ready  -  advertising \${capabilities.join(", ")}\`</span>);
   <span class="tk-kw">await</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>(() <span class="tk-op">=&gt;</span> {});   <span class="tk-cm">// run forever</span>
 }
 
@@ -253,7 +253,7 @@ const tsRouterNats = `<span class="tk-kw">import</span> { Dendrite, MemoryRegist
 <span class="tk-fn">main</span>();`;
 
 // ===========================================================================
-// TypeScript — devsynapse variant (MemorySynapse, single in-process file)
+// TypeScript  -  devsynapse variant (MemorySynapse, single in-process file)
 // ===========================================================================
 
 const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse, MemoryRegistryStore, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
@@ -339,12 +339,12 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
       installStep(combo),
       ...(broker ? [broker] : []),
       {
-        eyebrow: "Workers — two specialised Neurons",
+        eyebrow: "Workers  -  two specialised Neurons",
         prose: (
           <>
             One <code className="inline">worker.py</code> serves both roles; the{" "}
             <code className="inline">ROLES</code> map picks the capabilities and
-            the function. Each Axon advertises its capabilities in REGISTER —
+            the function. Each Axon advertises its capabilities in REGISTER  - 
             that is what the router searches on.
           </>
         ),
@@ -352,7 +352,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
         html: pyWorker(url),
       },
       {
-        eyebrow: "The Router — discover by capability",
+        eyebrow: "The Router  -  discover by capability",
         prose: (
           <>
             The router is a Dendrite with a{" "}
@@ -360,7 +360,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
             store, it auto-subscribes to REGISTER / HEARTBEAT / DEREGISTER and
             keeps a live view of the namespace. Each task calls{" "}
             <code className="inline">find_neurons(capability=…)</code> instead of
-            naming a worker — workers can join or leave at runtime.
+            naming a worker  -  workers can join or leave at runtime.
           </>
         ),
         filename: "router.py",
@@ -379,7 +379,7 @@ function tsNatsData(): ComboData {
       installStep("ts-nats"),
       ...(broker ? [broker] : []),
       {
-        eyebrow: "Workers — bring-your-own Neuron",
+        eyebrow: "Workers  -  bring-your-own Neuron",
         prose: (
           <>
             A Neuron is simply an{" "}
@@ -392,7 +392,7 @@ function tsNatsData(): ComboData {
         html: tsWorkerNats,
       },
       {
-        eyebrow: "The Router — discover by capability",
+        eyebrow: "The Router  -  discover by capability",
         prose: (
           <>
             Identical logic to Python: a{" "}
@@ -446,7 +446,7 @@ function extendBody(combo: Combo): React.ReactNode {
       <p>
         <strong>Many providers per capability.</strong>{" "}
         <code className="inline">find_neurons(capability=…)</code> returns every
-        live match — load-balance across them (round-robin, least-recently-seen,
+        live match  -  load-balance across them (round-robin, least-recently-seen,
         or by <code className="inline">version</code>) instead of always taking
         the first.
       </p>
@@ -458,7 +458,7 @@ function extendBody(combo: Combo): React.ReactNode {
         view survives restarts and is shared across multiple router processes.
       </p>
       <p>
-        <strong>Watch members come and go.</strong> Kill a worker — it stops
+        <strong>Watch members come and go.</strong> Kill a worker  -  it stops
         heartbeating and is marked deregistered;{" "}
         <code className="inline">registry_snapshot(include_deregistered=True)</code>{" "}
         shows the full history, while routing skips anything offline.
@@ -469,13 +469,13 @@ function extendBody(combo: Combo): React.ReactNode {
           <code className="inline">MemorySynapse</code> for{" "}
           <code className="inline">NatsSynapse</code> (the NATS tab) and split
           the file into <code className="inline">worker.ts</code> +{" "}
-          <code className="inline">router.ts</code> — the discovery code is
+          <code className="inline">router.ts</code>  -  the discovery code is
           identical.
         </p>
       ) : (
         <p>
           <strong>Change transport.</strong> Every other tab is the same
-          topology — only the install, the synapse you connect to, and the
+          topology  -  only the install, the synapse you connect to, and the
           launch commands change. The capability-routing logic is byte-for-byte
           identical.
         </p>
@@ -518,9 +518,9 @@ export default function CapabilityRoutingClient() {
             and discovers workers from the REGISTER signals they broadcast. Each
             task names a <em>capability</em>; the router calls{" "}
             <code className="inline">find_neurons(capability=…)</code> to find a
-            live worker that advertises it. Workers join and leave at runtime —
+            live worker that advertises it. Workers join and leave at runtime  - 
             no hard-coded address lists. The same code runs over five language ×
-            transport stacks — pick one below.
+            transport stacks  -  pick one below.
           </p>
 
           <div
@@ -552,7 +552,7 @@ export default function CapabilityRoutingClient() {
               <code className="inline">cosmonapse.&lt;ns&gt;.TASK.routed</code> with a
               queue group keyed on each Dendrite&rsquo;s aggregate capabilities. The
               broker delivers each TASK <strong>exactly once</strong> within a matching
-              cap profile — no router-side discovery code needed. Use the
+              cap profile  -  no router-side discovery code needed. Use the
               RegistryStore-based pattern below when you need richer selection (preferred
               version, locality, cost) or use <Link href="/examples/bidding" className="inline-link">bidding</Link>{" "}
               for atomic claim across heterogeneous workers.
@@ -586,7 +586,7 @@ export default function CapabilityRoutingClient() {
             <Link href="/concepts" className="card">
               <div className="card-icon">→</div>
               <h3>Concepts</h3>
-              <p>Neuron, Axon, Dendrite, Synapse — what each one is and isn&apos;t.</p>
+              <p>Neuron, Axon, Dendrite, Synapse  -  what each one is and isn&apos;t.</p>
             </Link>
           </div>
         </div>

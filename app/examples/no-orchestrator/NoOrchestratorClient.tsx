@@ -9,7 +9,7 @@ import ComboExample, {
 import { PY_URL, installStep, brokerStep, runStep } from "../_shared";
 
 // ===========================================================================
-// Python — self-selecting worker + a routing-free producer.
+// Python  -  self-selecting worker + a routing-free producer.
 // Both workers run the SAME owner_of(trace_id); exactly one claims each task.
 // Only SYNAPSE_URL changes between dev / NATS / Kafka.
 // ===========================================================================
@@ -23,12 +23,12 @@ MY_ID       <span class="tk-op">=</span> <span class="tk-str">"worker-a"</span> 
 PEERS       <span class="tk-op">=</span> (<span class="tk-str">"worker-a"</span>, <span class="tk-str">"worker-b"</span>)   <span class="tk-cm"># every peer knows the pool</span>
 
 <span class="tk-kw">def</span> <span class="tk-fn">owner_of</span>(trace_id: str) <span class="tk-op">-&gt;</span> str:
-    <span class="tk-str">"""Pure function: every peer computes the SAME owner — no coordination."""</span>
+    <span class="tk-str">"""Pure function: every peer computes the SAME owner  -  no coordination."""</span>
     h <span class="tk-op">=</span> <span class="tk-fn">int</span>(hashlib.<span class="tk-fn">sha1</span>(trace_id.<span class="tk-fn">encode</span>()).<span class="tk-fn">hexdigest</span>(), <span class="tk-num">16</span>)
     <span class="tk-kw">return</span> PEERS[h <span class="tk-op">%</span> <span class="tk-fn">len</span>(PEERS)]
 
 <span class="tk-kw">async def</span> <span class="tk-fn">main</span>():
-    <span class="tk-cm"># The Axon is NOT attached — we route by hash, not by neuron-id.</span>
+    <span class="tk-cm"># The Axon is NOT attached  -  we route by hash, not by neuron-id.</span>
     axon <span class="tk-op">=</span> Axon(
         neuron_id<span class="tk-op">=</span>MY_ID,
         neuron_fn<span class="tk-op">=</span>Neuron(
@@ -55,7 +55,7 @@ PEERS       <span class="tk-op">=</span> (<span class="tk-str">"worker-a"</span>
     <span class="tk-kw">try</span>:
         <span class="tk-kw">async with</span> dendrite:
             <span class="tk-kw">await</span> dendrite.<span class="tk-fn">subscribe</span>(SignalType.TASK, on_task)
-            <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"{MY_ID} listening — no cortex, no queue"</span>)
+            <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"{MY_ID} listening  -  no cortex, no queue"</span>)
             <span class="tk-kw">await</span> asyncio.<span class="tk-fn">Event</span>().<span class="tk-fn">wait</span>()
     <span class="tk-kw">finally</span>:
         <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>()
@@ -86,7 +86,7 @@ SYNAPSE_URL <span class="tk-op">=</span> <span class="tk-str">"${url}"</span>
                 trace_id <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()
                 fut <span class="tk-op">=</span> asyncio.<span class="tk-fn">get_running_loop</span>().<span class="tk-fn">create_future</span>()
                 pending[trace_id] <span class="tk-op">=</span> fut
-                <span class="tk-cm"># The producer does NO routing — it just drops work in.</span>
+                <span class="tk-cm"># The producer does NO routing  -  it just drops work in.</span>
                 <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(neuron<span class="tk-op">=</span><span class="tk-str">"pool"</span>,
                                              input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: p}, trace_id<span class="tk-op">=</span>trace_id)
                 who, out <span class="tk-op">=</span> <span class="tk-kw">await</span> asyncio.<span class="tk-fn">wait_for</span>(fut, timeout<span class="tk-op">=</span><span class="tk-num">60</span>)
@@ -97,7 +97,7 @@ SYNAPSE_URL <span class="tk-op">=</span> <span class="tk-str">"${url}"</span>
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
 // ===========================================================================
-// TypeScript — NATS variant (cross-process: worker.ts + producer.ts)
+// TypeScript  -  NATS variant (cross-process: worker.ts + producer.ts)
 // ===========================================================================
 
 const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSynapse, SignalType } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
@@ -107,7 +107,7 @@ const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSy
 <span class="tk-kw">const</span> PEERS <span class="tk-op">=</span> [<span class="tk-str">"worker-a"</span>, <span class="tk-str">"worker-b"</span>];
 <span class="tk-kw">const</span> NAMESPACE <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
 
-<span class="tk-cm">// Pure function: every peer computes the SAME owner — no coordination.</span>
+<span class="tk-cm">// Pure function: every peer computes the SAME owner  -  no coordination.</span>
 <span class="tk-kw">const</span> <span class="tk-fn">ownerOf</span> <span class="tk-op">=</span> (traceId: string) <span class="tk-op">=&gt;</span> {
   <span class="tk-kw">const</span> h <span class="tk-op">=</span> <span class="tk-fn">createHash</span>(<span class="tk-str">"sha1"</span>).<span class="tk-fn">update</span>(traceId).<span class="tk-fn">digest</span>();
   <span class="tk-kw">return</span> PEERS[h.<span class="tk-fn">readUInt32BE</span>(<span class="tk-num">0</span>) <span class="tk-op">%</span> PEERS.length];
@@ -120,7 +120,7 @@ const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSy
   <span class="tk-kw">const</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
     synapse, namespace: NAMESPACE, dendriteId: MY_ID, heartbeatMs: <span class="tk-num">0</span>,
   });
-  <span class="tk-cm">// The Axon is NOT attached — we route by hash, not by neuron-id.</span>
+  <span class="tk-cm">// The Axon is NOT attached  -  we route by hash, not by neuron-id.</span>
   <span class="tk-kw">const</span> axon <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({
     neuronId: MY_ID,
     neuronFn: <span class="tk-kw">async</span> (input: any) <span class="tk-op">=&gt;</span> ({ response: <span class="tk-str">\`[\${MY_ID}] line about \${input.prompt}\`</span> }),
@@ -134,7 +134,7 @@ const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSy
     <span class="tk-kw">await</span> dendrite.<span class="tk-fn">publish</span>(<span class="tk-kw">await</span> axon.<span class="tk-fn">handleTask</span>(task));   <span class="tk-cm">// AGENT_OUTPUT</span>
   });
 
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${MY_ID} listening — no cortex, no queue\`</span>);
+  console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${MY_ID} listening  -  no cortex, no queue\`</span>);
   <span class="tk-kw">await</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>(() <span class="tk-op">=&gt;</span> {});
 }
 
@@ -159,7 +159,7 @@ const tsProducerNats = `<span class="tk-kw">import</span> { Dendrite, NatsSynaps
   <span class="tk-kw">for</span> (<span class="tk-kw">const</span> prompt <span class="tk-kw">of</span> [<span class="tk-str">"the sun"</span>, <span class="tk-str">"the moon"</span>, <span class="tk-str">"the sea"</span>, <span class="tk-str">"the wind"</span>]) {
     <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
     <span class="tk-kw">const</span> done: any <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>((res) <span class="tk-op">=&gt;</span> pending.<span class="tk-fn">set</span>(traceId, res));
-    <span class="tk-cm">// No routing here — the workers decide who answers.</span>
+    <span class="tk-cm">// No routing here  -  the workers decide who answers.</span>
     <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"pool"</span>, input: { prompt }, traceId });
     <span class="tk-kw">const</span> [who, out] <span class="tk-op">=</span> <span class="tk-kw">await</span> done;
     console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${who} answered: \${out.response}\`</span>);
@@ -170,7 +170,7 @@ const tsProducerNats = `<span class="tk-kw">import</span> { Dendrite, NatsSynaps
 <span class="tk-fn">main</span>();`;
 
 // ===========================================================================
-// TypeScript — devsynapse variant (MemorySynapse, single in-process file)
+// TypeScript  -  devsynapse variant (MemorySynapse, single in-process file)
 // ===========================================================================
 
 const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse, SignalType, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
@@ -179,7 +179,7 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
 <span class="tk-kw">const</span> NS <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
 <span class="tk-kw">const</span> PEERS <span class="tk-op">=</span> [<span class="tk-str">"worker-a"</span>, <span class="tk-str">"worker-b"</span>];
 
-<span class="tk-cm">// Every peer runs this identically — exactly one claims each trace.</span>
+<span class="tk-cm">// Every peer runs this identically  -  exactly one claims each trace.</span>
 <span class="tk-kw">const</span> <span class="tk-fn">ownerOf</span> <span class="tk-op">=</span> (t: string) <span class="tk-op">=&gt;</span> {
   <span class="tk-kw">const</span> h <span class="tk-op">=</span> <span class="tk-fn">createHash</span>(<span class="tk-str">"sha1"</span>).<span class="tk-fn">update</span>(t).<span class="tk-fn">digest</span>();
   <span class="tk-kw">return</span> PEERS[h.<span class="tk-fn">readUInt32BE</span>(<span class="tk-num">0</span>) <span class="tk-op">%</span> PEERS.length];
@@ -201,7 +201,7 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
 };
 
 <span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">MemorySynapse</span>();   <span class="tk-cm">// in-process — no broker</span>
+  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">MemorySynapse</span>();   <span class="tk-cm">// in-process  -  no broker</span>
   <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
   <span class="tk-kw">await</span> Promise.<span class="tk-fn">all</span>(PEERS.<span class="tk-fn">map</span>((id) <span class="tk-op">=&gt;</span> <span class="tk-fn">makeWorker</span>(synapse, id)));
 
@@ -233,10 +233,10 @@ const outputSnippet = `<span class="tk-op">$</span> python producer.py
 [worker-b] claims 92aa5b30
 
 <span class="tk-cm"># producer.py prints, in order:</span>
-worker-b answered: Golden disc ascends — silence breaks into light.
-worker-a answered: Pale lantern in the dark — tides remember her face.
+worker-b answered: Golden disc ascends  -  silence breaks into light.
+worker-a answered: Pale lantern in the dark  -  tides remember her face.
 worker-a answered: Salt sighs against stone, an old song the wind forgot.
-worker-b answered: Invisible river — it bends the wheat into prayer.`;
+worker-b answered: Invisible river  -  it bends the wheat into prayer.`;
 
 // ---------------------------------------------------------------------------
 // Per-combo step assembly
@@ -263,7 +263,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   ]);
   last.afterProse = (
     <>
-      Ownership is decided by the trace id, so the split is deterministic — not
+      Ownership is decided by the trace id, so the split is deterministic  -  not
       strictly alternating:
     </>
   );
@@ -273,18 +273,18 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
       installStep(combo),
       ...(broker ? [broker] : []),
       {
-        eyebrow: "Worker — it decides for itself",
+        eyebrow: "Worker  -  it decides for itself",
         prose: noAttachNote,
         filename: "worker_a.py",
         html: pyWorker(url),
       },
       {
-        eyebrow: "Producer — drops work in, routes nothing",
+        eyebrow: "Producer  -  drops work in, routes nothing",
         prose: (
           <>
             The producer fires tasks addressed to a logical{" "}
             <code className="inline">&quot;pool&quot;</code> and waits for
-            results. It never picks a worker — the{" "}
+            results. It never picks a worker  -  the{" "}
             <code className="inline">AGENT_OUTPUT</code> tells it who answered
             via <code className="inline">sig.neuron</code>.
           </>
@@ -305,7 +305,7 @@ function tsNatsData(): ComboData {
       installStep("ts-nats"),
       ...(broker ? [broker] : []),
       {
-        eyebrow: "Worker — it decides for itself",
+        eyebrow: "Worker  -  it decides for itself",
         prose: (
           <>
             Same idea as Python: subscribe to{" "}
@@ -319,7 +319,7 @@ function tsNatsData(): ComboData {
         html: tsWorkerNats,
       },
       {
-        eyebrow: "Producer — drops work in, routes nothing",
+        eyebrow: "Producer  -  drops work in, routes nothing",
         prose: (
           <>
             Dispatches to the logical{" "}
@@ -371,7 +371,7 @@ function extendBody(combo: Combo): React.ReactNode {
       <p>
         <strong>More peers.</strong> Add an id to{" "}
         <code className="inline">PEERS</code> on every worker. The hash spreads
-        load across the new size automatically — no central change.
+        load across the new size automatically  -  no central change.
       </p>
       <p>
         <strong>Smoother rebalancing.</strong> Swap the modulo for{" "}
@@ -383,7 +383,7 @@ function extendBody(combo: Combo): React.ReactNode {
         the workers to <em>decide</em>, give them the same{" "}
         <code className="inline">queue_group</code> on{" "}
         <code className="inline">subscribe(...)</code> and let the Synapse hand
-        each task to exactly one — no hashing required.
+        each task to exactly one  -  no hashing required.
       </p>
       <p>
         <strong>Live membership.</strong> Attach a{" "}
@@ -437,7 +437,7 @@ export default function NoOrchestratorClient() {
           </h1>
           <p className="page-sub">
             Drop the orchestrator entirely. A producer drops tasks into the
-            namespace and every worker hears all of them — but each runs the
+            namespace and every worker hears all of them  -  but each runs the
             same pure <code className="inline">owner_of(trace_id)</code>, so
             exactly one claims each task with zero coordination. No cortex, no
             queue, no shared state. Pick a stack below.
@@ -455,14 +455,14 @@ export default function NoOrchestratorClient() {
               <div className="card-icon">←</div>
               <h3>Orchestrator + Round Robin</h3>
               <p>
-                The centralised counterpart — one Cortex assigns every task in a
+                The centralised counterpart  -  one Cortex assigns every task in a
                 rotation.
               </p>
             </Link>
             <Link href="/concepts" className="card">
               <div className="card-icon">→</div>
               <h3>Concepts</h3>
-              <p>Neuron, Axon, Dendrite, Synapse — what each one is and isn&apos;t.</p>
+              <p>Neuron, Axon, Dendrite, Synapse  -  what each one is and isn&apos;t.</p>
             </Link>
             <Link href="/docs" className="card">
               <div className="card-icon">→</div>

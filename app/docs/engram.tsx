@@ -23,7 +23,7 @@ export const engramToc: TocGroup = {
 
 /* ─────────────────────────────  CODE SNIPPETS  ───────────────────────────── */
 
-const installSnippet = `<span class="tk-cm"># Engram ships inside the base cosmonapse package — nothing extra for</span>
+const installSnippet = `<span class="tk-cm"># Engram ships inside the base cosmonapse package  -  nothing extra for</span>
 <span class="tk-cm"># InMemoryEngram and SqliteEngram (stdlib sqlite3).</span>
 <span class="tk-op">$</span> pip install cosmonapse
 
@@ -71,9 +71,9 @@ axon = Axon(
     neuron_id=<span class="tk-str">"summariser"</span>,
     neuron_fn=summariser,
     engrams=[
-        <span class="tk-cm"># Addressed routing — Neuron says recall("notes", ...)</span>
+        <span class="tk-cm"># Addressed routing  -  Neuron says recall("notes", ...)</span>
         EngramBinding(name=<span class="tk-str">"notes"</span>, engram_id=<span class="tk-str">"notes-default"</span>),
-        <span class="tk-cm"># Slot routing — deployment owns the concrete vector store</span>
+        <span class="tk-cm"># Slot routing  -  deployment owns the concrete vector store</span>
         EngramBinding(
             name=<span class="tk-str">"memory"</span>,
             engram_kind=<span class="tk-str">"semantic"</span>,
@@ -85,7 +85,7 @@ axon = Axon(
 
 const helperSnippet = `<span class="tk-cm"># Injected into the Neuron when neuron_fn declares the kwargs.</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">summariser</span>(input, context, *, recall, imprint):
-    <span class="tk-cm"># READ — returns a RecallResult (iterable of Hit)</span>
+    <span class="tk-cm"># READ  -  returns a RecallResult (iterable of Hit)</span>
     prior = <span class="tk-kw">await</span> recall(
         <span class="tk-str">"notes"</span>,                       <span class="tk-cm"># binding name (must be wired on the Axon)</span>
         query={<span class="tk-str">"text"</span>: input[<span class="tk-str">"topic"</span>]},
@@ -97,7 +97,7 @@ const helperSnippet = `<span class="tk-cm"># Injected into the Neuron when neuro
 
     note = <span class="tk-str">f"summary of {input['topic']} ({len(prior)} priors)"</span>
 
-    <span class="tk-cm"># WRITE — fire-and-forget by default (await_ack=False)</span>
+    <span class="tk-cm"># WRITE  -  fire-and-forget by default (await_ack=False)</span>
     <span class="tk-kw">await</span> imprint(
         <span class="tk-str">"notes"</span>,
         op=<span class="tk-str">"append"</span>,                    <span class="tk-cm"># add | append | merge | upsert | delete</span>
@@ -105,7 +105,7 @@ const helperSnippet = `<span class="tk-cm"># Injected into the Neuron when neuro
         merge_key=input[<span class="tk-str">"topic"</span>],
     )
 
-    <span class="tk-cm"># WRITE + receipt — await the IMPRINTED ack</span>
+    <span class="tk-cm"># WRITE + receipt  -  await the IMPRINTED ack</span>
     receipt = <span class="tk-kw">await</span> imprint(
         <span class="tk-str">"notes"</span>, op=<span class="tk-str">"upsert"</span>, entry={<span class="tk-str">"content"</span>: note},
         merge_key=input[<span class="tk-str">"topic"</span>], await_ack=<span class="tk-kw">True</span>, deadline_ms=<span class="tk-num">500</span>,
@@ -155,7 +155,7 @@ const abcSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Engram<
         context_ref: <span class="tk-fn">str</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>,
         deadline_ms: <span class="tk-fn">int</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>,
         min_confidence: <span class="tk-fn">float</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>,
-    ) -> <span class="tk-fn">list</span>[Hit]: ...        <span class="tk-cm"># empty list on a miss — never raise</span>
+    ) -> <span class="tk-fn">list</span>[Hit]: ...        <span class="tk-cm"># empty list on a miss  -  never raise</span>
 
     <span class="tk-kw">async def</span> <span class="tk-fn">imprint</span>(
         self, op: <span class="tk-fn">str</span>, entry: <span class="tk-fn">dict</span>, *,
@@ -262,7 +262,7 @@ host.engrams                     <span class="tk-cm"># {"notes-default": notes}<
 const clientSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">EngramClient</span>:
     <span class="tk-cm"># One per Dendrite. The Dendrite constructs it and drives delivery;</span>
     <span class="tk-cm"># the Axon's recall/imprint helpers call into it. You rarely touch</span>
-    <span class="tk-cm"># it directly — it is the caller-side correlation table.</span>
+    <span class="tk-cm"># it directly  -  it is the caller-side correlation table.</span>
     <span class="tk-kw">def</span> <span class="tk-fn">__init__</span>(self, dendrite: Dendrite): ...
 
     <span class="tk-kw">async def</span> <span class="tk-fn">recall</span>(self, *, query, trace_id, parent_id, ...) -> RecallResult
@@ -272,13 +272,13 @@ const clientSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Engr
     <span class="tk-kw">def</span> <span class="tk-fn">cancel_trace</span>(self, trace_id: <span class="tk-fn">str</span>) -> <span class="tk-kw">None</span>   <span class="tk-cm"># on FINAL/ERROR for the trace</span>
     <span class="tk-kw">def</span> <span class="tk-fn">cancel_all</span>(self) -> <span class="tk-kw">None</span>                     <span class="tk-cm"># on Dendrite shutdown</span>`;
 
-const recallWireSnippet = `<span class="tk-cm">// RECALL — emitted by a hosting Dendrite on the Neuron's behalf</span>
+const recallWireSnippet = `<span class="tk-cm">// RECALL  -  emitted by a hosting Dendrite on the Neuron's behalf</span>
 {
   <span class="tk-str">"type"</span>: <span class="tk-str">"RECALL"</span>,
   <span class="tk-str">"trace_id"</span>: <span class="tk-str">"trc_01JV…"</span>,   <span class="tk-cm">// inherited from the containing TASK</span>
   <span class="tk-str">"parent_id"</span>: <span class="tk-str">"evt_01JV…"</span>,
   <span class="tk-str">"payload"</span>: {
-    <span class="tk-str">"engram_id"</span>:   <span class="tk-str">"pgvector-default"</span>,  <span class="tk-cm">// OR engram_kind — id wins</span>
+    <span class="tk-str">"engram_id"</span>:   <span class="tk-str">"pgvector-default"</span>,  <span class="tk-cm">// OR engram_kind  -  id wins</span>
     <span class="tk-str">"engram_kind"</span>: <span class="tk-str">"semantic"</span>,
     <span class="tk-str">"query"</span>:       { <span class="tk-str">"text"</span>: <span class="tk-str">"eviction cause"</span> },
     <span class="tk-str">"filters"</span>:     { <span class="tk-str">"tags"</span>: [<span class="tk-str">"k8s"</span>] },
@@ -287,7 +287,7 @@ const recallWireSnippet = `<span class="tk-cm">// RECALL — emitted by a hostin
   }
 }`;
 
-const recalledWireSnippet = `<span class="tk-cm">// RECALLED — one per responding Engram; parent_id → the RECALL</span>
+const recalledWireSnippet = `<span class="tk-cm">// RECALLED  -  one per responding Engram; parent_id → the RECALL</span>
 {
   <span class="tk-str">"type"</span>: <span class="tk-str">"RECALLED"</span>,
   <span class="tk-str">"payload"</span>: {
@@ -301,7 +301,7 @@ const recalledWireSnippet = `<span class="tk-cm">// RECALLED — one per respond
   }
 }`;
 
-const imprintWireSnippet = `<span class="tk-cm">// IMPRINT — addressed write (broadcast is opt-in via meta.broadcast)</span>
+const imprintWireSnippet = `<span class="tk-cm">// IMPRINT  -  addressed write (broadcast is opt-in via meta.broadcast)</span>
 {
   <span class="tk-str">"type"</span>: <span class="tk-str">"IMPRINT"</span>,
   <span class="tk-str">"payload"</span>: {
@@ -316,7 +316,7 @@ const imprintWireSnippet = `<span class="tk-cm">// IMPRINT — addressed write (
   }
 }
 
-<span class="tk-cm">// IMPRINTED — ack; parent_id → the IMPRINT</span>
+<span class="tk-cm">// IMPRINTED  -  ack; parent_id → the IMPRINT</span>
 {
   <span class="tk-str">"type"</span>: <span class="tk-str">"IMPRINTED"</span>,
   <span class="tk-str">"payload"</span>: {
@@ -327,7 +327,7 @@ const imprintWireSnippet = `<span class="tk-cm">// IMPRINT — addressed write (
 
 const idSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> new_engram_id
 
-new_engram_id()   <span class="tk-cm"># 'eng_01JVZ8K3M2…' — sortable ULID, eng_ prefix</span>`;
+new_engram_id()   <span class="tk-cm"># 'eng_01JVZ8K3M2…'  -  sortable ULID, eng_ prefix</span>`;
 
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
 
@@ -340,20 +340,20 @@ export default function EngramDocs() {
           Shared memory for Neurons, addressed as a first-class participant.
         </h2>
         <p className="docs-megasection-sub">
-          An <strong>Engram</strong> is a storage wrapper — the second persistent surface in
+          An <strong>Engram</strong> is a storage wrapper  -  the second persistent surface in
           Cosmonapse after the <code className="inline">RegistryStore</code>, and optional in the same
           way. It is a synapse-side participant with its own envelope category (like a Dendrite), not
           a Neuron: it never produces <code className="inline">AGENT_OUTPUT</code>. Neurons reach it
-          only through Signals — <code className="inline">RECALL</code> /{" "}
-          <code className="inline">IMPRINT</code> — that ride inside the containing TASK trace.
+          only through Signals  -  <code className="inline">RECALL</code> /{" "}
+          <code className="inline">IMPRINT</code>  -  that ride inside the containing TASK trace.
         </p>
       </div>
 
       {/* ─── Overview ─── */}
-      <Section id="eg-overview" eyebrow="ENGRAM · 01" title="Overview — the mental model">
+      <Section id="eg-overview" eyebrow="ENGRAM · 01" title="Overview  -  the mental model">
         <p className="docs-p">
           One Engram wraps <strong>one</strong> backend (sqlite, postgres, a vector store, an object
-          store — anything that holds bytes and answers queries) and owns its own schema. A namespace
+          store  -  anything that holds bytes and answers queries) and owns its own schema. A namespace
           may run <strong>zero, one, or many</strong> Engrams, each serving a distinct memory purpose:
           one for working context, one for vectors, one for blobs, one for relational records.
         </p>
@@ -411,7 +411,7 @@ export default function EngramDocs() {
           </tbody>
         </table>
 
-        <h3 className="docs-h3">engram_kind — conventional values</h3>
+        <h3 className="docs-h3">engram_kind  -  conventional values</h3>
         <p className="docs-p">
           <code className="inline">engram_kind</code> is a routing label. Conventional values are{" "}
           <code className="inline">relational</code>, <code className="inline">semantic</code>,{" "}
@@ -445,13 +445,13 @@ export default function EngramDocs() {
       </Section>
 
       {/* ─── EngramBinding ─── */}
-      <Section id="eg-binding" eyebrow="ENGRAM · 04" title="EngramBinding — declarative wiring">
+      <Section id="eg-binding" eyebrow="ENGRAM · 04" title="EngramBinding  -  declarative wiring">
         <p className="docs-p">
           An <strong>EngramBinding</strong> is how an Axon declares which Engrams its Neuron may
           address. The Axon stores a list of them at construction, so the Neuron references memory by
           a stable local <code className="inline">name</code> (e.g.{" "}
           <code className="inline">&quot;notes&quot;</code>) rather than a deployment-specific{" "}
-          <code className="inline">engram_id</code>. The Axon enforces this whitelist — a Neuron cannot
+          <code className="inline">engram_id</code>. The Axon enforces this whitelist  -  a Neuron cannot
           touch an Engram it was not wired to.
         </p>
         <ApiCard
@@ -485,7 +485,7 @@ export default function EngramDocs() {
             <tr>
               <td>engram_kind</td>
               <td>str | None</td>
-              <td>Slot routing — deployment owns the concrete implementation behind a kind.</td>
+              <td>Slot routing  -  deployment owns the concrete implementation behind a kind.</td>
             </tr>
             <tr>
               <td>default_deadline_ms</td>
@@ -505,13 +505,13 @@ export default function EngramDocs() {
       </Section>
 
       {/* ─── Helpers ─── */}
-      <Section id="eg-helpers" eyebrow="ENGRAM · 05" title="recall() & imprint() — the Neuron-side helpers">
+      <Section id="eg-helpers" eyebrow="ENGRAM · 05" title="recall() & imprint()  -  the Neuron-side helpers">
         <p className="docs-p">
           When a <code className="inline">neuron_fn</code> declares{" "}
           <code className="inline">recall</code> and/or <code className="inline">imprint</code>{" "}
           keyword-only parameters, the Axon injects bound async helpers for the current trace. They
           resolve the binding name, build the <code className="inline">RECALL</code> /{" "}
-          <code className="inline">IMPRINT</code> envelope, and correlate the response — all scoped to
+          <code className="inline">IMPRINT</code> envelope, and correlate the response  -  all scoped to
           the containing TASK&rsquo;s <code className="inline">trace_id</code> and{" "}
           <code className="inline">parent_id</code>. If no Engrams are wired, the helpers raise{" "}
           <code className="inline">EngramNotBound</code>.
@@ -520,7 +520,7 @@ export default function EngramDocs() {
         <ApiCard
           kind="async helper"
           name="recall(name, *, query, …) -> RecallResult"
-          summary="Emit RECALL to the bound Engram, await the response per recall_mode, and return a RecallResult. Returns an empty (falsy) result on a miss — it does not raise."
+          summary="Emit RECALL to the bound Engram, await the response per recall_mode, and return a RecallResult. Returns an empty (falsy) result on a miss  -  it does not raise."
         >
           <CodeBlock filename="recall.pyi" html={recallSigSnippet} maxWidth={760} />
         </ApiCard>
@@ -582,7 +582,7 @@ export default function EngramDocs() {
       </Section>
 
       {/* ─── Engram ABC ─── */}
-      <Section id="eg-abc" eyebrow="ENGRAM · 06" title="Engram — the backend ABC">
+      <Section id="eg-abc" eyebrow="ENGRAM · 06" title="Engram  -  the backend ABC">
         <p className="docs-p">
           Every backend implements this exact interface. The conformance suite in{" "}
           <code className="inline">tests/test_engram.py</code> runs against any{" "}
@@ -595,7 +595,7 @@ export default function EngramDocs() {
         <ApiCard
           kind="abstract base class"
           name="cosmonapse.engram.Engram"
-          summary="Storage wrapper — one backend per instance. recall() must return an empty list on a miss rather than raising."
+          summary="Storage wrapper  -  one backend per instance. recall() must return an empty list on a miss rather than raising."
         >
           <CodeBlock filename="engram.pyi" html={abcSnippet} maxWidth={840} />
         </ApiCard>
@@ -612,7 +612,7 @@ export default function EngramDocs() {
             <tr><td>version</td><td>attr: str | None</td><td>Optional backend version surfaced to callers.</td></tr>
             <tr><td>connect()</td><td>async, abstract</td><td>Open backend resources (DB pool, file handle).</td></tr>
             <tr><td>close()</td><td>async, abstract</td><td>Release backend resources.</td></tr>
-            <tr><td>recall(query, …)</td><td>async, abstract</td><td>Return matching <code className="inline">Hit</code>s. Empty list on a miss — never raise.</td></tr>
+            <tr><td>recall(query, …)</td><td>async, abstract</td><td>Return matching <code className="inline">Hit</code>s. Empty list on a miss  -  never raise.</td></tr>
             <tr><td>imprint(op, entry, …)</td><td>async, abstract</td><td>Write. Use <code className="inline">imprint_id</code> for idempotency (no-op on re-delivery).</td></tr>
             <tr><td>can_serve(query)</td><td>async, optional</td><td>Return <code className="inline">False</code> to decline a query (e.g. BM25 engram asked for vectors). Default serves all.</td></tr>
           </tbody>
@@ -694,9 +694,9 @@ export default function EngramDocs() {
       </Section>
 
       {/* ─── EngramClient ─── */}
-      <Section id="eg-client" eyebrow="ENGRAM · 10" title="EngramClient — caller-side correlation">
+      <Section id="eg-client" eyebrow="ENGRAM · 10" title="EngramClient  -  caller-side correlation">
         <p className="docs-p">
-          <code className="inline">EngramClient</code> is the caller-side bridge — one instance per
+          <code className="inline">EngramClient</code> is the caller-side bridge  -  one instance per
           Dendrite. The Axon&rsquo;s helpers and the Dendrite both call into it; only the Dendrite
           touches the Synapse. It builds envelopes, registers pending futures keyed by envelope{" "}
           <code className="inline">id</code>, resolves them when a matching{" "}
@@ -715,15 +715,15 @@ export default function EngramDocs() {
       </Section>
 
       {/* ─── Wire signals ─── */}
-      <Section id="eg-signals" eyebrow="ENGRAM · 11" title="Wire signals — RECALL / RECALLED / IMPRINT / IMPRINTED">
+      <Section id="eg-signals" eyebrow="ENGRAM · 11" title="Wire signals  -  RECALL / RECALLED / IMPRINT / IMPRINTED">
         <p className="docs-p">
           Engrams add four signal types to <code className="inline">SYNAPSE_TYPES</code>. Axons cannot
-          produce them directly — they go through the hosting Dendrite, the same as{" "}
+          produce them directly  -  they go through the hosting Dendrite, the same as{" "}
           <code className="inline">MEMORY_APPEND</code>. Routing precedence:{" "}
           <code className="inline">engram_id</code> beats <code className="inline">engram_kind</code>.
           Entry ids use the <code className="inline">eng_</code> ULID prefix. Engrams piggyback on{" "}
           <code className="inline">REGISTER</code> (<code className="inline">role: &quot;engram&quot;</code>),{" "}
-          <code className="inline">HEARTBEAT</code>, and <code className="inline">DISCOVER</code> — so
+          <code className="inline">HEARTBEAT</code>, and <code className="inline">DISCOVER</code>  -  so
           the <code className="inline">RegistryStore</code> already tracks them; no second registry.
         </p>
 
@@ -743,7 +743,7 @@ export default function EngramDocs() {
 
         <p className="docs-p">
           <code className="inline">MEMORY_APPEND</code> is now a convenience macro that compiles to{" "}
-          <code className="inline">IMPRINT {"{"} op: &quot;append&quot; {"}"}</code> — kept for
+          <code className="inline">IMPRINT {"{"} op: &quot;append&quot; {"}"}</code>  -  kept for
           back-compat, but prefer <code className="inline">IMPRINT</code>.{" "}
           <code className="inline">CONTEXT_SYNC</code> is unchanged: a transient broadcast, not a
           storage op.
@@ -756,7 +756,7 @@ export default function EngramDocs() {
           All Engram exceptions subclass <code className="inline">EngramError</code>. Backpressure
           (<code className="inline">EngramOverloaded</code>) surfaces as an{" "}
           <code className="inline">error</code> on the <code className="inline">IMPRINTED</code> receipt
-          rather than a separate <code className="inline">ERROR</code> signal — so a shed write does
+          rather than a separate <code className="inline">ERROR</code> signal  -  so a shed write does
           not terminate the parent TASK.
         </p>
         <table className="spec-table">
@@ -781,8 +781,8 @@ export default function EngramDocs() {
         </p>
         <CodeBlock filename="ids.py" html={idSnippet} maxWidth={640} />
         <p className="docs-p" style={{ marginTop: 24 }}>
-          For the protocol-level design rationale — routing precedence, broadcast semantics, and the
-          full envelope grammar — see the{" "}
+          For the protocol-level design rationale  -  routing precedence, broadcast semantics, and the
+          full envelope grammar  -  see the{" "}
           <Link href="/protocol" className="inline-link">
             envelope spec
           </Link>{" "}

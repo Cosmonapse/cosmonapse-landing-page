@@ -5,13 +5,13 @@ import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 
 // ---------------------------------------------------------------------------
-// Snippets — kept in sync with cosmonapse-core/examples/building_a_neuron/main.py
+// Snippets  -  kept in sync with cosmonapse-core/examples/building_a_neuron/main.py
 // ---------------------------------------------------------------------------
 
 const installSnippet = `<span class="tk-cm"># Python 3.11+. httpx powers the HuggingFace Neuron source.</span>
 <span class="tk-op">$</span> pip install cosmonapse httpx
 
-<span class="tk-cm"># Read scope is enough — the token grants access to the public</span>
+<span class="tk-cm"># Read scope is enough  -  the token grants access to the public</span>
 <span class="tk-cm"># Inference Providers router at https://router.huggingface.co.</span>
 <span class="tk-op">$</span> <span class="tk-kw">export</span> HF_TOKEN<span class="tk-op">=</span>hf_xxxxxxxxxxxxxxxxxxxxxxxx`;
 
@@ -20,7 +20,7 @@ const neuronSnippet = `<span class="tk-cm"># A Neuron is anything that satisfies
 <span class="tk-cm">#</span>
 <span class="tk-cm"># The unified factory wraps any source behind that interface. Here it's</span>
 <span class="tk-cm"># a HuggingFace endpoint; it could equally be Ollama, a Flask app, or an</span>
-<span class="tk-cm"># MCP server — the Axon never knows the difference.</span>
+<span class="tk-cm"># MCP server  -  the Axon never knows the difference.</span>
 <span class="tk-kw">import</span> os
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Neuron
 
@@ -38,7 +38,7 @@ greeter <span class="tk-op">=</span> Neuron(
 <span class="tk-cm"># Output the Neuron returns:    {"response": "&lt;text&gt;", "meta": &lt;raw&gt;}</span>`;
 
 const axonSnippet = `<span class="tk-cm"># The Axon declares identity + capabilities and owns the Neuron.</span>
-<span class="tk-cm"># It doesn't know it's wrapping an LLM — this code is byte-for-byte the</span>
+<span class="tk-cm"># It doesn't know it's wrapping an LLM  -  this code is byte-for-byte the</span>
 <span class="tk-cm"># same as it would be for a hand-written async function.</span>
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon
 
@@ -53,7 +53,7 @@ const dendriteSnippet = `<span class="tk-cm"># The Dendrite is the only componen
 <span class="tk-cm"># but cannot emit orchestration signals (TASK / FINAL / etc.).</span>
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, MemorySynapse
 
-synapse <span class="tk-op">=</span> MemorySynapse()         <span class="tk-cm"># in-process — no socket</span>
+synapse <span class="tk-op">=</span> MemorySynapse()         <span class="tk-cm"># in-process  -  no socket</span>
 <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>()
 
 worker <span class="tk-op">=</span> Dendrite(
@@ -121,15 +121,15 @@ greeter <span class="tk-op">=</span> Neuron(
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
 const outputSnippet = `<span class="tk-op">$</span> python main.py
-[AGENT_OUTPUT] Hello, Cosmonapse! Welcome aboard — let's build something cool.`;
+[AGENT_OUTPUT] Hello, Cosmonapse! Welcome aboard  -  let's build something cool.`;
 
 const swapEndpointSnippet = `<span class="tk-cm"># The endpoint is the only HF-specific line. Point it elsewhere for any</span>
-<span class="tk-cm"># OpenAI-compatible chat server — your Neuron code never changes.</span>
+<span class="tk-cm"># OpenAI-compatible chat server  -  your Neuron code never changes.</span>
 endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>                          <span class="tk-cm"># default</span>
 endpoint<span class="tk-op">=</span><span class="tk-str">"https://&lt;your-endpoint&gt;.endpoints.huggingface.cloud"</span>   <span class="tk-cm"># dedicated HF endpoint</span>
 endpoint<span class="tk-op">=</span><span class="tk-str">"http://localhost:8080"</span>                                 <span class="tk-cm"># local TGI / vLLM / LM Studio</span>
 
-<span class="tk-cm"># For Ollama, switch source — same Axon, same Dendrite.</span>
+<span class="tk-cm"># For Ollama, switch source  -  same Axon, same Dendrite.</span>
 greeter <span class="tk-op">=</span> Neuron(source<span class="tk-op">=</span><span class="tk-str">"ollama"</span>, model<span class="tk-op">=</span><span class="tk-str">"llama3"</span>)`;
 
 export default function BuildingNeuronClient() {
@@ -140,7 +140,7 @@ export default function BuildingNeuronClient() {
           <div className="page-eyebrow">// Example 01 · Beginner</div>
           <h1 className="page-title">Building a Neuron.</h1>
           <p className="page-sub">
-            The smallest possible Cosmonapse program — one LLM Neuron backed by
+            The smallest possible Cosmonapse program  -  one LLM Neuron backed by
             Hugging Face, one Axon, one Dendrite, one TASK, one reply. Single
             process, in-memory{" "}
             <Link href="/concepts" className="inline-link">Synapse</Link>, no
@@ -165,7 +165,7 @@ export default function BuildingNeuronClient() {
             >
               huggingface.co/settings/tokens
             </a>{" "}
-            — read scope is enough.
+             -  read scope is enough.
           </p>
           <CodeBlock html={installSnippet} maxWidth={760} />
         </div>
@@ -198,7 +198,7 @@ export default function BuildingNeuronClient() {
             The <Link href="/concepts" className="inline-link">Axon</Link> wraps
             the Neuron, gives it an addressable id on the bus, and turns return
             values into protocol-valid AGENT_OUTPUT Signals. It never touches
-            the Synapse itself — that boundary is enforced in code, not
+            the Synapse itself  -  that boundary is enforced in code, not
             convention. This snippet is identical whether the Neuron is an LLM,
             a function, or a Flask app.
           </p>
@@ -214,7 +214,7 @@ export default function BuildingNeuronClient() {
             The <Link href="/concepts" className="inline-link">Dendrite</Link>{" "}
             hosts Axons, emits REGISTER / HEARTBEAT / DEREGISTER on their
             behalf, routes inbound TASKs, and exposes the dispatch API. We
-            build two — a{" "}
+            build two  -  a{" "}
             <code className="inline">role=&quot;worker&quot;</code> that serves
             requests, and an orchestrator (default role) that sends them. Both
             share the same in-memory Synapse.
@@ -254,7 +254,7 @@ export default function BuildingNeuronClient() {
             <CodeBlock html={outputSnippet} maxWidth={880} />
           </div>
           <p style={{ color: "var(--text-faint)", maxWidth: 760, marginTop: 8, fontSize: 12.5 }}>
-            Exact text varies — the model is stochastic.
+            Exact text varies  -  the model is stochastic.
           </p>
         </div>
       </section>
@@ -265,7 +265,7 @@ export default function BuildingNeuronClient() {
           <h2 className="sub-title">One line moves between providers.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             The endpoint is the only HuggingFace-specific line. Point it at a
-            dedicated HF endpoint, a local TGI / vLLM server, or LM Studio —
+            dedicated HF endpoint, a local TGI / vLLM server, or LM Studio  - 
             the Neuron, Axon, and Dendrite code never changes. For Ollama, swap
             the <code className="inline">source</code>.
           </p>
@@ -284,7 +284,7 @@ export default function BuildingNeuronClient() {
             </Link>
             <Link href="/examples/pathway" className="card">
               <div className="card-icon">→</div>
-              <h3>Pathway — three shapes</h3>
+              <h3>Pathway  -  three shapes</h3>
               <p>The full surface dispatch_and_wait is built on. Sequential, reactive, streaming.</p>
             </Link>
             <Link href="/examples/round-robin" className="card">

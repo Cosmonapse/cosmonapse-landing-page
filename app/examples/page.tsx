@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Examples — Cosmonapse",
+  title: "Examples  -  Cosmonapse",
   description:
     "End-to-end example setups built on Cosmonapse primitives. Copy, run, and adapt each topology for your own agents.",
 };
 
 // ---------------------------------------------------------------------------
-// Example catalogue — sorted by difficulty
+// Example catalogue  -  sorted by difficulty
 // ---------------------------------------------------------------------------
 
 type Example = {
@@ -30,7 +30,7 @@ const examples: Example[] = [
     tag: "Foundations",
     title: "Building a Neuron",
     description:
-      "The smallest possible Cosmonapse program — one Neuron, one Axon, one Dendrite, one TASK, one reply. Single process, in-memory Synapse, no broker. The example to read first.",
+      "The smallest possible Cosmonapse program  -  one Neuron, one Axon, one Dendrite, one TASK, one reply. Single process, in-memory Synapse, no broker. The example to read first.",
     primitives: ["Neuron", "Axon", "Dendrite", "Synapse", "Pathway"],
     difficulty: "Beginner",
     accentColor: "var(--accent)",
@@ -41,7 +41,7 @@ const examples: Example[] = [
     tag: "Orchestration",
     title: "Orchestrator + Round Robin",
     description:
-      "A Cortex (orchestrator Dendrite) load-balances prompts across two workers in a plain rotation. Slide across five stacks — Python and TypeScript over devsynapse, NATS, and Kafka.",
+      "A Cortex (orchestrator Dendrite) load-balances prompts across two workers in a plain rotation. Slide across five stacks  -  Python and TypeScript over devsynapse, NATS, and Kafka.",
     primitives: ["Neuron", "Axon", "Dendrite", "Synapse"],
     difficulty: "Beginner",
     accentColor: "var(--accent)",
@@ -50,7 +50,7 @@ const examples: Example[] = [
     slug: "pathway",
     number: "03",
     tag: "Consume",
-    title: "Pathway — three consumption shapes",
+    title: "Pathway  -  three consumption shapes",
     description:
       "One primitive, three faces: await pw.wait() for sequential request/reply, @pw.on(SignalType.X) for reactive trace-scoped callbacks, and async for sig in pw: for streaming. Plus scope=\"terminal\" for decentralised orchestration and observe_pathway() for non-originating watchers.",
     primitives: ["Pathway", "Dendrite", "Synapse"],
@@ -75,7 +75,7 @@ const examples: Example[] = [
     tag: "Decentralised",
     title: "No Orchestrator",
     description:
-      "Drop the Cortex. Every worker hears every task and runs the same pure owner_of(trace_id), so exactly one claims each — no coordination, no queue. Same five stacks via the slider.",
+      "Drop the Cortex. Every worker hears every task and runs the same pure owner_of(trace_id), so exactly one claims each  -  no coordination, no queue. Same five stacks via the slider.",
     primitives: ["Axon", "Dendrite", "Synapse"],
     difficulty: "Intermediate",
     accentColor: "var(--accent-3)",
@@ -84,30 +84,41 @@ const examples: Example[] = [
     slug: "real-world-neurons",
     number: "06",
     tag: "Neuron sources",
-    title: "Real-world Neurons (API + MCP)",
+    title: "Real-world Neurons (MCP + web edge)",
     description:
-      "A Neuron is anything that interacts with the real world. One Cortex dispatches to an HTTP API (Flask / Express) and a wrapped stdio MCP server through the identical Axon interface. Same five stacks via the slider.",
+      "A Neuron is anything that interacts with the real world  -  here, a wrapped stdio MCP server. An HTTP API is not a Neuron: your web framework (Flask / Express) stays at the edge and dispatches TASKs from its route handlers via an orchestrator Dendrite. Same five stacks via the slider.",
     primitives: ["Neuron", "Axon", "Dendrite", "Synapse"],
+    difficulty: "Intermediate",
+    accentColor: "var(--accent-3)",
+  },
+  {
+    slug: "orchestrator-api",
+    number: "07",
+    tag: "Web integration",
+    title: "Building an Orchestrator API",
+    description:
+      "Wire a Dendrite into Flask, FastAPI, Express, or raw WSGI. Your HTTP framework stays at the edge and dispatches TASKs from its route handlers  -  the Neuron never sees HTTP, the framework never sees the Synapse.",
+    primitives: ["Dendrite", "Synapse", "Pathway"],
     difficulty: "Intermediate",
     accentColor: "var(--accent-3)",
   },
   // ───────────────────────────────  Advanced  ───────────────────────────────
   {
     slug: "capability-routing",
-    number: "07",
+    number: "08",
     tag: "Discovery",
     title: "Capability-based Routing",
     description:
-      "A router Dendrite holds a RegistryStore and discovers workers from their REGISTER signals. Each task names a capability; the router finds a live worker that advertises it — no hard-coded ids. Same five stacks via the slider.",
+      "A router Dendrite holds a RegistryStore and discovers workers from their REGISTER signals. Each task names a capability; the router finds a live worker that advertises it  -  no hard-coded ids. Same five stacks via the slider.",
     primitives: ["Axon", "Dendrite", "RegistryStore", "Synapse"],
     difficulty: "Advanced",
     accentColor: "var(--accent-2)",
   },
   {
     slug: "bidding",
-    number: "08",
+    number: "09",
     tag: "Atomic claim",
-    title: "Bidding — TASK_OFFER / BID / TASK_AWARDED",
+    title: "Bidding  -  TASK_OFFER / BID / TASK_AWARDED",
     description:
       "Competitive bidding for capability-routed dispatch. Workers register on_task_offer + call bid(); the producer picks a winner by first_bid, lowest_cost, or highest_confidence and emits TASK_AWARDED. Atomic claim for heterogeneous deployments where queue-group routing falls short.",
     primitives: ["Dendrite", "Pathway", "Synapse"],
@@ -142,7 +153,7 @@ export default function ExamplesPage() {
           <p className="page-sub">
             Runnable example setups built on Cosmonapse primitives. Copy any of
             them, swap the Synapse URL, and adapt for your own agents. Sorted
-            by difficulty — start with{" "}
+            by difficulty  -  start with{" "}
             <Link href="/examples/building-a-neuron" className="inline-link">
               Building a Neuron
             </Link>{" "}
@@ -349,27 +360,3 @@ export default function ExamplesPage() {
           letter-spacing: 0.08em;
           text-transform: uppercase;
           margin-bottom: 6px;
-        }
-        .ex-cat-cta-title {
-          font-size: 19px;
-          font-weight: 600;
-          margin: 0 0 6px;
-          letter-spacing: -0.01em;
-        }
-        .ex-cat-cta-desc {
-          font-size: 13.5px;
-          color: var(--text-dim);
-          line-height: 1.6;
-          margin: 0;
-          max-width: 640px;
-        }
-        .ex-cat-cta-arrow {
-          font-family: var(--font-mono, ui-monospace, monospace);
-          font-size: 22px;
-          color: var(--accent);
-          flex-shrink: 0;
-        }
-      `}</style>
-    </>
-  );
-}

@@ -15,10 +15,10 @@ export function generateMetadata({ params }: { params: { section: string } }): M
   const sec = sectionBySlug(BASE, params.section);
   return {
     title: sec
-      ? `${sec.label} — Python SDK Reference — Cosmonapse`
-      : "Python SDK Reference — Cosmonapse",
+      ? `${sec.label}  -  Python SDK Reference  -  Cosmonapse`
+      : "Python SDK Reference  -  Cosmonapse",
     description:
-      "Cosmonapse Python SDK API reference — class signatures, parameters, and worked examples.",
+      "Cosmonapse Python SDK API reference  -  class signatures, parameters, and worked examples.",
   };
 }
 
@@ -26,7 +26,7 @@ export default function PythonSectionPage({ params }: { params: { section: strin
   const sec = sectionBySlug(BASE, params.section);
   if (!sec) notFound();
 
-  // Engram is a large subsystem — render the full reference inline here
+  // Engram is a large subsystem  -  render the full reference inline here
   // (this is its canonical home) instead of a pointer to a second page.
   const isEngram = sec.id === "engram";
 
@@ -36,7 +36,7 @@ export default function PythonSectionPage({ params }: { params: { section: strin
       sub={
         isEngram ? (
           <>
-            The <code className="inline">cosmonapse.engram</code> subsystem — shared memory for
+            The <code className="inline">cosmonapse.engram</code> subsystem  -  shared memory for
             Neurons, serviced over <code className="inline">RECALL</code> /{" "}
             <code className="inline">IMPRINT</code> signals. Verified against{" "}
             <code className="inline">packages/python-sdk/cosmonapse/engram</code> and{" "}
@@ -44,7 +44,7 @@ export default function PythonSectionPage({ params }: { params: { section: strin
           </>
         ) : (
           <>
-            <code className="inline">cosmonapse</code> Python package — verified against{" "}
+            <code className="inline">cosmonapse</code> Python package  -  verified against{" "}
             <code className="inline">packages/python-sdk</code>. If something here disagrees with the
             code, the code wins.
           </>

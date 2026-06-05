@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import CodeBlock from "./CodeBlock";
 
 // ---------------------------------------------------------------------------
-// "Build on Cosmonapse" — three transports, one program.
+// "Build on Cosmonapse"  -  three transports, one program.
 //
 // The whole point of this section is that the only line that changes between
 // MemorySynapse / NatsSynapse / KafkaSynapse is the URL. Same Neuron, same
-// Axon, same Dendrite, same dispatch_and_wait — ~20 lines end to end.
+// Axon, same Dendrite, same dispatch_and_wait  -  ~20 lines end to end.
 // ---------------------------------------------------------------------------
 
 type TransportId = "memory" | "nats" | "kafka";
@@ -30,7 +30,7 @@ const TRANSPORTS: {
     id: "nats",
     label: "NatsSynapse",
     synapse: "nats://broker:4222",
-    scale: "Production default — clean fit for the protocol.",
+    scale: "Production default  -  clean fit for the protocol.",
   },
   {
     id: "kafka",
@@ -42,7 +42,7 @@ const TRANSPORTS: {
 ];
 
 // ---------------------------------------------------------------------------
-// The snippet is the same for every transport — only SYNAPSE_URL changes.
+// The snippet is the same for every transport  -  only SYNAPSE_URL changes.
 // We render it as one template with the URL injected, so the diff between
 // tabs is exactly one line, which is the whole point.
 // ---------------------------------------------------------------------------
@@ -84,7 +84,7 @@ export default function BuildOnCosmonapse() {
         <div className="section-eyebrow">// Build on Cosmonapse</div>
         <h2 className="section-title">~20 lines. Three transports.</h2>
         <p className="section-sub">
-          A working multi-agent system is about twenty lines — define an async
+          A working multi-agent system is about twenty lines  -  define an async
           function, wrap it in an <code className="inline">Axon</code>, attach
           it to a <code className="inline">Dendrite</code>, call{" "}
           <code className="inline">dispatch_and_wait</code>. No protocol
@@ -133,19 +133,19 @@ export default function BuildOnCosmonapse() {
             <p className="boc-side-prose">{transport.scale}</p>
             <ul className="boc-side-list">
               <li>
-                <strong>Neuron</strong> — a plain async function. Zero protocol
+                <strong>Neuron</strong>  -  a plain async function. Zero protocol
                 knowledge.
               </li>
               <li>
-                <strong>Axon</strong> — identity, capabilities, validation into{" "}
+                <strong>Axon</strong>  -  identity, capabilities, validation into{" "}
                 <code className="inline">AGENT_OUTPUT</code>.
               </li>
               <li>
-                <strong>Dendrite</strong> — the only thing that touches the
+                <strong>Dendrite</strong>  -  the only thing that touches the
                 Synapse. Hosts the Axon, routes inbound TASKs.
               </li>
               <li>
-                <strong>dispatch_and_wait</strong> — sugar over a Pathway: emit
+                <strong>dispatch_and_wait</strong>  -  sugar over a Pathway: emit
                 a TASK, await the terminal Signal, close, return.
               </li>
             </ul>

@@ -59,7 +59,7 @@ export default function Footer() {
               </li>
               <li>
                 <a href={`${GITHUB}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer">
-                  License — MIT
+                  License  -  MIT
                 </a>
               </li>
               <li>
@@ -94,7 +94,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© 2026 Cosmonapse — Research preview</span>
+          <span>© 2026 Cosmonapse  -  Research preview</span>
           <span>v0.1.0-alpha</span>
         </div>
       </div>

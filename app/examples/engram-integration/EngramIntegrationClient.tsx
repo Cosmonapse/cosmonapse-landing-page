@@ -5,7 +5,7 @@ import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 
 // ---------------------------------------------------------------------------
-// Snippets — kept in sync with cosmonapse-core/examples/engram_integration/main.py
+// Snippets  -  kept in sync with cosmonapse-core/examples/engram_integration/main.py
 // ---------------------------------------------------------------------------
 
 const installSnippet = `<span class="tk-cm"># Python 3.11+. The default InMemoryEngram needs no extras.</span>
@@ -13,7 +13,7 @@ const installSnippet = `<span class="tk-cm"># Python 3.11+. The default InMemory
 
 <span class="tk-cm"># For durable storage:</span>
 <span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[postgres]"</span>   <span class="tk-cm"># PostgresEngram</span>
-<span class="tk-cm"># (SqliteEngram is in the stdlib — no extra needed.)</span>`;
+<span class="tk-cm"># (SqliteEngram is in the stdlib  -  no extra needed.)</span>`;
 
 const neuronSnippet = `<span class="tk-cm"># The Neuron gains two keyword-only parameters: recall and imprint.</span>
 <span class="tk-cm"># The Axon injects them at call time because the Axon was constructed</span>
@@ -21,7 +21,7 @@ const neuronSnippet = `<span class="tk-cm"># The Neuron gains two keyword-only p
 <span class="tk-cm">#</span>
 <span class="tk-cm"># Under the hood, recall("ctx", ...) emits a RECALL Signal under the</span>
 <span class="tk-cm"># current trace_id and awaits the matching RECALLED reply. The Neuron</span>
-<span class="tk-cm"># stays pure — it never imports the protocol or touches the Synapse.</span>
+<span class="tk-cm"># stays pure  -  it never imports the protocol or touches the Synapse.</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">researcher</span>(input, context, *, recall, imprint):
     question <span class="tk-op">=</span> input[<span class="tk-str">"question"</span>]
 
@@ -49,9 +49,9 @@ const neuronSnippet = `<span class="tk-cm"># The Neuron gains two keyword-only p
 
 const wiringSnippet = `<span class="tk-cm"># Three Dendrites, one shared Synapse:</span>
 <span class="tk-cm">#</span>
-<span class="tk-cm">#   host          — owns the Engram backend (answers RECALL/IMPRINT)</span>
-<span class="tk-cm">#   worker        — hosts the Neuron, declares the EngramBinding</span>
-<span class="tk-cm">#   orchestrator  — dispatches TASKs</span>
+<span class="tk-cm">#   host           -  owns the Engram backend (answers RECALL/IMPRINT)</span>
+<span class="tk-cm">#   worker         -  hosts the Neuron, declares the EngramBinding</span>
+<span class="tk-cm">#   orchestrator   -  dispatches TASKs</span>
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> (
     Axon, Dendrite, EngramBinding, InMemoryEngram, MemorySynapse,
 )
@@ -68,7 +68,7 @@ host.<span class="tk-fn">attach_engram</span>(
 
 <span class="tk-cm"># 2. Worker. The binding maps a local name ("ctx") to the wire</span>
 <span class="tk-cm">#    engram_id, so the Neuron addresses memory by a stable local</span>
-<span class="tk-cm">#    name — operations repoint the backend without editing Neuron code.</span>
+<span class="tk-cm">#    name  -  operations repoint the backend without editing Neuron code.</span>
 worker <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"demo"</span>,
                     dendrite_id<span class="tk-op">=</span><span class="tk-str">"worker"</span>, role<span class="tk-op">=</span><span class="tk-str">"worker"</span>)
 worker.<span class="tk-fn">attach_axon</span>(
@@ -102,16 +102,16 @@ const backendsSnippet = `<span class="tk-cm"># Same Engram API, three backends. 
 <span class="tk-cm"># the Neuron and the binding never change.</span>
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> InMemoryEngram, SqliteEngram, PostgresEngram
 
-<span class="tk-cm"># 1 · In-process — for tests &amp; single-process apps.</span>
+<span class="tk-cm"># 1 · In-process  -  for tests &amp; single-process apps.</span>
 host.<span class="tk-fn">attach_engram</span>(InMemoryEngram(engram_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, engram_kind<span class="tk-op">=</span><span class="tk-str">"context"</span>))
 
-<span class="tk-cm"># 2 · SQLite — durable, single file, no server.</span>
+<span class="tk-cm"># 2 · SQLite  -  durable, single file, no server.</span>
 host.<span class="tk-fn">attach_engram</span>(SqliteEngram(
     engram_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, engram_kind<span class="tk-op">=</span><span class="tk-str">"context"</span>,
     path<span class="tk-op">=</span><span class="tk-str">"./engram.db"</span>,
 ))
 
-<span class="tk-cm"># 3 · Postgres — for production. Requires the [postgres] extra.</span>
+<span class="tk-cm"># 3 · Postgres  -  for production. Requires the [postgres] extra.</span>
 host.<span class="tk-fn">attach_engram</span>(PostgresEngram(
     engram_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, engram_kind<span class="tk-op">=</span><span class="tk-str">"context"</span>,
     dsn<span class="tk-op">=</span><span class="tk-str">"postgresql://user:pass@localhost/cosmo"</span>,
@@ -126,9 +126,9 @@ const opsSnippet = `<span class="tk-cm"># imprint operations</span>
 
 <span class="tk-cm"># recall modes (configure default on the binding)</span>
 EngramBinding(name<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, engram_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, default_recall_mode<span class="tk-op">=</span><span class="tk-str">"merge"</span>)
-<span class="tk-cm">#   "first"  — return the best single match (default)</span>
-<span class="tk-cm">#   "merge"  — combine matching entries across backends</span>
-<span class="tk-cm">#   "all"    — return every match, partial flag if any backend timed out</span>`;
+<span class="tk-cm">#   "first"   -  return the best single match (default)</span>
+<span class="tk-cm">#   "merge"   -  combine matching entries across backends</span>
+<span class="tk-cm">#   "all"     -  return every match, partial flag if any backend timed out</span>`;
 
 export default function EngramIntegrationClient() {
   return (
@@ -169,7 +169,7 @@ export default function EngramIntegrationClient() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">01 · The Neuron</div>
-          <h2 className="sub-title">Pure function — plus two helpers.</h2>
+          <h2 className="sub-title">Pure function  -  plus two helpers.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             The Neuron is still a plain async function. The only change is the
             signature: <code className="inline">recall</code> and{" "}
@@ -189,7 +189,7 @@ export default function EngramIntegrationClient() {
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             One Dendrite hosts the Engram, one hosts the Neuron with a
             declarative <code className="inline">EngramBinding</code>, and one
-            dispatches TASKs. The host could be the same process as the worker —
+            dispatches TASKs. The host could be the same process as the worker  - 
             we split them here to make the routing explicit.
           </p>
           <CodeBlock filename="wiring.py" html={wiringSnippet} maxWidth={880} />
@@ -203,7 +203,7 @@ export default function EngramIntegrationClient() {
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             Two back-to-back dispatches with the same question. The first sees an
             empty Engram and imprints the answer. The second finds the cached
-            entry and short-circuits — proof the imprint landed.
+            entry and short-circuits  -  proof the imprint landed.
           </p>
           <CodeBlock filename="dispatch.py" html={dispatchSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
@@ -231,7 +231,7 @@ export default function EngramIntegrationClient() {
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             <code className="inline">imprint</code> covers add / append / merge /
             upsert / delete. <code className="inline">recall</code> returns one
-            entry, a merged view, or the full set — pick the mode per call, or
+            entry, a merged view, or the full set  -  pick the mode per call, or
             set a default on the binding.
           </p>
           <CodeBlock filename="ops.py" html={opsSnippet} maxWidth={880} />
@@ -250,12 +250,12 @@ export default function EngramIntegrationClient() {
             <Link href="/protocol" className="card">
               <div className="card-icon">→</div>
               <h3>Engram envelope spec</h3>
-              <p>RECALL / RECALLED / IMPRINT / IMPRINTED — the four signals the binding emits.</p>
+              <p>RECALL / RECALLED / IMPRINT / IMPRINTED  -  the four signals the binding emits.</p>
             </Link>
             <Link href="/docs#engram" className="card">
               <div className="card-icon">→</div>
               <h3>Engram API reference</h3>
-              <p>Full surface — Engram ABC, EngramBinding, EngramClient, backends, exceptions.</p>
+              <p>Full surface  -  Engram ABC, EngramBinding, EngramClient, backends, exceptions.</p>
             </Link>
           </div>
         </div>

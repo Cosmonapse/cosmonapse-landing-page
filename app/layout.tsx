@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cosmonapse — Distributed cognition protocol for autonomous AI agents",
+  title: "Cosmonapse  -  Distributed cognition protocol for autonomous AI agents",
   description:
     "Cosmonapse is an open protocol and SDK for building autonomous AI agent systems. One envelope. One channel. Replaceable neurons. MIT licensed.",
   metadataBase: new URL("https://cosmonapse.dev"),
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "Cosmonapse",
   ],
   openGraph: {
-    title: "Cosmonapse — The nervous system for autonomous AI agents",
+    title: "Cosmonapse  -  The nervous system for autonomous AI agents",
     description:
       "Open protocol and SDK for autonomous AI agents. One envelope. One channel. Replaceable neurons.",
     url: "https://cosmonapse.dev",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cosmonapse — The nervous system for autonomous AI agents",
+    title: "Cosmonapse  -  The nervous system for autonomous AI agents",
     description:
       "Open protocol and SDK for autonomous AI agents. One envelope. One channel. Replaceable neurons.",
     site: "@Cosmonapse",

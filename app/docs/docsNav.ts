@@ -1,12 +1,12 @@
 /**
- * Documentation navigation — pure data, no JSX.
+ * Documentation navigation  -  pure data, no JSX.
  *
  * Each reference (Python / TypeScript / CLI) is a dropdown in the docs
  * sidebar. Every section is its own route: `${base}/${slug}`. `id` is the
  * <Section id> the content component filters on; `slug` is the URL segment.
  *
  * Importing this from a client component is safe because it pulls in no
- * React components — only plain objects.
+ * React components  -  only plain objects.
  */
 
 export type DocSection = { slug: string; id: string; label: string };
@@ -19,7 +19,7 @@ export const DOC_REFS: DocRef[] = [
     sections: [
       { slug: "installation", id: "install", label: "Installation" },
       { slug: "imports", id: "imports", label: "Top-level imports" },
-      { slug: "neuron", id: "neuron", label: "Neuron — sources" },
+      { slug: "neuron", id: "neuron", label: "Neuron  -  sources" },
       { slug: "axon", id: "axon", label: "Axon" },
       { slug: "dendrite", id: "dendrite", label: "Dendrite" },
       { slug: "pathway", id: "pathway", label: "Pathway" },
@@ -40,7 +40,7 @@ export const DOC_REFS: DocRef[] = [
       { slug: "installation", id: "ts-install", label: "Installation" },
       { slug: "imports", id: "ts-imports", label: "Top-level imports" },
       { slug: "axon", id: "ts-axon", label: "Axon" },
-      { slug: "neuron", id: "ts-neuron", label: "Neuron — sources & clarify" },
+      { slug: "neuron", id: "ts-neuron", label: "Neuron  -  sources & clarify" },
       { slug: "dendrite", id: "ts-dendrite", label: "Dendrite" },
       { slug: "synapse", id: "ts-synapse", label: "Synapse" },
       { slug: "registry", id: "ts-registry", label: "RegistryStore" },

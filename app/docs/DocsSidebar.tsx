@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { DOC_REFS } from "./docsNav";
 
 /**
- * Accordion reference rail. Three entries — Python SDK, TypeScript SDK,
- * cosmo CLI — each a dropdown whose children are that page's sections.
+ * Accordion reference rail. Three entries  -  Python SDK, TypeScript SDK,
+ * cosmo CLI  -  each a dropdown whose children are that page's sections.
  * Every section is its own route (`${base}/${slug}`). The reference that
  * matches the current path is expanded by default.
  *

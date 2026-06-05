@@ -3,7 +3,7 @@ import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 
 export const metadata: Metadata = {
-  title: "Quickstart — Cosmonapse",
+  title: "Quickstart  -  Cosmonapse",
   description:
     "Install Cosmonapse, write a Neuron, wire an Axon and Dendrite, boot a local Synapse, watch Signals flow. No Docker, no infrastructure.",
 };
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const installSnippet = `<span class="tk-cm"># Python 3.11+</span>
 pip install cosmonapse flask`;
 
-const synapseSnippet = `<span class="tk-cm"># Boot a local TCP dev synapse — no Docker, no NATS, no Postgres.</span>
+const synapseSnippet = `<span class="tk-cm"># Boot a local TCP dev synapse  -  no Docker, no NATS, no Postgres.</span>
 <span class="tk-cm"># Streams every Signal to stdout as it crosses the bus.</span>
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart
 
@@ -42,7 +42,7 @@ const axonDendriteSnippet = `<span class="tk-kw">import</span> asyncio
     synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
 
     <span class="tk-cm"># 3. Build a worker Dendrite and attach the Axon.</span>
-    <span class="tk-cm">#    role="worker" — workers host Axons and reply to TASKs, but</span>
+    <span class="tk-cm">#    role="worker"  -  workers host Axons and reply to TASKs, but</span>
     <span class="tk-cm">#    cannot dispatch new ones (the role guard sits on emit()).</span>
     worker <span class="tk-op">=</span> Dendrite(
         synapse<span class="tk-op">=</span>synapse,
@@ -60,7 +60,7 @@ const flaskSnippet = `<span class="tk-kw">import</span> asyncio, concurrent.futu
 <span class="tk-kw">from</span> flask <span class="tk-kw">import</span> Flask, request, jsonify
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, connect_synapse, new_trace_id
 
-<span class="tk-cm"># asyncio loop in a background thread — Flask stays synchronous.</span>
+<span class="tk-cm"># asyncio loop in a background thread  -  Flask stays synchronous.</span>
 loop <span class="tk-op">=</span> asyncio.<span class="tk-fn">new_event_loop</span>()
 threading.<span class="tk-fn">Thread</span>(target<span class="tk-op">=</span>loop.run_forever, daemon<span class="tk-op">=</span><span class="tk-kw">True</span>).<span class="tk-fn">start</span>()
 
@@ -70,7 +70,9 @@ orch: Dendrite <span class="tk-op">=</span> <span class="tk-kw">None</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">setup</span>():
     <span class="tk-kw">global</span> orch
     synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
-    orch <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>)
+    <span class="tk-cm"># role="orchestrator" (default)  -  this Dendrite dispatches TASKs.</span>
+    orch <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>,
+                    role<span class="tk-op">=</span><span class="tk-str">"orchestrator"</span>)
 
     <span class="tk-op">@</span>orch.<span class="tk-fn">on_agent_output</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">on_output</span>(sig):
@@ -79,9 +81,6 @@ orch: Dendrite <span class="tk-op">=</span> <span class="tk-kw">None</span>
 
     <span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>()
 
-<span class="tk-cm"># NEW: orch.dispatch_and_wait(...) is now the preferred RPC shape.</span>
-<span class="tk-cm"># The Future/dict pattern above predates Pathway; new code should just do:</span>
-<span class="tk-cm">#   sig = await orch.dispatch_and_wait(neuron="hello-neuron", input=..., timeout_s=5)</span>
 asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(<span class="tk-fn">setup</span>(), loop).<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">10</span>)
 
 app <span class="tk-op">=</span> <span class="tk-fn">Flask</span>(__name__)
@@ -145,7 +144,7 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">02 · Start a Synapse</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON broker —
+            <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON broker  - 
             no Docker, no NATS, no Postgres. To watch Signals crossing the bus, attach{" "}
             <code className="inline">cosmo doppler</code> in another terminal (Step 06). The{" "}
             <code className="inline">--namespace</code> flag scopes all Signals so multiple projects can
@@ -155,7 +154,7 @@ export default function QuickstartPage() {
           <p className="prose" style={{ marginTop: 16 }}>
             Leave this terminal open. Swap the URL for{" "}
             <code className="inline">nats://</code> or <code className="inline">kafka://</code> when you
-            move to production — the rest of your code stays the same.
+            move to production  -  the rest of your code stays the same.
           </p>
         </div>
       </section>
@@ -164,7 +163,7 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">03 · Write a Neuron</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            A Neuron is a plain async function — no imports from Cosmonapse, no decorators, no protocol
+            A Neuron is a plain async function  -  no imports from Cosmonapse, no decorators, no protocol
             knowledge. It receives <code className="inline">input</code> (the TASK payload) and{" "}
             <code className="inline">context</code> (fetched by the Axon via{" "}
             <code className="inline">context_ref</code>) and returns a plain dict.
@@ -178,7 +177,7 @@ export default function QuickstartPage() {
           <div className="sub-eyebrow">04 · Wire an Axon and Dendrite</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             The <strong>Axon</strong> wraps the Neuron and gives it an identity on the bus. The{" "}
-            <strong>Dendrite</strong> is the only component that touches the Synapse — it hosts the Axon,
+            <strong>Dendrite</strong> is the only component that touches the Synapse  -  it hosts the Axon,
             emits REGISTER / HEARTBEAT / DEREGISTER, and routes inbound TASKs.
           </p>
           <CodeBlock filename="worker.py" html={axonDendriteSnippet} maxWidth={800} />
@@ -194,8 +193,10 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">05 · Connect an HTTP interface</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            An orchestrator Dendrite has no Axon — its job is to dispatch tasks and collect results. Flask
-            is synchronous; cosmonapse is async. The bridge is a{" "}
+            An <code className="inline">role="orchestrator"</code> Dendrite has no Axon  -  its job is to
+            dispatch tasks and collect results, the counterpart to the{" "}
+            <code className="inline">role="worker"</code> Dendrite from Step 04. Flask is synchronous;
+            cosmonapse is async. The bridge is a{" "}
             <code className="inline">concurrent.futures.Future</code> per{" "}
             <code className="inline">trace_id</code>: the asyncio handler resolves it, the Flask route
             blocks on it.
@@ -209,7 +210,7 @@ export default function QuickstartPage() {
           <div className="sub-eyebrow">06 · Watch the Signals flow</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             Attach a Doppler to see every Signal as it crosses the Synapse. It is a passive read-only
-            subscriber — it never competes with Dendrites for messages.
+            subscriber  -  it never competes with Dendrites for messages.
           </p>
           <CodeBlock html={dopplerSnippet} maxWidth={760} />
         </div>
@@ -223,7 +224,7 @@ export default function QuickstartPage() {
           </p>
           <CodeBlock html={testSnippet} maxWidth={760} />
           <p className="prose" style={{ marginTop: 16 }}>
-            Watch the Doppler terminal — you'll see the full REGISTER → TASK → AGENT_OUTPUT trace as it
+            Watch the Doppler terminal  -  you'll see the full REGISTER → TASK → AGENT_OUTPUT trace as it
             happens.
           </p>
         </div>
@@ -249,8 +250,4 @@ export default function QuickstartPage() {
               <p>v0.1 manual SDK · v0.2 Axon-as-MCP · v0.3 declarative router · v0.4 router agent.</p>
             </Link>
           </div>
-        </div>
-      </section>
-    </>
-  );
-}
+ 

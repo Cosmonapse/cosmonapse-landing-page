@@ -6,7 +6,7 @@ import CodeBlock from "./CodeBlock";
 // ---------------------------------------------------------------------------
 // The five real language × transport combinations.
 //
-// The TypeScript SDK ships MemorySynapse + NatsSynapse only — the Kafka
+// The TypeScript SDK ships MemorySynapse + NatsSynapse only  -  the Kafka
 // adapter is not ported to TS yet (see packages/ts-sdk/src/index.ts), so
 // there is no TS + Kafka tab.
 // ---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ export const COMBOS: { id: Combo; lang: string; transport: string }[] = [
 ];
 
 export type Step = {
-  /** Step title WITHOUT a number — ComboExample auto-numbers steps. */
+  /** Step title WITHOUT a number  -  ComboExample auto-numbers steps. */
   eyebrow: string;
   /** Optional intro prose rendered above the code. */
   prose?: React.ReactNode;
@@ -38,7 +38,7 @@ export type Step = {
 
 export type ComboData = {
   steps: Step[];
-  /** "Extend the pattern" body — already combo-specific. */
+  /** "Extend the pattern" body  -  already combo-specific. */
   extend: React.ReactNode;
 };
 
@@ -59,7 +59,7 @@ export default function ComboExample({
           <div className="sub-eyebrow">Pick your stack</div>
           <p className="prose" style={{ marginBottom: 18, marginTop: 4 }}>
             The same topology, expressed across language and transport. Slide
-            between tabs — the routing logic never changes; only the imports,
+            between tabs  -  the routing logic never changes; only the imports,
             the synapse you connect to, and how you launch it do.
           </p>
           <div

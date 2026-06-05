@@ -28,7 +28,7 @@ const TIER_LABEL: Record<Tier, string> = {
 
 const tutorials: Tutorial[] = [
   // -------------------------------------------------------------------------
-  // START HERE — 1, 2, 3
+  // START HERE  -  1, 2, 3
   // -------------------------------------------------------------------------
   {
     number: 1,
@@ -39,7 +39,7 @@ const tutorials: Tutorial[] = [
       <>
         A Neuron is just an async function. Wrap it in an Axon, host it on a
         Dendrite, connect an orchestrator Dendrite, and call{" "}
-        <code className="inline">dispatch_and_wait</code>. No broker needed —
+        <code className="inline">dispatch_and_wait</code>. No broker needed  - 
         MemorySynapse runs in-process.
       </>
     ),
@@ -65,7 +65,7 @@ orch = Dendrite(synapse=synapse, namespace=<span class="tk-str">"demo"</span>)
     print(reply.payload[<span class="tk-str">"output"</span>])  <span class="tk-cm"># {"msg": "Hello, world!"}</span>`,
       },
     ],
-    deeperLink: { href: "/examples/building-a-neuron", label: "Building a Neuron — full walkthrough" },
+    deeperLink: { href: "/examples/building-a-neuron", label: "Building a Neuron  -  full walkthrough" },
   },
   {
     number: 2,
@@ -75,20 +75,20 @@ orch = Dendrite(synapse=synapse, namespace=<span class="tk-str">"demo"</span>)
     note: (
       <>
         In real dev you run each process separately. Start the broker with the
-        CLI, then replace MemorySynapse with a URL — nothing else in your code
+        CLI, then replace MemorySynapse with a URL  -  nothing else in your code
         changes.
       </>
     ),
     blocks: [
       {
-        html: `<span class="tk-cm"># Terminal 1 — start the broker</span>
+        html: `<span class="tk-cm"># Terminal 1  -  start the broker</span>
 cosmo synapse start memory <span class="tk-op">--namespace</span>=demo
 
-<span class="tk-cm"># Terminal 2 — watch every signal</span>
+<span class="tk-cm"># Terminal 2  -  watch every signal</span>
 cosmo doppler <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo`,
       },
       {
-        html: `<span class="tk-cm"># worker.py — one URL change, everything else identical</span>
+        html: `<span class="tk-cm"># worker.py  -  one URL change, everything else identical</span>
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> connect_synapse, Axon, Dendrite
 
 synapse = <span class="tk-kw">await</span> connect_synapse(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
@@ -99,7 +99,7 @@ worker.attach_axon(Axon(neuron_id=<span class="tk-str">"greeter"</span>, neuron_
     <span class="tk-kw">await</span> asyncio.sleep(<span class="tk-fn">float</span>(<span class="tk-str">"inf"</span>))  <span class="tk-cm"># stay alive</span>`,
       },
     ],
-    deeperLink: { href: "/quickstart", label: "Quickstart — install and first 5 minutes" },
+    deeperLink: { href: "/quickstart", label: "Quickstart  -  install and first 5 minutes" },
   },
   {
     number: 3,
@@ -138,11 +138,11 @@ axon = Axon(
     )`,
       },
     ],
-    deeperLink: { href: "/examples/capability-routing", label: "Capability-based routing — full walkthrough" },
+    deeperLink: { href: "/examples/capability-routing", label: "Capability-based routing  -  full walkthrough" },
   },
 
   // -------------------------------------------------------------------------
-  // CORE — 4, 5, 6
+  // CORE  -  4, 5, 6
   // -------------------------------------------------------------------------
   {
     number: 4,
@@ -153,12 +153,12 @@ axon = Axon(
       <>
         Axons and Dendrites fire three hook kinds. Use them for startup
         announcements, heartbeat-driven reconciliation, and recurring background
-        work — without a central orchestrator.
+        work  -  without a central orchestrator.
       </>
     ),
     blocks: [
       {
-        html: `<span class="tk-cm"># Axon lifecycle — fires after REGISTER is emitted</span>
+        html: `<span class="tk-cm"># Axon lifecycle  -  fires after REGISTER is emitted</span>
 <span class="tk-op">@</span>axon.on_connect
 <span class="tk-kw">async def</span> <span class="tk-fn">announce</span>(axon):
     print(<span class="tk-fn">f</span><span class="tk-str">"Neuron {axon.neuron_id} is live"</span>)
@@ -168,13 +168,13 @@ axon = Axon(
 <span class="tk-kw">async def</span> <span class="tk-fn">flush_cache</span>(axon):
     cache.clear()
 
-<span class="tk-cm"># Dendrite lifecycle — fires on every heartbeat tick</span>
+<span class="tk-cm"># Dendrite lifecycle  -  fires on every heartbeat tick</span>
 <span class="tk-op">@</span>dendrite.on_refresh
 <span class="tk-kw">async def</span> <span class="tk-fn">reconcile</span>(d, event):
     <span class="tk-kw">if</span> event.reason == <span class="tk-str">"heartbeat"</span>:
         <span class="tk-kw">await</span> d.refresh(reason=<span class="tk-str">"manual"</span>)
 
-<span class="tk-cm"># Dendrite periodic — gossip state every 10 s (peer-to-peer)</span>
+<span class="tk-cm"># Dendrite periodic  -  gossip state every 10 s (peer-to-peer)</span>
 <span class="tk-op">@</span>dendrite.on_schedule(every_s=<span class="tk-num">10</span>)
 <span class="tk-kw">async def</span> <span class="tk-fn">gossip</span>(d):
     <span class="tk-kw">await</span> d.dispatch_task(neuron=<span class="tk-str">"peer"</span>, input={<span class="tk-str">"state"</span>: local_state()})`,
@@ -183,32 +183,32 @@ axon = Axon(
   },
   {
     number: 5,
-    title: "Pathway API — three consumption shapes",
+    title: "Pathway API  -  three consumption shapes",
     surface: "dispatch · dispatch_and_subscribe · Pathway.wait · Pathway.on · async for sig in pathway",
     tier: "core",
     note: (
       <>
         A Pathway is a per-trace event handle. Open one with{" "}
         <code className="inline">dispatch()</code> and consume it in whichever
-        shape fits the workflow — blocking wait, callback, or async iteration.
+        shape fits the workflow  -  blocking wait, callback, or async iteration.
         All three compose on the same Pathway.
       </>
     ),
     blocks: [
       {
-        html: `<span class="tk-cm"># Shape 1 — blocking wait (request/reply)</span>
+        html: `<span class="tk-cm"># Shape 1  -  blocking wait (request/reply)</span>
 pw = <span class="tk-kw">await</span> orch.dispatch(neuron=<span class="tk-str">"thinker"</span>, input={<span class="tk-str">"q"</span>: <span class="tk-str">"why?"</span>})
 sig = <span class="tk-kw">await</span> pw.wait(timeout_s=<span class="tk-num">10</span>)
 print(sig.payload[<span class="tk-str">"output"</span>])
 
-<span class="tk-cm"># Shape 2 — callbacks (reactive / streaming)</span>
+<span class="tk-cm"># Shape 2  -  callbacks (reactive / streaming)</span>
 pw = orch.dispatch_and_subscribe(neuron=<span class="tk-str">"streamer"</span>, input={...})
 
 <span class="tk-op">@</span>pw.on(SignalType.AGENT_OUTPUT)
 <span class="tk-kw">async def</span> <span class="tk-fn">on_chunk</span>(sig):
     sys.stdout.write(sig.payload[<span class="tk-str">"output"</span>][<span class="tk-str">"delta"</span>])
 
-<span class="tk-cm"># Shape 3 — async iteration (stream everything on the trace)</span>
+<span class="tk-cm"># Shape 3  -  async iteration (stream everything on the trace)</span>
 pw = <span class="tk-kw">await</span> orch.dispatch(neuron=<span class="tk-str">"planner"</span>, input={...})
 <span class="tk-kw">async for</span> sig <span class="tk-kw">in</span> pw:
     print(sig.type.value, sig.payload)  <span class="tk-cm"># PLAN, TOOL_CALL, AGENT_OUTPUT …</span>
@@ -217,18 +217,18 @@ pw = <span class="tk-kw">await</span> orch.dispatch(neuron=<span class="tk-str">
 final = <span class="tk-kw">await</span> pw.wait_for(SignalType.FINAL, timeout_s=<span class="tk-num">30</span>)`,
       },
     ],
-    deeperLink: { href: "/examples/pathway", label: "Pathway — three shapes, full walkthrough" },
+    deeperLink: { href: "/examples/pathway", label: "Pathway  -  three shapes, full walkthrough" },
   },
   {
     number: 6,
-    title: "Neuron factory — wrap anything real-world",
-    surface: "Neuron(source=...) · huggingface · ollama · flask · mcp",
+    title: "Neuron factory  -  wrap anything real-world",
+    surface: "Neuron(source=...) · huggingface · ollama · mcp",
     tier: "core",
     note: (
       <>
         <code className="inline">Neuron(source=...)</code> returns a callable
         that satisfies <code className="inline">NeuronFn</code>. It slots
-        directly into <code className="inline">Axon.neuron_fn</code> — the rest
+        directly into <code className="inline">Axon.neuron_fn</code>  -  the rest
         of the protocol never knows what's behind it.
       </>
     ),
@@ -243,24 +243,23 @@ Axon(neuron_id=<span class="tk-str">"chat"</span>,
                       model=<span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
                       api_key=os.environ[<span class="tk-str">"HF_TOKEN"</span>], use_chat_api=True))
 
-<span class="tk-cm"># Same Axon, local model — just swap the source to Ollama</span>
+<span class="tk-cm"># Same Axon, local model  -  just swap the source to Ollama</span>
 Axon(neuron_id=<span class="tk-str">"summarise"</span>,
      neuron_fn=Neuron(source=<span class="tk-str">"ollama"</span>, model=<span class="tk-str">"llama3"</span>))
 
-<span class="tk-cm"># Existing Flask app — becomes a Neuron with zero rewrites</span>
-Axon(neuron_id=<span class="tk-str">"legacy-api"</span>,
-     neuron_fn=Neuron(source=<span class="tk-str">"flask"</span>, app=flask_app, default_path=<span class="tk-str">"/run"</span>))
+<span class="tk-cm"># An HTTP API is NOT a Neuron  -  keep your framework (Flask/Express) at the</span>
+<span class="tk-cm"># edge and dispatch TASKs from its routes via an orchestrator Dendrite.</span>
 
-<span class="tk-cm"># Stdio MCP server — tools become a Neuron surface</span>
+<span class="tk-cm"># Stdio MCP server  -  tools become a Neuron surface</span>
 Axon(neuron_id=<span class="tk-str">"files"</span>,
      neuron_fn=Neuron(source=<span class="tk-str">"mcp"</span>, server=<span class="tk-str">"filesystem"</span>, args=[<span class="tk-str">"."</span>]))`,
       },
     ],
-    deeperLink: { href: "/examples/real-world-neurons", label: "Real-world Neurons — API + MCP walkthrough" },
+    deeperLink: { href: "/examples/real-world-neurons", label: "Real-world Neurons  -  MCP + web edge walkthrough" },
   },
 
   // -------------------------------------------------------------------------
-  // ADVANCED — 7, 8, 9
+  // ADVANCED  -  7, 8, 9
   // -------------------------------------------------------------------------
   {
     number: 7,
@@ -277,7 +276,7 @@ Axon(neuron_id=<span class="tk-str">"files"</span>,
     ),
     blocks: [
       {
-        html: `<span class="tk-cm"># Phase 1 — design + arch in parallel</span>
+        html: `<span class="tk-cm"># Phase 1  -  design + arch in parallel</span>
 p1_done = asyncio.Event()
 results: dict = {}
 
@@ -293,7 +292,7 @@ results: dict = {}
 )
 <span class="tk-kw">await</span> p1_done.wait()
 
-<span class="tk-cm"># Phase 2 — frontend + backend use phase-1 results as context</span>
+<span class="tk-cm"># Phase 2  -  frontend + backend use phase-1 results as context</span>
 <span class="tk-kw">await</span> asyncio.gather(
     orch.dispatch_task(neuron=<span class="tk-str">"frontend"</span>, input={...},
                        context_ref=<span class="tk-str">"design_spec"</span>),
@@ -305,7 +304,7 @@ results: dict = {}
   },
   {
     number: 8,
-    title: "Engram — shared memory for Neurons",
+    title: "Engram  -  shared memory for Neurons",
     surface: "EngramBinding · InMemoryEngram · recall · imprint · attach_engram",
     tier: "advanced",
     note: (
@@ -313,7 +312,7 @@ results: dict = {}
         Declare an <code className="inline">EngramBinding</code> on the Axon.
         The SDK injects <code className="inline">recall</code> and{" "}
         <code className="inline">imprint</code> helpers into the Neuron at
-        call time — the Neuron stays pure, it never imports the protocol.
+        call time  -  the Neuron stays pure, it never imports the protocol.
       </>
     ),
     blocks: [
@@ -340,11 +339,11 @@ worker.attach_axon(Axon(
 ))`,
       },
     ],
-    deeperLink: { href: "/examples/engram-integration", label: "Integrating an Engram — full walkthrough" },
+    deeperLink: { href: "/examples/engram-integration", label: "Integrating an Engram  -  full walkthrough" },
   },
   {
     number: 9,
-    title: "Clarifications — agents asking back",
+    title: "Clarifications  -  agents asking back",
     surface: "__clarification__ · Pathway.wait_for · SignalType.CLARIFICATION",
     tier: "advanced",
     note: (
@@ -380,17 +379,17 @@ sig = <span class="tk-kw">await</span> pw.wait()
   },
 
   // -------------------------------------------------------------------------
-  // PRODUCTION — 10
+  // PRODUCTION  -  10
   // -------------------------------------------------------------------------
   {
     number: 10,
-    title: "Production — persistent registry + NATS/Kafka",
+    title: "Production  -  persistent registry + NATS/Kafka",
     surface: "SqliteRegistryStore · PostgresRegistryStore · NatsSynapse · KafkaSynapse",
     tier: "production",
     note: (
       <>
         Swap one URL and one import. Every Neuron, Axon, and workflow stays
-        identical — only the synapse and store change.
+        identical  -  only the synapse and store change.
       </>
     ),
     blocks: [
@@ -443,7 +442,7 @@ const cliCards: CliCard[] = [
       { html: `cosmo synapse start memory <span class="tk-op">--quiet</span>` },
     ],
     description:
-      "Start a local dev synapse (TCP + NDJSON). Streams every signal to stdout by default — pass --quiet to suppress. Ctrl-C to stop.",
+      "Start a local dev synapse (TCP + NDJSON). Streams every signal to stdout by default  -  pass --quiet to suppress. Ctrl-C to stop.",
   },
   {
     title: "cosmo synapse view",
@@ -502,7 +501,7 @@ const cliCards: CliCard[] = [
       { html: `cosmo validate <span class="tk-op">--namespace</span>=dev` },
     ],
     description:
-      "Four terminals: broker, watcher, worker, validator. The doppler and validator are read-only — you can attach and detach them at any time.",
+      "Four terminals: broker, watcher, worker, validator. The doppler and validator are read-only  -  you can attach and detach them at any time.",
   },
 ];
 
@@ -872,16 +871,4 @@ export default function TutorialsClient() {
 
         @media (max-width: 720px) {
           .ex-tut-head {
-            grid-template-columns: 32px 1fr auto;
-          }
-          .ex-tut-sub {
-            font-size: 11px;
-          }
-          .ex-badge {
-            display: none;
-          }
-        }
-      `}</style>
-    </>
-  );
-}
+            grid-template-c

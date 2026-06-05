@@ -18,7 +18,7 @@ export const pythonToc: TocGroup = {
   items: [
     { href: "#install", label: "Installation" },
     { href: "#imports", label: "Top-level imports" },
-    { href: "#neuron", label: "Neuron — sources" },
+    { href: "#neuron", label: "Neuron  -  sources" },
     { href: "#axon", label: "Axon" },
     { href: "#dendrite", label: "Dendrite" },
     { href: "#pathway", label: "Pathway" },
@@ -42,7 +42,6 @@ const installSnippet = `<span class="tk-cm"># Python 3.11 or newer required.</sp
 <span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[nats]"</span>      <span class="tk-cm"># NatsSynapse (nats-py)</span>
 <span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[kafka]"</span>     <span class="tk-cm"># KafkaSynapse (aiokafka)</span>
 <span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[postgres]"</span>  <span class="tk-cm"># PostgresRegistryStore + PostgresEngram (asyncpg)</span>
-<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[flask]"</span>     <span class="tk-cm"># Flask / WSGI Neuron factory</span>
 
 <span class="tk-cm"># Provider-backed Neurons (Ollama / HuggingFace) need httpx:</span>
 <span class="tk-op">$</span> pip install httpx
@@ -72,12 +71,12 @@ const topImportSnippet = `<span class="tk-kw">from</span> cosmonapse <span class
     PostgresRegistryStore,
     NeuronRecord,
 
-    <span class="tk-cm"># Pathway — per-trace event handle</span>
+    <span class="tk-cm"># Pathway  -  per-trace event handle</span>
     Pathway,
     PathwayClosedError,
     PATHWAY_TYPES,
 
-    <span class="tk-cm"># Engram — shared memory (RECALL / IMPRINT)</span>
+    <span class="tk-cm"># Engram  -  shared memory (RECALL / IMPRINT)</span>
     Engram,
     EngramBinding,
     EngramClient,
@@ -110,26 +109,20 @@ const topImportSnippet = `<span class="tk-kw">from</span> cosmonapse <span class
 const neuronSourceSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Neuron
 
 <span class="tk-cm"># A Neuron is anything that interacts with the real world. The same factory</span>
-<span class="tk-cm"># wraps an LLM, an HTTP app, or an MCP server — the Axon never knows which.</span>
+<span class="tk-cm"># wraps an LLM or an MCP server  -  the Axon never knows which.</span>
 
-<span class="tk-cm"># 1 · LLM / agent — Ollama, HuggingFace TGI / vLLM / OpenAI-compatible</span>
+<span class="tk-cm"># 1 · LLM / agent  -  Ollama, HuggingFace, OpenAI, Anthropic, or any</span>
+<span class="tk-cm">#     OpenAI-compatible host (groq / openrouter / together / mistral).</span>
 chat <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"chat"</span>,
             neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"ollama"</span>, model<span class="tk-op">=</span><span class="tk-str">"llama3"</span>))
+cloud <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"cloud"</span>,  <span class="tk-cm"># api_key falls back to OPENAI_API_KEY</span>
+             neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"openai"</span>, model<span class="tk-op">=</span><span class="tk-str">"gpt-4o"</span>))
 
-<span class="tk-cm"># 2 · API — an existing Flask app (or any WSGI callable), served in-process</span>
-<span class="tk-kw">from</span> flask <span class="tk-kw">import</span> Flask, request, jsonify
-app <span class="tk-op">=</span> Flask(__name__)
+<span class="tk-cm"># 2 · An HTTP API is NOT a Neuron. Keep your web framework (Flask/FastAPI)</span>
+<span class="tk-cm">#     at the edge and dispatch TASKs from its routes via an orchestrator</span>
+<span class="tk-cm">#     Dendrite  -  see the quickstart and the real-world-neurons example.</span>
 
-<span class="tk-op">@</span>app.post(<span class="tk-str">"/summarise"</span>)
-<span class="tk-kw">def</span> <span class="tk-fn">summarise</span>():
-    body <span class="tk-op">=</span> request.get_json()
-    <span class="tk-kw">return</span> jsonify(summary<span class="tk-op">=</span>body[<span class="tk-str">"text"</span>][:<span class="tk-str">120</span>])
-
-api <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"summary-api"</span>,
-           neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"flask"</span>, app<span class="tk-op">=</span>app,
-                            default_path<span class="tk-op">=</span><span class="tk-str">"/summarise"</span>))
-
-<span class="tk-cm"># 3 · MCP server — wrap any stdio MCP server's tools as a Neuron</span>
+<span class="tk-cm"># 3 · MCP server  -  wrap any stdio MCP server's tools as a Neuron</span>
 files <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"files"</span>,
              neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, server<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>,
                               args<span class="tk-op">=</span>[<span class="tk-str">"/data"</span>], tool<span class="tk-op">=</span><span class="tk-str">"read_file"</span>))`;
@@ -190,7 +183,7 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
     <span class="tk-op">@</span>property
     <span class="tk-kw">def</span> <span class="tk-fn">role</span>(self) <span class="tk-op">-></span> str: ...           <span class="tk-cm"># "orchestrator" | "worker"</span>
 
-    <span class="tk-cm"># No Dendrite.connect() — build the synapse yourself, then pass it in:</span>
+    <span class="tk-cm"># No Dendrite.connect()  -  build the synapse yourself, then pass it in:</span>
     <span class="tk-cm">#   synapse = await connect_synapse("cosmo://127.0.0.1:7070")</span>
     <span class="tk-cm">#   dendrite = Dendrite(synapse=synapse, ...)</span>
 
@@ -316,7 +309,7 @@ const dendriteUseSnippet = `<span class="tk-kw">import</span> asyncio
     <span class="tk-kw">async with</span> dendrite:
         <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(neuron<span class="tk-op">=</span><span class="tk-str">"answerer"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"q"</span>: <span class="tk-str">"hi"</span>})
         <span class="tk-kw">await</span> asyncio.<span class="tk-fn">sleep</span>(<span class="tk-fn">float</span>(<span class="tk-str">"inf"</span>))
-    <span class="tk-cm"># The Dendrite never closes the synapse — you do:</span>
+    <span class="tk-cm"># The Dendrite never closes the synapse  -  you do:</span>
     <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>()
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
@@ -425,7 +418,7 @@ syn <span class="tk-op">=</span> <span class="tk-fn">synapse_from_url</span>(<sp
 syn <span class="tk-op">=</span> <span class="tk-fn">synapse_from_url</span>(<span class="tk-str">"nats://nats:4222"</span>)            <span class="tk-cm"># NatsSynapse</span>
 syn <span class="tk-op">=</span> <span class="tk-fn">synapse_from_url</span>(<span class="tk-str">"kafka://broker:9092"</span>)         <span class="tk-cm"># KafkaSynapse</span>
 
-<span class="tk-cm"># memory:// has no URL — it is process-local, so build it directly:</span>
+<span class="tk-cm"># memory:// has no URL  -  it is process-local, so build it directly:</span>
 syn <span class="tk-op">=</span> <span class="tk-fn">MemorySynapse</span>()
 
 <span class="tk-cm"># Build + connect in one call:</span>
@@ -513,8 +506,8 @@ const signalTypeSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">
 
 const helpersSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> new_trace_id, new_event_id
 
-trace <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()        <span class="tk-cm"># "trc_01JV..."  — prefixed ULID</span>
-eid   <span class="tk-op">=</span> <span class="tk-fn">new_event_id</span>()        <span class="tk-cm"># "evt_01JV..."  — prefixed ULID</span>
+trace <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()        <span class="tk-cm"># "trc_01JV..."   -  prefixed ULID</span>
+eid   <span class="tk-op">=</span> <span class="tk-fn">new_event_id</span>()        <span class="tk-cm"># "evt_01JV..."   -  prefixed ULID</span>
 
 <span class="tk-cm"># ULIDs sort lexicographically by creation time.</span>
 <span class="tk-cm"># Call new_trace_id() at the top of any externally-triggered request</span>
@@ -525,10 +518,10 @@ const errorsSnippet = `<span class="tk-cm"># The SDK raises exactly one custom e
 CortexProtocolError <span class="tk-op">=</span> DendriteProtocolError   <span class="tk-cm"># back-compat alias</span>
 
 <span class="tk-cm"># Everything else surfaces as a stdlib / dependency exception:</span>
-<span class="tk-cm">#   ValueError       — bad envelope id prefix, unknown synapse URL scheme</span>
-<span class="tk-cm">#   TypeError        — Dendrite built without a synapse</span>
-<span class="tk-cm">#   pydantic.ValidationError — malformed Signal fields</span>
-<span class="tk-cm">#   transport errors — raised straight from nats-py / aiokafka / asyncpg</span>
+<span class="tk-cm">#   ValueError        -  bad envelope id prefix, unknown synapse URL scheme</span>
+<span class="tk-cm">#   TypeError         -  Dendrite built without a synapse</span>
+<span class="tk-cm">#   pydantic.ValidationError  -  malformed Signal fields</span>
+<span class="tk-cm">#   transport errors  -  raised straight from nats-py / aiokafka / asyncpg</span>
 
 <span class="tk-cm"># Usage</span>
 <span class="tk-kw">try</span>:
@@ -573,16 +566,18 @@ export default function PythonDocs({ section }: { section?: string }) {
         <CodeBlock filename="imports.py" html={topImportSnippet} maxWidth={820} />
       </Section>
 
-      {/* ─── Neuron — sources ─── */}
-      <Section id="neuron" eyebrow="SDK · 03" title="Neuron — sources">
+      {/* ─── Neuron  -  sources ─── */}
+      <Section id="neuron" eyebrow="SDK · 03" title="Neuron  -  sources">
         <p className="docs-p">
           A <strong>Neuron</strong> is <em>anything that interacts with the real world</em>, exposed
           behind one signature: <code className="inline">async (input, context) → dict</code>. It is
-          not limited to an LLM agent — it can be an agent, an existing <strong>API</strong> (a Flask
-          app or any WSGI callable), or an <strong>MCP server</strong>. The{" "}
+          not limited to an LLM agent  -  it can be an agent, an <strong>MCP server</strong>, or a plain
+          async function. The{" "}
           <code className="inline">Neuron(source=…)</code> factory wraps each kind into the same{" "}
           <code className="inline">neuron_fn</code>, so the Axon and the rest of the protocol can&rsquo;t
-          tell them apart. Each source is a soft dependency — installed only when you use it.
+          tell them apart. Each source is a soft dependency  -  installed only when you use it. An HTTP
+          API is <em>not</em> a Neuron: keep your web framework at the edge and dispatch TASKs from its
+          routes via an orchestrator Dendrite.
         </p>
 
         <ApiCard kind="factory" name="cosmonapse.Neuron(source, **kwargs)" summary="Returns a NeuronFn callable for the chosen source. Pass it straight to Axon(neuron_fn=…).">
@@ -613,23 +608,35 @@ export default function PythonDocs({ section }: { section?: string }) {
               <td>TGI / vLLM / llama.cpp / LM Studio (OpenAI-compatible). Needs <code className="inline">httpx</code>.</td>
             </tr>
             <tr>
-              <td>&quot;flask&quot; / &quot;wsgi&quot; / &quot;api&quot;</td>
-              <td>API</td>
-              <td>app*, default_method, default_path, base_headers</td>
-              <td>Serves a Flask/WSGI app in-process. Input is HTTP-shaped (method/path/json/query/headers); returns <code className="inline">{`{status, ok, json, response, headers, meta}`}</code>. Needs <code className="inline">werkzeug</code> (ships with Flask).</td>
+              <td>&quot;openai&quot;</td>
+              <td>LLM</td>
+              <td>model*, api_key, endpoint, system, temperature, max_tokens</td>
+              <td>OpenAI Chat Completions. <code className="inline">api_key</code> falls back to <code className="inline">OPENAI_API_KEY</code>; point <code className="inline">endpoint</code> at Azure or a proxy. Needs <code className="inline">httpx</code>.</td>
+            </tr>
+            <tr>
+              <td>&quot;anthropic&quot;</td>
+              <td>LLM</td>
+              <td>model*, api_key, system, max_tokens, temperature</td>
+              <td>Anthropic Messages API. <code className="inline">api_key</code> falls back to <code className="inline">ANTHROPIC_API_KEY</code>; OpenAI-style system messages are hoisted to the top-level <code className="inline">system</code> field. Needs <code className="inline">httpx</code>.</td>
+            </tr>
+            <tr>
+              <td>&quot;groq&quot; / &quot;openrouter&quot; / &quot;together&quot; / &quot;mistral&quot;</td>
+              <td>LLM</td>
+              <td>model, api_key, endpoint, temperature, max_new_tokens</td>
+              <td>OpenAI-compatible hosted endpoints  -  pre-configured <code className="inline">&quot;huggingface&quot;</code> Neurons with the provider base URL and <code className="inline">use_chat_api=True</code>. <code className="inline">api_key</code> falls back to <code className="inline">GROQ_API_KEY</code> / <code className="inline">OPENROUTER_API_KEY</code> / <code className="inline">TOGETHER_API_KEY</code> / <code className="inline">MISTRAL_API_KEY</code>. Needs <code className="inline">httpx</code>.</td>
             </tr>
             <tr>
               <td>&quot;mcp&quot;</td>
               <td>MCP server</td>
               <td>command+args <em>or</em> server+args, env, cwd, tool</td>
-              <td>Spawns any stdio MCP server and exposes its tools. Input is <code className="inline">{`{tool, arguments}`}</code> (or <code className="inline">{`{"__list_tools__": True}`}</code>); returns <code className="inline">{`{response, result, is_error, content, meta}`}</code>. Wrapper only — does not implement a server. Needs <code className="inline">mcp</code>.</td>
+              <td>Spawns any stdio MCP server and exposes its tools. Input is <code className="inline">{`{tool, arguments}`}</code> (or <code className="inline">{`{"__list_tools__": True}`}</code>); returns <code className="inline">{`{response, result, is_error, content, meta}`}</code>. Wrapper only  -  does not implement a server. Needs <code className="inline">mcp</code>.</td>
             </tr>
           </tbody>
         </table>
 
         <p className="docs-p">
           The <code className="inline">&quot;mcp&quot;</code> source ships{" "}
-          <code className="inline">STANDARD_MCP_SERVERS</code> — launch presets for well-known published
+          <code className="inline">STANDARD_MCP_SERVERS</code>  -  launch presets for well-known published
           servers (<code className="inline">filesystem</code>, <code className="inline">fetch</code>,{" "}
           <code className="inline">git</code>, <code className="inline">memory</code>,{" "}
           <code className="inline">everything</code>, <code className="inline">sequentialthinking</code>,{" "}
@@ -641,12 +648,12 @@ export default function PythonDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Axon ─── */}
-      <Section id="axon" eyebrow="SDK · 04" title="Axon — agent-side tool">
+      <Section id="axon" eyebrow="SDK · 04" title="Axon  -  agent-side tool">
         <p className="docs-p">
           The <strong>Axon</strong> owns the Neuron&rsquo;s identity (
           <code className="inline">neuron_id</code>, <code className="inline">capabilities</code>,{" "}
           <code className="inline">version</code>) and the tool body (
-          <code className="inline">neuron_fn</code>). It never touches the Synapse — it must be
+          <code className="inline">neuron_fn</code>). It never touches the Synapse  -  it must be
           attached to a Dendrite to participate.
         </p>
 
@@ -700,11 +707,11 @@ export default function PythonDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Dendrite ─── */}
-      <Section id="dendrite" eyebrow="SDK · 05" title="Dendrite — synapse-side connector">
+      <Section id="dendrite" eyebrow="SDK · 05" title="Dendrite  -  synapse-side connector">
         <p className="docs-p">
           The <strong>Dendrite</strong> is the only thing that touches the Synapse. It hosts attached
           Axons, owns REGISTER / HEARTBEAT / DEREGISTER, routes inbound TASKs to the matching Axon,
-          and publishes the Axon&rsquo;s returned Signal. Every Dendrite can also orchestrate — there
+          and publishes the Axon&rsquo;s returned Signal. Every Dendrite can also orchestrate  -  there
           is no separate Cortex class in v0.2.
         </p>
 
@@ -759,14 +766,14 @@ export default function PythonDocs({ section }: { section?: string }) {
         <ApiCard kind="method" name="Dendrite.attach_axon(axon: Axon) -> None" summary="Register an Axon on this Dendrite. If the Dendrite is already started, the next start cycle emits REGISTER. Raises if neuron_id is already attached." />
         <ApiCard kind="method" name="Dendrite.detach_axon(neuron_id: str) -> None" summary="Stop hosting the named Axon and emit DEREGISTER." />
         <ApiCard kind="async method" name="Dendrite.start() -> None" summary="Wire subscriptions, emit REGISTER for every attached Axon, and start the heartbeat task plus any on_schedule coroutines." />
-        <ApiCard kind="async method" name="Dendrite.stop(reason=None) -> None" summary="Cancel background tasks, emit DEREGISTER for each Axon, and tear down subscriptions. The passed-in Synapse and RegistryStore are NOT closed — the caller owns them." />
+        <ApiCard kind="async method" name="Dendrite.stop(reason=None) -> None" summary="Cancel background tasks, emit DEREGISTER for each Axon, and tear down subscriptions. The passed-in Synapse and RegistryStore are NOT closed  -  the caller owns them." />
         <ApiCard kind="async context manager" name="async with Dendrite as d: ..." summary="Equivalent to start() on enter and stop() on exit, with exceptions propagated normally." />
 
         <h3 className="docs-h3">Orchestration primitives</h3>
         <ApiCard
           kind="async method"
           name="Dendrite.dispatch_task(*, neuron, input, trace_id=None, parent_id=None, context_ref=None, capabilities=None, meta=None) -> Signal"
-          summary="Publish a TASK envelope addressed to a Neuron. Auto-generates trace_id and id if omitted. This is a fire-and-publish call — it does not consult the registry, so dispatching to an unknown neuron simply produces a TASK no Axon picks up. Returns the emitted Signal so the caller can correlate."
+          summary="Publish a TASK envelope addressed to a Neuron. Auto-generates trace_id and id if omitted. This is a fire-and-publish call  -  it does not consult the registry, so dispatching to an unknown neuron simply produces a TASK no Axon picks up. Returns the emitted Signal so the caller can correlate."
         />
         <ApiCard kind="async method" name="Dendrite.emit_final(*, trace_id, parent_id, result, meta=None) -> Signal" summary="Publish a terminal FINAL envelope for a trace. Exactly one FINAL or ERROR is expected per trace; subsequent terminal envelopes for the same trace are dropped by well-behaved consumers." />
         <ApiCard kind="async method" name="Dendrite.emit_error(*, trace_id, parent_id, code, message, recoverable=False, meta=None) -> Signal" summary="Publish a terminal ERROR envelope with a short machine code and a human-readable message. recoverable=True signals to the consumer that the task may be retried or re-routed." />
@@ -775,8 +782,8 @@ export default function PythonDocs({ section }: { section?: string }) {
         <h3 className="docs-h3">Inbound handlers</h3>
         <p className="docs-p">
           The six <code className="inline">on_*</code> methods are decorators you apply to a coroutine.
-          For any other type, <code className="inline">subscribe()</code> is a coroutine — not a
-          decorator — that takes the type and a handler and returns a{" "}
+          For any other type, <code className="inline">subscribe()</code> is a coroutine  -  not a
+          decorator  -  that takes the type and a handler and returns a{" "}
           <code className="inline">Subscription</code>.
         </p>
         <table className="spec-table">
@@ -806,7 +813,7 @@ export default function PythonDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Pathway ─── */}
-      <Section id="pathway" eyebrow="SDK · 06" title="Pathway — per-trace event handle">
+      <Section id="pathway" eyebrow="SDK · 06" title="Pathway  -  per-trace event handle">
         <p className="docs-p">
           A <strong>Pathway</strong> is the client-side observation surface for one logical workflow,
           identified by its <code className="inline">trace_id</code>. It supports{" "}
@@ -837,7 +844,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           <code className="inline">Pathway(scope=&quot;all&quot;)</code> (default, centralised pattern)
           delivers every PATHWAY_TYPES Signal on the trace.{" "}
           <code className="inline">scope=&quot;terminal&quot;</code> (decentralised pattern) delivers
-          only FINAL / ERROR / CLARIFICATION — intermediate orchestration is handled peer-to-peer by
+          only FINAL / ERROR / CLARIFICATION  -  intermediate orchestration is handled peer-to-peer by
           other Dendrites and the Cortex only wakes for events that need attention. FINAL and ERROR
           always reach auto-close regardless of scope.
         </p>
@@ -846,7 +853,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           <code className="inline">dendrite.dispatch(...)</code> returns a Pathway in{" "}
           <em>originator</em> role.{" "}
           <code className="inline">dendrite.observe_pathway(trace_id)</code> opens one in{" "}
-          <em>observer</em> role — watch a trace another peer started, without emitting a TASK.
+          <em>observer</em> role  -  watch a trace another peer started, without emitting a TASK.
         </p>
         <CodeBlock filename="pathway.pyi" html={pathwayClassSnippet} maxWidth={880} />
         <h3 className="docs-h3">Example</h3>
@@ -854,7 +861,7 @@ export default function PythonDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Engram pointer ─── */}
-      <Section id="engram" eyebrow="SDK · 06b" title="Engram — shared memory">
+      <Section id="engram" eyebrow="SDK · 06b" title="Engram  -  shared memory">
         <p className="docs-p">
           The Engram subsystem (the <code className="inline">cosmonapse.engram</code> package:{" "}
           <code className="inline">Engram</code>, <code className="inline">EngramBinding</code>,{" "}
@@ -878,14 +885,14 @@ export default function PythonDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Cortex alias ─── */}
-      <Section id="cortex" eyebrow="SDK · 07" title="Cortex — back-compat alias">
+      <Section id="cortex" eyebrow="SDK · 07" title="Cortex  -  back-compat alias">
         <p className="docs-p">
           <code className="inline">cosmonapse.Cortex</code> is an alias of{" "}
           <code className="inline">cosmonapse.Dendrite</code>, and{" "}
           <code className="inline">CortexProtocolError</code> aliases{" "}
           <code className="inline">DendriteProtocolError</code>. They are preserved for code written
           against the v0.1 split where the orchestrator was a separate class. New code should use{" "}
-          <code className="inline">Dendrite</code> directly — every orchestration primitive lives
+          <code className="inline">Dendrite</code> directly  -  every orchestration primitive lives
           there.
         </p>
         <p className="docs-p">
@@ -915,7 +922,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
             <tr>
               <td>on_refresh(fn)</td>
-              <td>On each refresh event — a heartbeat tick, a REGISTER / DEREGISTER / HEARTBEAT observed via the registry mirror, or a manual <code className="inline">await component.refresh(reason=...)</code>. The handler receives a <code className="inline">RefreshEvent(reason, neuron_id, extra)</code>.</td>
+              <td>On each refresh event  -  a heartbeat tick, a REGISTER / DEREGISTER / HEARTBEAT observed via the registry mirror, or a manual <code className="inline">await component.refresh(reason=...)</code>. The handler receives a <code className="inline">RefreshEvent(reason, neuron_id, extra)</code>.</td>
             </tr>
             <tr>
               <td>on_schedule(every_s=N)(fn)</td>
@@ -928,14 +935,14 @@ export default function PythonDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Synapse ─── */}
-      <Section id="synapse" eyebrow="SDK · 08" title="Synapse — transport adapters">
+      <Section id="synapse" eyebrow="SDK · 08" title="Synapse  -  transport adapters">
         <p className="docs-p">
           A <strong>Synapse</strong> is the message bus. The application picks a backend, passes the
           adapter to the Dendrite, and never touches the wire format again. All adapters subclass the
           same abstract <code className="inline">Synapse</code> base.
         </p>
 
-        <ApiCard kind="abstract base" name="cosmonapse.Synapse" summary="The contract every transport adapter must satisfy. Adapters are responsible for ordering, dedup window, ack semantics, and durability — the SDK assumes at-least-once delivery and in-order per key.">
+        <ApiCard kind="abstract base" name="cosmonapse.Synapse" summary="The contract every transport adapter must satisfy. Adapters are responsible for ordering, dedup window, ack semantics, and durability  -  the SDK assumes at-least-once delivery and in-order per key.">
           <CodeBlock filename="synapse.pyi" html={synapseInterfaceSnippet} maxWidth={820} />
         </ApiCard>
 
@@ -973,7 +980,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         </table>
 
         <h3 className="docs-h3">URL factory</h3>
-        <ApiCard kind="function" name="synapse_from_url(url: str) -> Synapse" summary="Map a cosmo:// / nats:// / kafka:// URL to a non-connected adapter instance. Raises ValueError for any other scheme. MemorySynapse has no URL — build it directly." />
+        <ApiCard kind="function" name="synapse_from_url(url: str) -> Synapse" summary="Map a cosmo:// / nats:// / kafka:// URL to a non-connected adapter instance. Raises ValueError for any other scheme. MemorySynapse has no URL  -  build it directly." />
         <ApiCard kind="async function" name="connect_synapse(url: str) -> Synapse" summary="Same as synapse_from_url but immediately calls connect()." />
         <CodeBlock filename="urls.py" html={synapseUrlSnippet} maxWidth={780} />
 
@@ -988,7 +995,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             <tr><td>cosmo://host:port</td><td>DevSynapse client (talks to cosmo synapse start)</td></tr>
             <tr><td>nats://host:port</td><td>NatsSynapse</td></tr>
             <tr><td>kafka://host:port</td><td>KafkaSynapse</td></tr>
-            <tr><td>(no URL)</td><td>MemorySynapse — construct directly, it is process-local</td></tr>
+            <tr><td>(no URL)</td><td>MemorySynapse  -  construct directly, it is process-local</td></tr>
           </tbody>
         </table>
 
@@ -997,7 +1004,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           Subjects follow <code className="inline">cosmonapse.&lt;namespace&gt;.&lt;TYPE&gt;</code>.
           Queue groups load-balance within a group; subscribers with no{" "}
           <code className="inline">queue_group</code> form the Doppler population (every matching
-          message goes to each one). Application code must never construct subjects directly — let the
+          message goes to each one). Application code must never construct subjects directly  -  let the
           Dendrite resolve them.
         </p>
       </Section>
@@ -1007,7 +1014,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         <p className="docs-p">
           The <strong>RegistryStore</strong> is the one optional persistent surface the SDK owns. It
           is a live view of every Neuron seen on a namespace: capabilities, status, last heartbeat.
-          Anything beyond that — cost histograms, audit history, latency dashboards — is the
+          Anything beyond that  -  cost histograms, audit history, latency dashboards  -  is the
           developer&rsquo;s to build on top.
         </p>
 
@@ -1046,14 +1053,14 @@ export default function PythonDocs({ section }: { section?: string }) {
       {/* ─── Signal ─── */}
       <Section id="signal" eyebrow="SDK · 10" title="Signal & SignalType">
         <p className="docs-p">
-          A <strong>Signal</strong> is the in-memory representation of an envelope — a Pydantic v2
+          A <strong>Signal</strong> is the in-memory representation of an envelope  -  a Pydantic v2
           model. Every method that publishes or receives a message uses it. See{" "}
           <Link href="/protocol">the envelope spec</Link> for the full wire-level field reference.
         </p>
         <ApiCard kind="model" name="cosmonapse.Signal" summary="Pydantic BaseModel mirroring the envelope schema. encode() / decode() round-trip with the wire format; field validators reject ids that don't carry the evt_ / trc_ prefixes.">
           <CodeBlock filename="signal.pyi" html={signalSnippet} maxWidth={840} />
         </ApiCard>
-        <ApiCard kind="enum" name="cosmonapse.SignalType" summary="String enum of every legal type. SYNAPSE_TYPES is a frozenset of the values a Dendrite is allowed to publish — anything else passed to dendrite.emit() raises DendriteProtocolError.">
+        <ApiCard kind="enum" name="cosmonapse.SignalType" summary="String enum of every legal type. SYNAPSE_TYPES is a frozenset of the values a Dendrite is allowed to publish  -  anything else passed to dendrite.emit() raises DendriteProtocolError.">
           <CodeBlock filename="signal_type.pyi" html={signalTypeSnippet} maxWidth={840} />
         </ApiCard>
       </Section>
@@ -1088,15 +1095,31 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </thead>
           <tbody>
-            <tr><td>DendriteProtocolError</td><td><code className="inline">dendrite.emit()</code> (or a primitive that calls it) is given a type outside SYNAPSE_TYPES. Subclasses <code className="inline">ValueError</code>.</td></tr>
-            <tr><td>CortexProtocolError</td><td>Alias of the above, for v0.1-era code.</td></tr>
-            <tr><td>pydantic.ValidationError</td><td>A Signal is constructed or decoded with malformed fields.</td></tr>
-            <tr><td>ValueError</td><td>An envelope id lacks its evt_ / trc_ prefix, or <code className="inline">synapse_from_url</code> gets an unknown scheme.</td></tr>
-            <tr><td>TypeError</td><td>A Dendrite is built without a <code className="inline">synapse</code>, or a required argument is missing.</td></tr>
+            <tr>
+              <td><code className="inline">DendriteProtocolError</code></td>
+              <td><code className="inline">dendrite.emit()</code> is called with a Signal type not in <code className="inline">SYNAPSE_TYPES</code> (e.g. a worker trying to emit a TASK).</td>
+            </tr>
+            <tr>
+              <td><code className="inline">ValueError</code></td>
+              <td>Bad envelope id prefix (not <code className="inline">evt_</code> / <code className="inline">trc_</code>), or unknown Synapse URL scheme.</td>
+            </tr>
+            <tr>
+              <td><code className="inline">TypeError</code></td>
+              <td>Dendrite constructed without a <code className="inline">synapse=</code> argument.</td>
+            </tr>
+            <tr>
+              <td><code className="inline">pydantic.ValidationError</code></td>
+              <td>Malformed Signal fields on decode (wire format does not match the envelope schema).</td>
+            </tr>
+            <tr>
+              <td>Transport exception</td>
+              <td>Raised directly from <code className="inline">nats-py</code>, <code className="inline">aiokafka</code>, or <code className="inline">asyncpg</code> — not wrapped.</td>
+            </tr>
           </tbody>
         </table>
       </Section>
     </>
   );
+
   return pickSection(all, section);
 }

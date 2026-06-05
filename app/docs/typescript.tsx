@@ -19,7 +19,7 @@ export const typescriptToc: TocGroup = {
     { href: "#ts-install", label: "Installation" },
     { href: "#ts-imports", label: "Top-level imports" },
     { href: "#ts-axon", label: "Axon" },
-    { href: "#ts-neuron", label: "Neuron — sources & clarify" },
+    { href: "#ts-neuron", label: "Neuron  -  sources & clarify" },
     { href: "#ts-dendrite", label: "Dendrite" },
     { href: "#ts-synapse", label: "Synapse" },
     { href: "#ts-registry", label: "RegistryStore" },
@@ -47,7 +47,7 @@ const importsSnippet = `<span class="tk-kw">import</span> {
   Dendrite,
   Cortex,                 <span class="tk-cm">// back-compat alias of Dendrite</span>
 
-  <span class="tk-cm">// Transports — construct directly (no URL factory in the TS port)</span>
+  <span class="tk-cm">// Transports  -  construct directly (no URL factory in the TS port)</span>
   MemorySynapse,
   NatsSynapse,
 
@@ -55,10 +55,9 @@ const importsSnippet = `<span class="tk-kw">import</span> {
   MemoryRegistryStore,
   neuronRecord,
 
-  <span class="tk-cm">// Neuron — contract + source factories</span>
+  <span class="tk-cm">// Neuron  -  contract + source factories</span>
   clarify,
   isClarification,
-  expressNeuron,          <span class="tk-cm">// wrap an Express / Node app</span>
   mcpNeuron,              <span class="tk-cm">// wrap any stdio MCP server</span>
   neuron,                 <span class="tk-cm">// unified neuron(source, opts) factory</span>
   standardMcpServers,     <span class="tk-cm">// presets for published MCP servers</span>
@@ -99,7 +98,7 @@ const axonClassSnippet = `<span class="tk-kw">interface</span> <span class="tk-f
   <span class="tk-fn">handleTask</span>(task: Signal): Promise<span class="tk-op">&lt;</span>Signal<span class="tk-op">&gt;</span>;
 }
 
-<span class="tk-cm">// A Neuron is a plain function — sync or async:</span>
+<span class="tk-cm">// A Neuron is a plain function  -  sync or async:</span>
 <span class="tk-kw">type</span> <span class="tk-fn">NeuronFn</span> <span class="tk-op">=</span> (input: Json, context: unknown[]) <span class="tk-op">=></span> Promise<span class="tk-op">&lt;</span>Json<span class="tk-op">&gt;</span> <span class="tk-op">|</span> Json;`;
 
 const axonUseSnippet = `<span class="tk-kw">import</span> { Axon, clarify } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
@@ -124,27 +123,20 @@ const neuronSnippet = `<span class="tk-kw">import</span> { clarify, isClarificat
 <span class="tk-cm">// The Axon turns a clarify() return into a CLARIFICATION signal for you.</span>
 <span class="tk-fn">isClarification</span>(<span class="tk-kw">await</span> <span class="tk-fn">neuronFn</span>({}, []));   <span class="tk-cm">// true</span>`;
 
-const neuronSourceSnippet = `<span class="tk-kw">import</span> { Axon, expressNeuron, mcpNeuron, neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-<span class="tk-kw">import</span> express <span class="tk-kw">from</span> <span class="tk-str">"express"</span>;
+const neuronSourceSnippet = `<span class="tk-kw">import</span> { Axon, mcpNeuron, neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
-<span class="tk-cm">// 1 · API — wrap an Express app (or any Node request listener) as a Neuron</span>
-<span class="tk-kw">const</span> app <span class="tk-op">=</span> <span class="tk-fn">express</span>();
-app.<span class="tk-fn">use</span>(express.<span class="tk-fn">json</span>());
-app.<span class="tk-fn">post</span>(<span class="tk-str">"/summarise"</span>, (req, res) <span class="tk-op">=&gt;</span> res.<span class="tk-fn">json</span>({ summary: req.body.text.<span class="tk-fn">slice</span>(<span class="tk-str">0</span>, <span class="tk-str">120</span>) }));
+<span class="tk-cm">// An HTTP API is NOT a Neuron. Keep Express/Fastify on the OUTSIDE as an</span>
+<span class="tk-cm">// HTTP boundary and dispatch TASKs from its routes via an orchestrator</span>
+<span class="tk-cm">// Dendrite  -  see the real-world-neurons example.</span>
 
-<span class="tk-kw">const</span> api <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({
-  neuronId: <span class="tk-str">"summary-api"</span>,
-  neuronFn: <span class="tk-fn">expressNeuron</span>(app, { defaultPath: <span class="tk-str">"/summarise"</span> }),
-});
-
-<span class="tk-cm">// 2 · MCP server — wrap any stdio MCP server's tools as a Neuron</span>
+<span class="tk-cm">// MCP server  -  wrap any stdio MCP server's tools as a Neuron</span>
 <span class="tk-kw">const</span> files <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({
   neuronId: <span class="tk-str">"files"</span>,
   neuronFn: <span class="tk-fn">mcpNeuron</span>({ server: <span class="tk-str">"filesystem"</span>, args: [<span class="tk-str">"/data"</span>], tool: <span class="tk-str">"read_file"</span> }),
 });
 
-<span class="tk-cm">// Or use the unified factory — mirrors Python's Neuron(source=…)</span>
-<span class="tk-kw">const</span> sameApi <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"express"</span>, { app, defaultPath: <span class="tk-str">"/summarise"</span> });`;
+<span class="tk-cm">// Or use the unified factory  -  mirrors Python's Neuron(source=…)</span>
+<span class="tk-kw">const</span> sameFiles <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"mcp"</span>, { server: <span class="tk-str">"filesystem"</span>, args: [<span class="tk-str">"/data"</span>] });`;
 
 const dendriteClassSnippet = `<span class="tk-kw">interface</span> <span class="tk-fn">DendriteOptions</span> {
   synapse:                Synapse;        <span class="tk-cm">// REQUIRED</span>
@@ -163,7 +155,7 @@ const dendriteClassSnippet = `<span class="tk-kw">interface</span> <span class="
   <span class="tk-fn">start</span>(): Promise<span class="tk-op">&lt;</span>void<span class="tk-op">&gt;</span>;
   <span class="tk-fn">stop</span>(reason?: string): Promise<span class="tk-op">&lt;</span>void<span class="tk-op">&gt;</span>;
 
-  <span class="tk-cm">// ── Inbound handlers — method calls, NOT decorators ─────</span>
+  <span class="tk-cm">// ── Inbound handlers  -  method calls, NOT decorators ─────</span>
   <span class="tk-fn">onAgentOutput</span>(fn: SignalHandler): SignalHandler;
   <span class="tk-fn">onClarification</span>(fn: SignalHandler): SignalHandler;
   <span class="tk-fn">onErrorSignal</span>(fn: SignalHandler): SignalHandler;
@@ -212,7 +204,7 @@ dendrite.<span class="tk-fn">onAgentOutput</span>(<span class="tk-kw">async</spa
 <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
 <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"answerer"</span>, input: { q: <span class="tk-str">"hi"</span> } });
 
-<span class="tk-cm">// … on shutdown — the Dendrite never closes the synapse, you do:</span>
+<span class="tk-cm">// … on shutdown  -  the Dendrite never closes the synapse, you do:</span>
 <span class="tk-kw">await</span> dendrite.<span class="tk-fn">stop</span>();
 <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>();`;
 
@@ -224,7 +216,7 @@ const synapseInterfaceSnippet = `<span class="tk-kw">interface</span> <span clas
   <span class="tk-fn">request</span>(subject: string, signal: Signal, opts?: RequestOptions): Promise<span class="tk-op">&lt;</span>Signal<span class="tk-op">&gt;</span>;
 }
 
-<span class="tk-cm">// Construct adapters directly — there is no synapse_from_url in the TS port:</span>
+<span class="tk-cm">// Construct adapters directly  -  there is no synapse_from_url in the TS port:</span>
 <span class="tk-kw">const</span> mem  <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">MemorySynapse</span>();
 <span class="tk-kw">const</span> nats <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">NatsSynapse</span>({ url: <span class="tk-str">"nats://127.0.0.1:4222"</span> });  <span class="tk-cm">// needs npm i nats</span>`;
 
@@ -321,7 +313,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         </h2>
         <p className="docs-megasection-sub">
           <code className="inline">@cosmonapse/sdk</code> is the 1:1 TypeScript port of the Python
-          envelope protocol and runtime. The shapes are identical on the wire — only the surface is
+          envelope protocol and runtime. The shapes are identical on the wire  -  only the surface is
           idiomatic: <code className="inline">camelCase</code> names, options-object constructors, and
           classes you instantiate with <code className="inline">new</code>. This is a v0.1 port; see{" "}
           <Link href="#ts-parity">Parity with Python</Link> for what isn&rsquo;t carried over yet.
@@ -340,13 +332,13 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
       <Section id="ts-imports" eyebrow="TS · 02" title="Top-level imports">
         <p className="docs-p">
           Everything is re-exported from the package root. Values and types come from the same
-          entry point — use <code className="inline">import type</code> for the type-only symbols.
+          entry point  -  use <code className="inline">import type</code> for the type-only symbols.
         </p>
         <CodeBlock filename="imports.ts" html={importsSnippet} maxWidth={820} />
       </Section>
 
       {/* ─── Axon ─── */}
-      <Section id="ts-axon" eyebrow="TS · 03" title="Axon — agent-side tool">
+      <Section id="ts-axon" eyebrow="TS · 03" title="Axon  -  agent-side tool">
         <p className="docs-p">
           The <strong>Axon</strong> wraps a <code className="inline">neuronFn</code> with the metadata
           and validation needed to put it on the bus. It never touches the Synapse; attach it to a
@@ -399,28 +391,27 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Neuron / clarify ─── */}
-      <Section id="ts-neuron" eyebrow="TS · 04" title="Neuron — sources, contract & clarify()">
+      <Section id="ts-neuron" eyebrow="TS · 04" title="Neuron  -  sources, contract & clarify()">
         <p className="docs-p">
-          A Neuron is a plain function — <code className="inline">NeuronFn</code> — wrapping{" "}
+          A Neuron is a plain function  -  <code className="inline">NeuronFn</code>  -  wrapping{" "}
           <em>anything that interacts with the real world</em>. Write your own, or use a source
-          factory: <code className="inline">expressNeuron(app)</code> wraps an Express app (or any
-          Node request listener), <code className="inline">mcpNeuron(opts)</code> wraps any stdio MCP
-          server, and the unified <code className="inline">neuron(source, opts)</code> mirrors
-          Python&rsquo;s <code className="inline">Neuron(source=…)</code>. To ask for more information
-          instead of producing a result, return <code className="inline">clarify()</code>; the Axon
-          converts it into a CLARIFICATION signal.
+          factory: <code className="inline">mcpNeuron(opts)</code> wraps any stdio MCP server, and the
+          unified <code className="inline">neuron(source, opts)</code> mirrors Python&rsquo;s{" "}
+          <code className="inline">Neuron(source=…)</code>. An HTTP API is <em>not</em> a Neuron  - 
+          keep Express/Fastify at the edge and dispatch TASKs from its routes via an orchestrator
+          Dendrite. To ask for more information instead of producing a result, return{" "}
+          <code className="inline">clarify()</code>; the Axon converts it into a CLARIFICATION signal.
         </p>
 
         <h3 className="docs-h3">Source factories</h3>
-        <ApiCard kind="function" name="expressNeuron(app, opts?): CloseableNeuronFn" summary="API source. Mounts an Express/Node request listener on an ephemeral loopback port (once, reused) and replays each TASK as an HTTP request. Input is HTTP-shaped (method/path/json/query/headers); returns {status, ok, json, response, headers, meta}." />
-        <ApiCard kind="function" name="mcpNeuron(opts): CloseableNeuronFn" summary="MCP source. Spawns any stdio MCP server (command+args or a server preset) via @modelcontextprotocol/sdk and exposes its tools. Input is {tool, arguments} or {__list_tools__:true}. Wrapper only — does not implement a server. The SDK is an optional peer dependency, imported lazily." />
-        <ApiCard kind="function" name="neuron(source, opts): CloseableNeuronFn" summary='Unified dispatcher. source = "express" | "http" | "api" | "mcp". Mirrors Python&rsquo;s Neuron(source=…).' />
+        <ApiCard kind="function" name="mcpNeuron(opts): CloseableNeuronFn" summary="MCP source. Spawns any stdio MCP server (command+args or a server preset) via @modelcontextprotocol/sdk and exposes its tools. Input is {tool, arguments} or {__list_tools__:true}. Wrapper only  -  does not implement a server. The SDK is an optional peer dependency, imported lazily." />
+        <ApiCard kind="function" name="neuron(source, opts): CloseableNeuronFn" summary='Unified dispatcher. source = "mcp" | "ollama" | "huggingface" | "hf". Mirrors Python&rsquo;s Neuron(source=…).' />
         <ApiCard kind="const" name="standardMcpServers" summary="Launch presets for well-known published MCP servers (filesystem, fetch, git, memory, everything, sequentialthinking, time). Pass server=&quot;filesystem&quot; and your args are appended to the preset." />
         <CodeBlock filename="neuron_sources.ts" html={neuronSourceSnippet} maxWidth={860} />
 
         <h3 className="docs-h3">Contract & clarify()</h3>
         <p className="docs-p">
-          Every source — and any hand-written Neuron — satisfies the same{" "}
+          Every source  -  and any hand-written Neuron  -  satisfies the same{" "}
           <code className="inline">NeuronFn</code> signature, so the Axon treats them identically.
         </p>
         <ApiCard kind="function" name="clarify(question: string, context?: Json): ClarificationOutput" summary="Build a clarification marker for a Neuron to return." />
@@ -429,11 +420,11 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Dendrite ─── */}
-      <Section id="ts-dendrite" eyebrow="TS · 05" title="Dendrite — synapse-side connector">
+      <Section id="ts-dendrite" eyebrow="TS · 05" title="Dendrite  -  synapse-side connector">
         <p className="docs-p">
           The <strong>Dendrite</strong> is the only component that touches the Synapse. It hosts
           attached Axons, owns REGISTER / HEARTBEAT / DEREGISTER, routes inbound TASKs, and exposes
-          every orchestration primitive. Unlike Python, handler registration is plain method calls —
+          every orchestration primitive. Unlike Python, handler registration is plain method calls  - 
           there are no decorators in the TS port.
         </p>
         <ApiCard kind="class" name="Dendrite" summary="Hosts Axons and orchestrates. Synapse and (optionally) RegistryStore are passed in via the options object; the Dendrite never builds or closes them.">
@@ -512,11 +503,11 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Synapse ─── */}
-      <Section id="ts-synapse" eyebrow="TS · 06" title="Synapse — transport adapters">
+      <Section id="ts-synapse" eyebrow="TS · 06" title="Synapse  -  transport adapters">
         <p className="docs-p">
           A <strong>Synapse</strong> is the message bus. The TS port ships{" "}
           <code className="inline">MemorySynapse</code> (single process) and{" "}
-          <code className="inline">NatsSynapse</code> (cluster). There is no URL factory — construct
+          <code className="inline">NatsSynapse</code> (cluster). There is no URL factory  -  construct
           the adapter you want directly and pass it to the Dendrite.
         </p>
         <ApiCard kind="interface" name="Synapse" summary="The contract every adapter implements. The caller builds, connects, and closes it; the Dendrite only uses it.">
@@ -610,11 +601,11 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             </tr>
           </thead>
           <tbody>
-            <tr><td>KafkaSynapse</td><td>Not ported — use MemorySynapse or NatsSynapse.</td></tr>
-            <tr><td>SqliteRegistryStore / PostgresRegistryStore</td><td>Not ported — only MemoryRegistryStore.</td></tr>
-            <tr><td>Provider-backed Neuron factories (Ollama / HF)</td><td>Not ported — pass your own NeuronFn.</td></tr>
-            <tr><td>Lifecycle hooks (on_connect / on_refresh / on_schedule)</td><td>Not ported — no LifecycleHooks mixin.</td></tr>
-            <tr><td>connect_synapse / synapse_from_url URL factory</td><td>Not ported — construct adapters directly.</td></tr>
+            <tr><td>KafkaSynapse</td><td>Not ported  -  use MemorySynapse or NatsSynapse.</td></tr>
+            <tr><td>SqliteRegistryStore / PostgresRegistryStore</td><td>Not ported  -  only MemoryRegistryStore.</td></tr>
+            <tr><td>Provider-backed Neuron factories (Ollama / HF)</td><td>Not ported  -  pass your own NeuronFn.</td></tr>
+            <tr><td>Lifecycle hooks (on_connect / on_refresh / on_schedule)</td><td>Not ported  -  no LifecycleHooks mixin.</td></tr>
+            <tr><td>connect_synapse / synapse_from_url URL factory</td><td>Not ported  -  construct adapters directly.</td></tr>
             <tr><td>async context manager (async with dendrite)</td><td>Use start() / stop() explicitly.</td></tr>
           </tbody>
         </table>
@@ -623,3 +614,4 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
   );
   return pickSection(all, section);
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
