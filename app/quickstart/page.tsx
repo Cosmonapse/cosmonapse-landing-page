@@ -250,4 +250,9 @@ export default function QuickstartPage() {
               <p>v0.1 manual SDK · v0.2 Axon-as-MCP · v0.3 declarative router · v0.4 router agent.</p>
             </Link>
           </div>
+        </div>
+      </section>
+    </>
+  );
+}
  
