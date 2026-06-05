@@ -23,7 +23,6 @@ type Example = {
 };
 
 const examples: Example[] = [
-  // ───────────────────────────────  Beginner  ───────────────────────────────
   {
     slug: "building-a-neuron",
     number: "01",
@@ -36,8 +35,19 @@ const examples: Example[] = [
     accentColor: "var(--accent)",
   },
   {
-    slug: "round-robin",
+    slug: "orchestrator-api",
     number: "02",
+    tag: "Web integration",
+    title: "Building an Orchestrator API",
+    description:
+      "Wire a Dendrite into Flask, FastAPI, Express, or raw WSGI. Your HTTP framework stays at the edge and dispatches TASKs from its route handlers  -  the Neuron never sees HTTP, the framework never sees the Synapse.",
+    primitives: ["Dendrite", "Synapse", "Pathway"],
+    difficulty: "Intermediate",
+    accentColor: "var(--accent-3)",
+  },
+  {
+    slug: "round-robin",
+    number: "03",
     tag: "Orchestration",
     title: "Orchestrator + Round Robin",
     description:
@@ -48,7 +58,7 @@ const examples: Example[] = [
   },
   {
     slug: "pathway",
-    number: "03",
+    number: "04",
     tag: "Consume",
     title: "Pathway  -  three consumption shapes",
     description:
@@ -57,10 +67,9 @@ const examples: Example[] = [
     difficulty: "Beginner",
     accentColor: "var(--accent)",
   },
-  // ─────────────────────────────  Intermediate  ─────────────────────────────
   {
     slug: "engram-integration",
-    number: "04",
+    number: "05",
     tag: "Shared memory",
     title: "Integrating an Engram",
     description:
@@ -71,7 +80,7 @@ const examples: Example[] = [
   },
   {
     slug: "no-orchestrator",
-    number: "05",
+    number: "06",
     tag: "Decentralised",
     title: "No Orchestrator",
     description:
@@ -82,7 +91,7 @@ const examples: Example[] = [
   },
   {
     slug: "real-world-neurons",
-    number: "06",
+    number: "07",
     tag: "Neuron sources",
     title: "Real-world Neurons (MCP + web edge)",
     description:
@@ -91,18 +100,6 @@ const examples: Example[] = [
     difficulty: "Intermediate",
     accentColor: "var(--accent-3)",
   },
-  {
-    slug: "orchestrator-api",
-    number: "07",
-    tag: "Web integration",
-    title: "Building an Orchestrator API",
-    description:
-      "Wire a Dendrite into Flask, FastAPI, Express, or raw WSGI. Your HTTP framework stays at the edge and dispatches TASKs from its route handlers  -  the Neuron never sees HTTP, the framework never sees the Synapse.",
-    primitives: ["Dendrite", "Synapse", "Pathway"],
-    difficulty: "Intermediate",
-    accentColor: "var(--accent-3)",
-  },
-  // ───────────────────────────────  Advanced  ───────────────────────────────
   {
     slug: "capability-routing",
     number: "08",
@@ -174,7 +171,7 @@ export default function ExamplesPage() {
                 key={e.slug}
                 href={`/examples/${e.slug}`}
                 className="ex-cat-card"
-                style={{ borderColor: `${e.accentColor}` + "55" }}
+                style={{ borderColor: e.accentColor }}
               >
                 <div className="ex-cat-head">
                   <span
