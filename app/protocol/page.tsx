@@ -250,7 +250,7 @@ export default function ProtocolPage() {
             <div className="layer">
               <div className="layer-name">Axon  -  agent-side tool</div>
               <div className="layer-desc">
-                Unwraps TASK → calls Neuron. Wraps Neuron output → AGENT_OUTPUT / CLARIFICATION / ERROR →
+                Unwraps TASK → calls Neuron. Wraps Neuron output → AGENT_OUTPUT / CLARIFICATION / PERMISSION / ERROR →
                 returns to Dendrite. Never touches the Synapse directly.
               </div>
             </div>
@@ -442,9 +442,24 @@ export default function ProtocolPage() {
               <code className="inline">{`{ target_event_id, severity, note }`}</code>
             </Msg>
             <Msg name="CLARIFICATION" by="Dendrite (Axon data)">
-              The Axon recognises a clarification signal in the agent&rsquo;s raw output and emits this
-              directly. The Dendrite never has to inspect AGENT_OUTPUT for it. Payload:{" "}
-              <code className="inline">{`{ questions, context? }`}</code>
+              The Axon recognises a <code className="inline">__clarification__</code> marker in the
+              agent&rsquo;s raw output and emits this directly. The Dendrite never has to inspect
+              AGENT_OUTPUT for it. Payload:{" "}
+              <code className="inline">{`{ question, context? }`}</code>
+            </Msg>
+            <Msg name="PERMISSION" by="Dendrite (Axon data)">
+              A Neuron asks to perform an action before doing it  -  the same return-and-resume shape
+              as CLARIFICATION, via a <code className="inline">__permission__</code> marker (typically
+              only after an Engram recall misses). Payload:{" "}
+              <code className="inline">{`{ action, scope?, reason? }`}</code>
+            </Msg>
+            <Msg name="PERMISSION_DECISION / CLARIFICATION_ANSWER" by="Dendrite">
+              The verdict / answer to a request. <code className="inline">parent_id</code> is the
+              request&rsquo;s id. No correlation client: the answering Dendrite either re-dispatches a
+              TASK with the decision (so the Neuron resumes and can imprint/recall it) or emits this
+              discrete reply. Payload:{" "}
+              <code className="inline">{`{ granted, reason?, ttl_ms? }`}</code> /{" "}
+              <code className="inline">{`{ answer }`}</code>
             </Msg>
             <Msg name="DISCOVER" by="Dendrite">
               Capability discovery probe. Peers that match respond on the discovery subject; the originator

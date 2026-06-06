@@ -94,7 +94,7 @@ const axonClassSnippet = `<span class="tk-kw">interface</span> <span class="tk-f
   <span class="tk-fn">constructor</span>(opts: AxonOptions);
 
   <span class="tk-cm">// Called by the Dendrite for each inbound TASK. Resolves</span>
-  <span class="tk-cm">// contextRef, runs neuronFn, returns AGENT_OUTPUT / CLARIFICATION / ERROR.</span>
+  <span class="tk-cm">// contextRef, runs neuronFn, returns AGENT_OUTPUT / CLARIFICATION / PERMISSION / ERROR.</span>
   <span class="tk-fn">handleTask</span>(task: Signal): Promise<span class="tk-op">&lt;</span>Signal<span class="tk-op">&gt;</span>;
 }
 
@@ -158,6 +158,7 @@ const dendriteClassSnippet = `<span class="tk-kw">interface</span> <span class="
   <span class="tk-cm">// ── Inbound handlers  -  method calls, NOT decorators ─────</span>
   <span class="tk-fn">onAgentOutput</span>(fn: SignalHandler): SignalHandler;
   <span class="tk-fn">onClarification</span>(fn: SignalHandler): SignalHandler;
+  <span class="tk-fn">onPermission</span>(fn: SignalHandler): SignalHandler;
   <span class="tk-fn">onErrorSignal</span>(fn: SignalHandler): SignalHandler;
   <span class="tk-fn">onRegister</span>(fn: SignalHandler): SignalHandler;
   <span class="tk-fn">onDeregister</span>(fn: SignalHandler): SignalHandler;
@@ -274,7 +275,8 @@ const signalTypeSnippet = `<span class="tk-cm">// SignalType is a const object (
   <span class="tk-cm">// … TASK_OFFER, BID, TASK_AWARDED, TASK_DECLINED,</span>
   <span class="tk-cm">//    THOUGHT_DELTA, PLAN, TOOL_CALL, TOOL_RESULT,</span>
   <span class="tk-cm">//    MEMORY_APPEND, ESCALATION, CONSENSUS, CONTEXT_SYNC,</span>
-  <span class="tk-cm">//    CRITIQUE, CLARIFICATION,</span>
+  <span class="tk-cm">//    CRITIQUE, CLARIFICATION, PERMISSION,</span>
+  <span class="tk-cm">//    PERMISSION_DECISION, CLARIFICATION_ANSWER,</span>
   REGISTER: <span class="tk-str">"REGISTER"</span>,
   DEREGISTER: <span class="tk-str">"DEREGISTER"</span>,
   HEARTBEAT: <span class="tk-str">"HEARTBEAT"</span>,
@@ -344,7 +346,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           and validation needed to put it on the bus. It never touches the Synapse; attach it to a
           Dendrite to participate.
         </p>
-        <ApiCard kind="class" name="Axon" summary="Turns raw Neuron output into protocol-valid signals: a normal return becomes AGENT_OUTPUT, a clarify() return becomes CLARIFICATION, and a thrown error becomes ERROR.">
+        <ApiCard kind="class" name="Axon" summary="Turns raw Neuron output into protocol-valid signals: a normal return becomes AGENT_OUTPUT, a clarify() return becomes CLARIFICATION, a permissionRequest() return becomes PERMISSION, and a thrown error becomes ERROR.">
           <CodeBlock filename="axon.ts" html={axonClassSnippet} maxWidth={820} />
         </ApiCard>
 
@@ -401,6 +403,8 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           keep Express/Fastify at the edge and dispatch TASKs from its routes via an orchestrator
           Dendrite. To ask for more information instead of producing a result, return{" "}
           <code className="inline">clarify()</code>; the Axon converts it into a CLARIFICATION signal.
+          To ask permission before acting, return <code className="inline">permissionRequest()</code>{" "}
+           -  same return-and-resume shape  -  and the Axon emits a PERMISSION signal.
         </p>
 
         <h3 className="docs-h3">Source factories</h3>
@@ -409,13 +413,15 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         <ApiCard kind="const" name="standardMcpServers" summary="Launch presets for well-known published MCP servers (filesystem, fetch, git, memory, everything, sequentialthinking, time). Pass server=&quot;filesystem&quot; and your args are appended to the preset." />
         <CodeBlock filename="neuron_sources.ts" html={neuronSourceSnippet} maxWidth={860} />
 
-        <h3 className="docs-h3">Contract & clarify()</h3>
+        <h3 className="docs-h3">Contract, clarify() & permissionRequest()</h3>
         <p className="docs-p">
           Every source  -  and any hand-written Neuron  -  satisfies the same{" "}
           <code className="inline">NeuronFn</code> signature, so the Axon treats them identically.
         </p>
         <ApiCard kind="function" name="clarify(question: string, context?: Json): ClarificationOutput" summary="Build a clarification marker for a Neuron to return." />
         <ApiCard kind="function" name="isClarification(output: unknown): output is ClarificationOutput" summary="Type guard that detects a clarify() marker." />
+        <ApiCard kind="function" name="permissionRequest(action: string, opts?: { scope?, reason?, context? }): PermissionRequestOutput" summary="Build a permission-request marker for a Neuron to return. Typically returned only after an Engram recall misses." />
+        <ApiCard kind="function" name="isPermissionRequest(output: unknown): output is PermissionRequestOutput" summary="Type guard that detects a permissionRequest() marker." />
         <CodeBlock filename="neuron.ts" html={neuronSnippet} maxWidth={820} />
       </Section>
 
@@ -490,6 +496,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           <tbody>
             <tr><td>dendrite.onAgentOutput(fn)</td><td>Every AGENT_OUTPUT on the namespace.</td></tr>
             <tr><td>dendrite.onClarification(fn)</td><td>Every CLARIFICATION.</td></tr>
+            <tr><td>dendrite.onPermission(fn)</td><td>Every PERMISSION request. Reply with respondToPermission / grantPermission / denyPermission.</td></tr>
             <tr><td>dendrite.onErrorSignal(fn)</td><td>Every ERROR.</td></tr>
             <tr><td>dendrite.onRegister(fn)</td><td>Every REGISTER.</td></tr>
             <tr><td>dendrite.onDeregister(fn)</td><td>Every DEREGISTER.</td></tr>

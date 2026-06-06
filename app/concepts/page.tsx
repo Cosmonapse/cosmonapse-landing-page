@@ -59,7 +59,7 @@ const productLine: {
       {
         name: "Axon",
         map: "Agent-side tool",
-        desc: "The only piece of Cosmonapse that lives inside the Neuron's process. Wraps the Neuron function, validates its output into a Signal (AGENT_OUTPUT, CLARIFICATION, or ERROR), and hands it to the Dendrite. The Neuron itself never touches the protocol.",
+        desc: "The only piece of Cosmonapse that lives inside the Neuron's process. Wraps the Neuron function, validates its output into a Signal (AGENT_OUTPUT, CLARIFICATION, PERMISSION, or ERROR), and hands it to the Dendrite. The Neuron itself never touches the protocol.",
       },
       {
         name: "Dendrite",

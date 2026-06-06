@@ -140,7 +140,7 @@ const axonClassSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">A
 
     <span class="tk-kw">async def</span> <span class="tk-fn">handle_task</span>(self, task: Signal) <span class="tk-op">-></span> Signal: ...
     <span class="tk-cm"># Called by the Dendrite. Resolves context_ref, invokes neuron_fn,</span>
-    <span class="tk-cm"># wraps the result in AGENT_OUTPUT / CLARIFICATION / ERROR.</span>
+    <span class="tk-cm"># wraps the result in AGENT_OUTPUT / CLARIFICATION / PERMISSION / ERROR.</span>
 
     <span class="tk-cm"># Inherited from LifecycleHooks:</span>
     <span class="tk-op">@</span>axon.on_connect          <span class="tk-cm"># after the hosting Dendrite emits REGISTER</span>
@@ -272,6 +272,7 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
     <span class="tk-cm"># ── Inbound handler decorators ──────────────────────────────</span>
     <span class="tk-op">@</span>dendrite.on_agent_output
     <span class="tk-op">@</span>dendrite.on_clarification
+    <span class="tk-op">@</span>dendrite.on_permission
     <span class="tk-op">@</span>dendrite.on_error            <span class="tk-cm"># alias of on_error_signal</span>
     <span class="tk-op">@</span>dendrite.on_register         <span class="tk-cm"># alias of on_register_signal</span>
     <span class="tk-op">@</span>dendrite.on_deregister       <span class="tk-cm"># alias of on_deregister_signal</span>
@@ -494,6 +495,9 @@ const signalTypeSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">
     CONTEXT_SYNC    <span class="tk-op">=</span> <span class="tk-str">"CONTEXT_SYNC"</span>
     CRITIQUE        <span class="tk-op">=</span> <span class="tk-str">"CRITIQUE"</span>
     CLARIFICATION   <span class="tk-op">=</span> <span class="tk-str">"CLARIFICATION"</span>
+    PERMISSION      <span class="tk-op">=</span> <span class="tk-str">"PERMISSION"</span>
+    PERMISSION_DECISION  <span class="tk-op">=</span> <span class="tk-str">"PERMISSION_DECISION"</span>
+    CLARIFICATION_ANSWER <span class="tk-op">=</span> <span class="tk-str">"CLARIFICATION_ANSWER"</span>
 
     <span class="tk-cm"># Agent management</span>
     REGISTER        <span class="tk-op">=</span> <span class="tk-str">"REGISTER"</span>
@@ -501,7 +505,7 @@ const signalTypeSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">
     HEARTBEAT       <span class="tk-op">=</span> <span class="tk-str">"HEARTBEAT"</span>
 
 <span class="tk-cm"># Frozensets defining who may emit what:</span>
-<span class="tk-fn">AXON_TYPES</span>     <span class="tk-cm"># AGENT_OUTPUT, CLARIFICATION, ERROR, REGISTER, DEREGISTER, HEARTBEAT</span>
+<span class="tk-fn">AXON_TYPES</span>     <span class="tk-cm"># AGENT_OUTPUT, CLARIFICATION, PERMISSION, ERROR, REGISTER, DEREGISTER, HEARTBEAT</span>
 <span class="tk-fn">SYNAPSE_TYPES</span>  <span class="tk-cm"># every type a Dendrite is allowed to emit (incl. ERROR)</span>`;
 
 const helpersSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> new_trace_id, new_event_id
@@ -700,7 +704,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         </table>
 
         <h3 className="docs-h3">Methods</h3>
-        <ApiCard kind="async method" name="Axon.handle_task(task: Signal) -> Signal" summary="Called by the Dendrite for each inbound TASK. Resolves context_ref, invokes neuron_fn, and returns the corresponding outbound Signal (AGENT_OUTPUT, CLARIFICATION, or ERROR). Application code never calls this directly." />
+        <ApiCard kind="async method" name="Axon.handle_task(task: Signal) -> Signal" summary="Called by the Dendrite for each inbound TASK. Resolves context_ref, invokes neuron_fn, and returns the corresponding outbound Signal (AGENT_OUTPUT, CLARIFICATION, PERMISSION, or ERROR). Application code never calls this directly." />
 
         <h3 className="docs-h3">Example</h3>
         <CodeBlock filename="answerer.py" html={axonUseSnippet} maxWidth={820} />
@@ -796,6 +800,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           <tbody>
             <tr><td>@dendrite.on_agent_output</td><td>Every AGENT_OUTPUT on the namespace.</td></tr>
             <tr><td>@dendrite.on_clarification</td><td>Every CLARIFICATION on the namespace.</td></tr>
+            <tr><td>@dendrite.on_permission</td><td>Every PERMISSION request. Reply with respond_to_permission / grant_permission / deny_permission.</td></tr>
             <tr><td>@dendrite.on_error</td><td>Every ERROR on the namespace.</td></tr>
             <tr><td>@dendrite.on_register</td><td>Every REGISTER (including re-registers attached to HEARTBEATs).</td></tr>
             <tr><td>@dendrite.on_deregister</td><td>Every DEREGISTER.</td></tr>
