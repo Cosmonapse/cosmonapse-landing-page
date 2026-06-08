@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import CodeBlock from "@/components/CodeBlock";
+import CodeSwitcher from "@/components/CodeSwitcher";
 
 export const metadata: Metadata = {
-  title: "Envelope Specification  -  Cosmonapse Protocol",
+  title: "Envelope Specification — Cosmonapse Protocol",
   description:
     "The envelope is the single shared contract of Cosmonapse. Every Signal on the channel is a valid envelope.",
 };
@@ -24,6 +25,32 @@ const envelopeSnippet = `{
     <span class="tk-fn">"tokens"</span>: { <span class="tk-fn">"out"</span>: <span class="tk-num">12</span> }
   }
 }`;
+
+// Connect + validate snippets shown in the switcher alongside the envelope
+const connectPy = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> connect_synapse, validateSignal
+
+<span class="tk-cm"># Connect to any Synapse — memory, NATS, Kafka.</span>
+synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
+
+<span class="tk-cm"># Validate an envelope against the spec.</span>
+ok, errors <span class="tk-op">=</span> <span class="tk-fn">validateSignal</span>(envelope_dict)
+<span class="tk-kw">if not</span> ok:
+    <span class="tk-kw">print</span>(errors)
+
+<span class="tk-cm"># Or use the CLI:</span>
+<span class="tk-cm"># $ cosmo validate &lt; signals.ndjson</span>`;
+
+const connectTs = `<span class="tk-kw">import</span> { connectSynapse, validateSignal } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+
+<span class="tk-cm">// Connect to any Synapse — memory, NATS, Kafka.</span>
+<span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
+
+<span class="tk-cm">// Validate an envelope against the spec.</span>
+<span class="tk-kw">const</span> { ok, errors } <span class="tk-op">=</span> <span class="tk-fn">validateSignal</span>(envelopeObj);
+<span class="tk-kw">if</span> (!ok) console.<span class="tk-fn">log</span>(errors);
+
+<span class="tk-cm">// Or use the CLI:</span>
+<span class="tk-cm">// $ cosmo validate &lt; signals.ndjson</span>`;
 
 type MsgProps = {
   name: string;
@@ -158,7 +185,15 @@ export default function ProtocolPage() {
           <div className="sub-eyebrow">The envelope</div>
 
           <div className="envelope-grid">
-            <CodeBlock filename="signal.json" html={envelopeSnippet} variant="elevated" />
+            <div>
+              <CodeBlock filename="signal.json" html={envelopeSnippet} variant="elevated" />
+              <div style={{ marginTop: 16 }}>
+                <CodeSwitcher
+                  python={{ html: connectPy, filename: "connect.py" }}
+                  typescript={{ html: connectTs, filename: "connect.ts" }}
+                />
+              </div>
+            </div>
 
             <div className="field-ref">
               <div className="field-ref-title">Field reference</div>
@@ -602,22 +637,23 @@ export default function ProtocolPage() {
           >
             <div style={{ marginBottom: 12 }}>
               <strong style={{ color: "#f87171", fontFamily: "var(--font-mono)" }}>Immune</strong>{" "}
-               -  Genome · Myelin · Reflex · AntiBody
+               — Genome · Myelin · Reflex · AntiBody
             </div>
             <div>
-              Planned signal types include <code className="inline">IDENTITY_ASSERT</code> (Genome  -  neuron
-              identity proof), <code className="inline">KEY_ROTATE</code> (Myelin  -  in-band key refresh),
-              and <code className="inline">THREAT_SIGNAL</code> (Reflex/AntiBody  -  anomaly broadcast). These
-              will extend the envelope spec in a future revision and remain backwards-compatible with v1
-              consumers.
+              Planned signal types include{" "}
+              <code className="inline">IDENTITY_ASSERT</code> (Genome — neuron identity proof),{" "}
+              <code className="inline">KEY_ROTATE</code> (Myelin — in-band key refresh), and{" "}
+              <code className="inline">THREAT_SIGNAL</code> (Reflex/AntiBody — anomaly broadcast).
+              These will extend the envelope spec in a future revision and remain backwards-compatible
+              with v1 consumers.
             </div>
             <div style={{ marginTop: 16 }}>
               <strong style={{ color: "#fb923c", fontFamily: "var(--font-mono)" }}>Cloud</strong>{" "}
-               -  Membrane
+               — Membrane
             </div>
             <div style={{ marginTop: 4 }}>
-              Membrane isolation signals are infrastructure-layer only and will not appear on the application
-              Synapse. They operate below the envelope boundary.
+              Membrane isolation signals are infrastructure-layer only and will not appear on the
+              application Synapse. They operate below the envelope boundary.
             </div>
           </div>
         </div>
@@ -630,7 +666,8 @@ export default function ProtocolPage() {
           <ol className="prose" style={{ paddingLeft: 24 }}>
             <li>It is well-formed JSON.</li>
             <li>
-              <code className="inline">v</code> is present and equals <code className="inline">&quot;1&quot;</code>.
+              <code className="inline">v</code> is present and equals{" "}
+              <code className="inline">&quot;1&quot;</code>.
             </li>
             <li>
               <code className="inline">id</code> is present and matches{" "}
@@ -651,16 +688,16 @@ export default function ProtocolPage() {
               <code className="inline">Z</code>.
             </li>
             <li>
-              <code className="inline">payload</code> and <code className="inline">meta</code>, if present,
-              are JSON objects.
+              <code className="inline">payload</code> and{" "}
+              <code className="inline">meta</code>, if present, are JSON objects.
             </li>
             <li>Required payload fields for the given type are present and correctly typed.</li>
           </ol>
           <p className="prose" style={{ marginTop: 16 }}>
-            <code className="inline">cosmo validate</code> checks these rules against a stream of envelopes.
-            Validity is purely structural  -  Cosmonapse does not enforce sequencing or lifecycle rules. What
-            constitutes a completed task, what happens after an error, and how envelopes flow over time are
-            decisions you make in your Dendrite.
+            <code className="inline">cosmo validate</code> checks these rules against a stream of
+            envelopes. Validity is purely structural — Cosmonapse does not enforce sequencing or
+            lifecycle rules. What constitutes a completed task, what happens after an error, and how
+            envelopes flow over time are decisions you make in your Dendrite.
           </p>
         </div>
       </section>

@@ -1,35 +1,57 @@
 import Link from "next/link";
-import CodeBlock from "@/components/CodeBlock";
+import CodeSwitcher from "@/components/CodeSwitcher";
 import BuildOnCosmonapse from "@/components/BuildOnCosmonapse";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
-const heroSnippet = `<span class="tk-kw">import</span> os
+// ─── Hero code snippets ────────────────────────────────────────────────────
+
+const heroPy = `<span class="tk-kw">import</span> os
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, Neuron, connect_synapse
 
-<span class="tk-cm"># 1. A Neuron  -  backed by Hugging Face. Same shape as a plain async fn.</span>
-hello_neuron <span class="tk-op">=</span> Neuron(
-    source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
+<span class="tk-cm"># 1.  LLM Neuron backed by Hugging Face — zero protocol knowledge.</span>
+neuron <span class="tk-op">=</span> Neuron(source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
     endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
     model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
-    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>,
-)
+    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>], use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>)
 
-<span class="tk-cm"># 2. Wrap it in an Axon  -  the agent-side tool. Doesn't know it's an LLM.</span>
-axon <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"hello-neuron"</span>, neuron_fn<span class="tk-op">=</span>hello_neuron,
-           capabilities<span class="tk-op">=</span>[<span class="tk-str">"text-generation"</span>, <span class="tk-str">"chat"</span>])
+<span class="tk-cm"># 2.  Axon — wraps the Neuron, gives it a protocol identity.</span>
+axon <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"llama"</span>, neuron_fn<span class="tk-op">=</span>neuron, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])
 
-<span class="tk-cm"># 3. Attach to a Dendrite  -  the only thing that touches the Synapse.</span>
-synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
+<span class="tk-cm"># 3.  Dendrite — the only component that touches the Synapse.</span>
+synapse  <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
 dendrite <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>)
 dendrite.<span class="tk-fn">attach_axon</span>(axon)
 
 <span class="tk-kw">async with</span> dendrite:
-    <span class="tk-cm"># Registered and serving: REGISTER → HEARTBEAT → route inbound TASKs.</span>
-    <span class="tk-cm"># Dispatch one  -  the reply comes back as an AGENT_OUTPUT Signal.</span>
-    <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(
-        neuron<span class="tk-op">=</span><span class="tk-str">"hello-neuron"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: <span class="tk-str">"Say hello to Cosmonapse."</span>})`;
+    pw <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(
+        neuron<span class="tk-op">=</span><span class="tk-str">"llama"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: <span class="tk-str">"Say hello to Cosmonapse."</span>})`;
+
+const heroTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse, neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+
+<span class="tk-cm">// 1.  LLM Neuron backed by Hugging Face — zero protocol knowledge.</span>
+<span class="tk-kw">const</span> fn <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"huggingface"</span>, {
+  endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
+  model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+  apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>,
+  useChatApi: <span class="tk-kw">true</span>,
+});
+
+<span class="tk-cm">// 2.  Axon — wraps the Neuron, gives it a protocol identity.</span>
+<span class="tk-kw">const</span> axon <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({ neuronId: <span class="tk-str">"llama"</span>, neuronFn: fn, capabilities: [<span class="tk-str">"chat"</span>] });
+
+<span class="tk-cm">// 3.  Dendrite — the only component that touches the Synapse.</span>
+<span class="tk-kw">await using</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
+  synapse: <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>),
+  namespace: <span class="tk-str">"quickstart"</span>,
+});
+dendrite.<span class="tk-fn">attachAxon</span>(axon); <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
+
+<span class="tk-kw">const</span> pw <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({
+  neuron: <span class="tk-str">"llama"</span>, input: { prompt: <span class="tk-str">"Say hello to Cosmonapse."</span> },
+});`;
+
+// ─── Product line data ─────────────────────────────────────────────────────
 
 type Status = "active" | "scoping" | "not-planned";
 
@@ -65,7 +87,7 @@ const products: {
     color: "var(--accent)",
     status: "active",
     concepts: ["Brain", "Neuron", "Axon", "Dendrite", "Synapse", "Signal", "Pathway"],
-    desc: "The open protocol and SDK. One envelope, one Synapse, replaceable Neurons. Everything else is built on top.",
+    desc: "The open protocol and SDK. One envelope, one Synapse, replaceable Neurons — backed by OpenAI, Anthropic, HuggingFace, Groq, Ollama, or any async function. Everything else is built on top.",
   },
   {
     name: "Cosmonapse Engram",
@@ -83,7 +105,7 @@ const products: {
     color: "#22d3ee",
     status: "active",
     concepts: ["Pulse", "Prism", "Resonance"],
-    desc: "Live telemetry and visualization over the Signal stream, reading the wave without disturbing the source. Pulse streams metrics, Prism turns them into dashboards, and Resonance adds cognition analytics  -  how Neurons influence each other and how Signals propagate through a Brain.",
+    desc: "Live telemetry and visualization over the Signal stream, reading the wave without disturbing the source. Pulse streams metrics, Prism turns them into dashboards, and Resonance adds cognition analytics — how Neurons influence each other and how Signals propagate through a Brain.",
   },
   {
     name: "Cosmonapse Immune",
@@ -101,7 +123,7 @@ const products: {
     color: "#fb923c",
     status: "not-planned",
     concepts: ["Membrane"],
-    desc: "The fully managed runtime  -  Brains in isolated Membranes, quota-enforced, credential-scoped at the infrastructure level.",
+    desc: "The fully managed runtime — Brains in isolated Membranes, quota-enforced, credential-scoped at the infrastructure level.",
   },
 ];
 
@@ -112,7 +134,7 @@ export default function HomePage() {
         <div className="container">
           <div className="badge">
             <span className="dot" />
-            v0.1  -  Research preview
+            v0.1.2 · Research preview
           </div>
           <h1 className="hero-title">
             The nervous system
@@ -120,9 +142,9 @@ export default function HomePage() {
             for <span className="gradient-text">autonomous AI agents</span>.
           </h1>
           <p className="hero-lead">
-            Cosmonapse is an open protocol and SDK for autonomous AI agents. Start with the Core today  - 
-            one envelope, one Synapse, replaceable Neurons, and a CLI that boots a local broker in
-            seconds. Memory, observability, security, and managed infrastructure are on the roadmap.
+            Cosmonapse is an open protocol and SDK for autonomous AI agents. Start with the Core
+            today — one envelope, one Synapse, replaceable Neurons backed by any LLM provider, and a
+            CLI that boots a local broker in seconds.
           </p>
           <div className="hero-ctas">
             <Link href="/quickstart" className="btn btn-primary">
@@ -147,13 +169,17 @@ export default function HomePage() {
             Open source · MIT licensed · Python + TypeScript SDK
           </p>
 
-          {/* <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "left" }}>
-            <CodeBlock filename="main.py" html={heroSnippet} variant="elevated" />
-          </div> */}
+          <div style={{ maxWidth: 780, margin: "0 auto", textAlign: "left" }}>
+            <CodeSwitcher
+              python={{ html: heroPy, filename: "main.py" }}
+              typescript={{ html: heroTs, filename: "main.ts" }}
+              variant="elevated"
+            />
+          </div>
         </div>
       </header>
 
-      {/* Build on Cosmonapse  -  three transports, one program */}
+      {/* Build on Cosmonapse */}
       <BuildOnCosmonapse />
 
       {/* Product line */}
@@ -162,9 +188,9 @@ export default function HomePage() {
           <div className="section-eyebrow">// Product line</div>
           <h2 className="section-title">Five layers. One nervous system.</h2>
           <p className="section-sub">
-            Cosmonapse Core ships today as an open protocol and SDK, with Engram primitives
-            landed in 0.1.0. Doppler, Immune, and Cloud extend it  -  each a self-contained product
-            with its own primitives, all speaking the same Signal envelope.
+            Cosmonapse Core ships today as an open protocol and SDK, with Engram primitives landed in
+            0.1.0. Doppler, Immune, and Cloud extend it — each a self-contained product with its own
+            primitives, all speaking the same Signal envelope.
           </p>
           <div
             style={{
@@ -299,10 +325,10 @@ export default function HomePage() {
       <section className="section">
         <div className="container">
           <div className="section-eyebrow">// What ships today</div>
-          <h2 className="section-title">Core  -  open protocol and SDK.</h2>
+          <h2 className="section-title">Core — open protocol and SDK.</h2>
           <p className="section-sub">
             The protocol and the primitives. Routing decisions, workflow rules, and lifecycle
-            policies stay with you  -  build the system that fits your team.
+            policies stay with you — build the system that fits your team.
           </p>
           <div className="grid-2">
             <div className="card">
@@ -315,27 +341,30 @@ export default function HomePage() {
             </div>
             <div className="card">
               <div className="card-icon">02</div>
-              <h3>Axon  -  agent-side tool</h3>
+              <h3>Neuron factory</h3>
               <p>
-                Owns the Neuron&rsquo;s identity and wraps its output into protocol-valid Signals.
-                Never touches the Synapse  -  that boundary is enforced in code, not convention.
+                <code className="inline">Neuron(source=&quot;huggingface&quot;)</code>,{" "}
+                <code className="inline">&quot;openai&quot;</code>,{" "}
+                <code className="inline">&quot;anthropic&quot;</code>,{" "}
+                <code className="inline">&quot;groq&quot;</code>,{" "}
+                <code className="inline">&quot;ollama&quot;</code>, and more — or any plain async
+                function. All behind the same signature. Zero protocol knowledge required.
               </p>
             </div>
             <div className="card">
               <div className="card-icon">03</div>
-              <h3>Dendrite  -  synapse-side connector</h3>
+              <h3>Axon — agent-side tool</h3>
               <p>
-                The only thing that touches the Synapse. Hosts Axons, emits REGISTER / HEARTBEAT /
-                DEREGISTER, routes inbound TASKs, and exposes every orchestration primitive.
+                Owns the Neuron&rsquo;s identity and wraps its output into protocol-valid Signals.
+                Never touches the Synapse — that boundary is enforced in code, not convention.
               </p>
             </div>
             <div className="card">
               <div className="card-icon">04</div>
-              <h3>RegistryStore</h3>
+              <h3>Dendrite — synapse-side connector</h3>
               <p>
-                Live view of every Neuron on a namespace  -  capabilities, status, last heartbeat.
-                Backed by memory, SQLite, or Postgres. The only mandatory persistent surface the SDK
-                owns.
+                The only thing that touches the Synapse. Hosts Axons, emits REGISTER / HEARTBEAT /
+                DEREGISTER, routes inbound TASKs, and exposes every orchestration primitive.
               </p>
             </div>
             <div className="card">
@@ -358,16 +387,16 @@ export default function HomePage() {
           <h2 className="section-title">Building the platform.</h2>
           <p className="section-sub">
             Core is the foundation. The full Cosmonapse platform adds memory, observability,
-            security, and managed infrastructure  -  each layer speaking the same Signal envelope.
+            security, and managed infrastructure — each layer speaking the same Signal envelope.
           </p>
           <div className="grid-2">
             <div className="card">
               <h3>Neurons are black boxes</h3>
               <p>
-                A Neuron is a pure function  - {" "}
+                A Neuron is a pure function —{" "}
                 <code className="inline">async fn(input, context) → output</code>. Zero protocol
-                knowledge. Wrap any existing LLM agent with an Axon and it becomes a protocol
-                participant with no modification.
+                knowledge. The <code className="inline">Neuron(source=...)</code> factory wraps any
+                LLM provider or MCP server behind that interface without modification.
               </p>
             </div>
             <div className="card">
@@ -375,27 +404,26 @@ export default function HomePage() {
               <p>
                 The Core protocol defines <code className="inline">MEMORY_APPEND</code>,{" "}
                 <code className="inline">CONTEXT_SYNC</code>,{" "}
-                <code className="inline">RECALL</code>, and <code className="inline">IMPRINT</code>{" "}
-                signals. Cosmonapse Engram ships the Recall and Imprint primitives in 0.1.0 with
-                InMemory, SQLite, and Postgres backends; Echo (snapshot replay) is next. Bring
-                your own context layer, or let Engram handle it.
+                <code className="inline">RECALL</code>, and{" "}
+                <code className="inline">IMPRINT</code>{" "}
+                signals. Cosmonapse Engram ships Recall and Imprint in 0.1.0 with InMemory, SQLite,
+                and Postgres backends; Echo (snapshot replay) is next.
               </p>
             </div>
             <div className="card">
-              <h3>Observability & cognition analytics</h3>
+              <h3>Observability &amp; cognition analytics</h3>
               <p>
-                Doppler is a non-competing read-only tap on the Synapse, with three features. Pulse
-                streams live telemetry  -  latency, throughput, cost per Neuron. Prism turns it into
-                dashboards and traces. Resonance is the cognition-analytics layer  -  mapping how Neurons
-                influence each other, tracking Signal propagation, detecting emergent Brain patterns,
-                and scoring collaboration efficiency across the same stream.
+                Doppler is a non-competing read-only tap on the Synapse. Pulse streams live
+                telemetry — latency, throughput, cost per Neuron. Prism turns it into dashboards
+                and traces. Resonance maps Neuron influence, tracks Signal propagation, and scores
+                collaboration efficiency.
               </p>
             </div>
             <div className="card">
               <h3>Secure and managed at scale</h3>
               <p>
-                Immune will handle identity, encryption, and automated threat response. Cloud will
-                run the entire stack inside Membrane  -  isolated, quota-enforced, credential-scoped at
+                Immune will handle identity, encryption, and automated threat response. Cloud runs
+                the entire stack inside Membrane — isolated, quota-enforced, credential-scoped at
                 the infrastructure level.
               </p>
             </div>
@@ -409,9 +437,9 @@ export default function HomePage() {
           <div className="cta-card">
             <h2>Build the substrate for agent swarms.</h2>
             <p>
-              Cosmonapse Core 0.1.0 is in research preview  -  the protocol is drafted, the SDK
-              ships with Engram, Pathway, capability-routed dispatch, and competitive bidding.
-              Doppler is next.
+              Cosmonapse Core 0.1.2 is in research preview — the protocol is drafted, the SDK ships
+              with Engram, Pathway, capability-routed dispatch, competitive bidding, and first-class
+              LLM provider Neurons. Doppler is next.
             </p>
             <div className="hero-ctas" style={{ marginBottom: 0 }}>
               <Link href="/quickstart" className="btn btn-primary">

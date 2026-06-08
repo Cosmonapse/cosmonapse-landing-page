@@ -53,18 +53,18 @@ const productLine: {
       },
       {
         name: "Neuron",
-        map: "Agent · MCP server · function",
-        desc: "Anything that interacts with the real world, exposed behind a pure-function interface  -  receives (input, context), returns output, zero protocol knowledge. Not just an LLM agent: it can be an agent, an MCP server, or a plain async function. The Neuron(source=…) factory turns each into the same callable. An HTTP API is not a Neuron  -  keep your web framework at the edge and dispatch TASKs from its routes via an orchestrator Dendrite. Replaceable without touching infrastructure.",
+        map: "Agent · LLM provider · MCP server · function",
+        desc: "Anything that interacts with the real world, exposed behind a pure-function interface — receives (input, context), returns output, zero protocol knowledge. The Neuron(source=...) factory wraps LLM providers (OpenAI, Anthropic, HuggingFace, Groq, Mistral, Together, OpenRouter, Ollama), MCP servers, or a plain async function behind the same callable. An HTTP API is not a Neuron — keep your web framework at the edge and dispatch TASKs from route handlers via an orchestrator Dendrite. Replaceable without touching infrastructure.",
       },
       {
         name: "Axon",
         map: "Agent-side tool",
         desc: "The only piece of Cosmonapse that lives inside the Neuron's process. Wraps the Neuron function, validates its output into a Signal (AGENT_OUTPUT, CLARIFICATION, PERMISSION, or ERROR), and hands it to the Dendrite. The Neuron itself never touches the protocol.",
       },
-      {
+        {
         name: "Dendrite",
         map: "Synapse-side connector",
-        desc: "The only component that touches the Synapse. Hosts Axons, owns routing decisions, exposes the aggregate of its Axons' capabilities, and emits REGISTER / HEARTBEAT / DEREGISTER per attached Axon. Has a role: orchestrator (can dispatch TASKs) or worker (hosts Axons only). Workers are guarded  -  they can serve TASKs and bid in capability routing, but can't emit orchestration signals.",
+        desc: "The only component that touches the Synapse. Hosts Axons, owns routing decisions, exposes the aggregate of its Axons' capabilities, and emits REGISTER / HEARTBEAT / DEREGISTER per attached Axon. Has a role: orchestrator (can dispatch TASKs) or worker (hosts Axons only). Workers are guarded — they can serve TASKs and bid in capability routing, but can't emit orchestration signals.",
       },
       {
         name: "Pathway",
@@ -577,13 +577,12 @@ export default function ConceptsPage() {
             </div>
             <div className="layer-arrow">↓</div>
             <div className="layer">
-              <div className="layer-name">Neuron  -  agent, MCP server, or function</div>
+              <div className="layer-name">Neuron  —  LLM provider · MCP server · async function</div>
               <div className="layer-desc">
-                Receives (input, context). Returns a plain dict. Anything that interacts with the
-                real world  -  an LLM agent, a wrapped MCP server, or a plain function  -  knowing
-                nothing about the Synapse, envelopes, trace IDs, or the rest of this picture.
-                (An HTTP API is not a Neuron; it sits at the edge, in front of an orchestrator
-                Dendrite.)
+                Receives (input, context). Returns a plain dict. The Neuron factory wraps any
+                provider — OpenAI, Anthropic, HuggingFace, Groq, Ollama, an MCP server, or a
+                plain async function — knowing nothing about the Synapse, envelopes, or trace IDs.
+                An HTTP API is not a Neuron: it sits at the edge, in front of an orchestrator Dendrite.
               </div>
             </div>
             <div className="layer-arrow">↓</div>
@@ -783,8 +782,9 @@ export default function ConceptsPage() {
           </table>
           <p className="prose" style={{ marginTop: 24, fontSize: 13, color: "var(--text-faint)" }}>
             Note: <strong>Cortex</strong> is kept as a back-compat alias for Dendrite. New code
+            Note: <strong>Cortex</strong> is kept as a back-compat alias for Dendrite. New code
             should use Dendrite directly. <strong>Axon</strong> (the agent-side tool that wraps a
-            Neuron) remains part of the Core runtime but is an implementation detail  -  applications
+            Neuron) remains part of the Core runtime but is an implementation detail — applications
             interact with Dendrites and Neurons directly.
           </p>
         </div>

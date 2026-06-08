@@ -1,88 +1,126 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
+import CodeSwitcher from "@/components/CodeSwitcher";
 
 export const metadata: Metadata = {
-  title: "Quickstart  -  Cosmonapse",
+  title: "Quickstart — Cosmonapse",
   description:
-    "Install Cosmonapse, write a Neuron, wire an Axon and Dendrite, boot a local Synapse, watch Signals flow. No Docker, no infrastructure.",
+    "Install Cosmonapse, create a Hugging Face Neuron, wire an Axon and Dendrite, boot a local Synapse, watch Signals flow.",
 };
 
-const installSnippet = `<span class="tk-cm"># Python 3.11+</span>
-pip install cosmonapse flask`;
+// ── Install ────────────────────────────────────────────────────────────────
 
-const synapseSnippet = `<span class="tk-cm"># Boot a local TCP dev synapse  -  no Docker, no NATS, no Postgres.</span>
-<span class="tk-cm"># Streams every Signal to stdout as it crosses the bus.</span>
-<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart
+const installPy = `<span class="tk-cm"># Python 3.11+</span>
+pip install cosmonapse httpx`;
+
+const installTs = `<span class="tk-cm">// Node 18+</span>
+npm install @cosmonapse/sdk`;
+
+// ── Synapse start (CLI — same for both) ────────────────────────────────────
+
+const synapseSnippet = `<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart
 
 <span class="tk-cm">  URL:        cosmo://127.0.0.1:7070</span>
 <span class="tk-cm">  Namespace:  quickstart</span>
 <span class="tk-cm">  Transport:  TCP + NDJSON  (single-host dev only)</span>
 <span class="tk-cm">  ────────────────────────────────────────────────</span>`;
 
-const neuronSnippet = `<span class="tk-cm"># A Neuron is a plain async function. Zero protocol knowledge.</span>
+// ── Neuron ─────────────────────────────────────────────────────────────────
 
-<span class="tk-kw">async def</span> <span class="tk-fn">hello_neuron</span>(input: dict, context: list) <span class="tk-op">-></span> dict:
-    name <span class="tk-op">=</span> input.<span class="tk-fn">get</span>(<span class="tk-str">"name"</span>, <span class="tk-str">"world"</span>)
-    <span class="tk-kw">return</span> {<span class="tk-str">"message"</span>: <span class="tk-fn">f</span><span class="tk-str">"Hello, {name}!"</span>}`;
+const neuronPy = `<span class="tk-kw">import</span> os
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Neuron
 
-const axonDendriteSnippet = `<span class="tk-kw">import</span> asyncio
-<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, connect_synapse
+<span class="tk-cm"># The Neuron factory wraps any provider behind the same pure-function</span>
+<span class="tk-cm"># interface: async (input, context) -> output. Zero protocol knowledge.</span>
+<span class="tk-cm"># Set HF_TOKEN to your Hugging Face access token first.</span>
+neuron_fn <span class="tk-op">=</span> Neuron(
+    source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
+    endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
+    model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
+    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>,
+)`;
+
+const neuronTs = `<span class="tk-kw">import</span> { neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+
+<span class="tk-cm">// The neuron() factory wraps any provider behind the same pure-function</span>
+<span class="tk-cm">// interface: async (input, context) => output. Zero protocol knowledge.</span>
+<span class="tk-cm">// Set HF_TOKEN in your environment first.</span>
+<span class="tk-kw">const</span> neuronFn <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"huggingface"</span>, {
+  endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
+  model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+  apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>,
+  useChatApi: <span class="tk-kw">true</span>,
+});`;
+
+// ── Axon + Dendrite (worker) ───────────────────────────────────────────────
+
+const workerPy = `<span class="tk-kw">import</span> asyncio, os
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, Neuron, connect_synapse
+
+neuron_fn <span class="tk-op">=</span> Neuron(
+    source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
+    endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
+    model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
+    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>,
+)
+
+<span class="tk-cm"># Axon: protocol identity for the Neuron. role="worker": replies to TASKs only.</span>
+axon <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"llama"</span>, neuron_fn<span class="tk-op">=</span>neuron_fn, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])
 
 <span class="tk-kw">async def</span> <span class="tk-fn">main</span>():
-    <span class="tk-cm"># 1. Wrap the Neuron in an Axon.</span>
-    axon <span class="tk-op">=</span> Axon(
-        neuron_id<span class="tk-op">=</span><span class="tk-str">"hello-neuron"</span>,
-        neuron_fn<span class="tk-op">=</span>hello_neuron,
-        capabilities<span class="tk-op">=</span>[<span class="tk-str">"greet"</span>],
-        version<span class="tk-op">=</span><span class="tk-str">"1.0.0"</span>,
-    )
-
-    <span class="tk-cm"># 2. Connect to the Synapse.</span>
     synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
-
-    <span class="tk-cm"># 3. Build a worker Dendrite and attach the Axon.</span>
-    <span class="tk-cm">#    role="worker"  -  workers host Axons and reply to TASKs, but</span>
-    <span class="tk-cm">#    cannot dispatch new ones (the role guard sits on emit()).</span>
-    worker <span class="tk-op">=</span> Dendrite(
-        synapse<span class="tk-op">=</span>synapse,
-        namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>,
-        role<span class="tk-op">=</span><span class="tk-str">"worker"</span>,
-    )
+    worker  <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>, role<span class="tk-op">=</span><span class="tk-str">"worker"</span>)
     worker.<span class="tk-fn">attach_axon</span>(axon)
-
     <span class="tk-kw">async with</span> worker:
-        <span class="tk-kw">await</span> asyncio.<span class="tk-fn">sleep</span>(<span class="tk-fn">float</span>(<span class="tk-str">"inf"</span>))  <span class="tk-cm"># run until cancelled</span>
+        <span class="tk-kw">await</span> asyncio.<span class="tk-fn">sleep</span>(<span class="tk-fn">float</span>(<span class="tk-str">"inf"</span>))  <span class="tk-cm"># serve until Ctrl-C</span>
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
-const flaskSnippet = `<span class="tk-kw">import</span> asyncio, concurrent.futures, threading
+const workerTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse, neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+
+<span class="tk-kw">const</span> neuronFn <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"huggingface"</span>, {
+  endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
+  model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+  apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>,
+  useChatApi: <span class="tk-kw">true</span>,
+});
+
+<span class="tk-cm">// Axon: protocol identity. role: "worker" — replies to TASKs, cannot dispatch.</span>
+<span class="tk-kw">const</span> axon    <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({ neuronId: <span class="tk-str">"llama"</span>, neuronFn, capabilities: [<span class="tk-str">"chat"</span>] });
+<span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
+<span class="tk-kw">const</span> worker  <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"quickstart"</span>, role: <span class="tk-str">"worker"</span> });
+worker.<span class="tk-fn">attachAxon</span>(axon);
+
+<span class="tk-kw">await</span> worker.<span class="tk-fn">start</span>();
+process.<span class="tk-fn">on</span>(<span class="tk-str">"SIGINT"</span>, () <span class="tk-op">=></span> worker.<span class="tk-fn">stop</span>());
+<span class="tk-kw">await new</span> <span class="tk-fn">Promise</span>(() <span class="tk-op">=></span> {});`;
+
+// ── HTTP interface (orchestrator) ──────────────────────────────────────────
+
+const serverPy = `<span class="tk-kw">import</span> asyncio, concurrent.futures, threading
 <span class="tk-kw">from</span> flask <span class="tk-kw">import</span> Flask, request, jsonify
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, connect_synapse, new_trace_id
 
-<span class="tk-cm"># asyncio loop in a background thread  -  Flask stays synchronous.</span>
+<span class="tk-cm"># asyncio loop in a background thread — Flask stays synchronous.</span>
 loop <span class="tk-op">=</span> asyncio.<span class="tk-fn">new_event_loop</span>()
 threading.<span class="tk-fn">Thread</span>(target<span class="tk-op">=</span>loop.run_forever, daemon<span class="tk-op">=</span><span class="tk-kw">True</span>).<span class="tk-fn">start</span>()
-
 pending: dict[str, concurrent.futures.Future] <span class="tk-op">=</span> {}
 orch: Dendrite <span class="tk-op">=</span> <span class="tk-kw">None</span>
 
 <span class="tk-kw">async def</span> <span class="tk-fn">setup</span>():
     <span class="tk-kw">global</span> orch
     synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
-    <span class="tk-cm"># role="orchestrator" (default)  -  this Dendrite dispatches TASKs.</span>
-    orch <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>,
-                    role<span class="tk-op">=</span><span class="tk-str">"orchestrator"</span>)
-
+    orch <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>, role<span class="tk-op">=</span><span class="tk-str">"orchestrator"</span>)
     <span class="tk-op">@</span>orch.<span class="tk-fn">on_agent_output</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">on_output</span>(sig):
         fut <span class="tk-op">=</span> pending.<span class="tk-fn">pop</span>(sig.trace_id, <span class="tk-kw">None</span>)
         <span class="tk-kw">if</span> fut <span class="tk-kw">and not</span> fut.<span class="tk-fn">done</span>(): fut.<span class="tk-fn">set_result</span>(sig.payload[<span class="tk-str">"output"</span>])
-
     <span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>()
 
 asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(<span class="tk-fn">setup</span>(), loop).<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">10</span>)
-
 app <span class="tk-op">=</span> <span class="tk-fn">Flask</span>(__name__)
 
 <span class="tk-op">@</span>app.<span class="tk-fn">post</span>(<span class="tk-str">"/task"</span>)
@@ -90,30 +128,60 @@ app <span class="tk-op">=</span> <span class="tk-fn">Flask</span>(__name__)
     trace_id <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()
     fut <span class="tk-op">=</span> concurrent.futures.<span class="tk-fn">Future</span>()
     pending[trace_id] <span class="tk-op">=</span> fut
-
-    <span class="tk-kw">async def</span> <span class="tk-fn">dispatch</span>():
-        <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatch_task</span>(neuron<span class="tk-op">=</span><span class="tk-str">"hello-neuron"</span>,
+    <span class="tk-kw">async def</span> <span class="tk-fn">_dispatch</span>():
+        <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatch_task</span>(neuron<span class="tk-op">=</span><span class="tk-str">"llama"</span>,
                                   input<span class="tk-op">=</span>request.<span class="tk-fn">get_json</span>(), trace_id<span class="tk-op">=</span>trace_id)
-
-    asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(<span class="tk-fn">dispatch</span>(), loop).<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">5</span>)
+    asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(<span class="tk-fn">_dispatch</span>(), loop).<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">5</span>)
     <span class="tk-kw">return</span> <span class="tk-fn">jsonify</span>(fut.<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">10</span>))
 
 app.<span class="tk-fn">run</span>(port<span class="tk-op">=</span><span class="tk-num">5000</span>)`;
 
-const dopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart
+const serverTs = `<span class="tk-kw">import</span> express <span class="tk-kw">from</span> <span class="tk-str">"express"</span>;
+<span class="tk-kw">import</span> { Dendrite, connectSynapse, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
-<span class="tk-cm">  REGISTER      neuron=hello-neuron  capabilities=['greet']</span>
-<span class="tk-cm">  TASK          trace=trc_…  neuron=hello-neuron</span>
-<span class="tk-cm">  AGENT_OUTPUT  trace=trc_…  neuron=hello-neuron  → {message: Hello, Cosmonapse!}</span>
+<span class="tk-kw">const</span> app     <span class="tk-op">=</span> <span class="tk-fn">express</span>().<span class="tk-fn">use</span>(express.<span class="tk-fn">json</span>());
+<span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> Map();
 
-<span class="tk-cm"># filter to specific types</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart <span class="tk-op">--</span>type TASK <span class="tk-op">--</span>type AGENT_OUTPUT`;
+<span class="tk-cm">// role: "orchestrator" — dispatches TASKs, collects AGENT_OUTPUT replies.</span>
+<span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
+<span class="tk-kw">const</span> orch    <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"quickstart"</span>, role: <span class="tk-str">"orchestrator"</span> });
+
+orch.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=></span> {
+  <span class="tk-kw">const</span> resolve <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
+  <span class="tk-kw">if</span> (resolve) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">resolve</span>(sig.payload.output); }
+});
+<span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>();
+
+app.<span class="tk-fn">post</span>(<span class="tk-str">"/task"</span>, <span class="tk-kw">async</span> (req, res) <span class="tk-op">=></span> {
+  <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
+  <span class="tk-kw">const</span> result  <span class="tk-op">=</span> <span class="tk-kw">await new</span> <span class="tk-fn">Promise</span>((resolve) <span class="tk-op">=></span> {
+    pending.<span class="tk-fn">set</span>(traceId, resolve);
+    orch.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"llama"</span>, input: req.body, traceId });
+  });
+  res.<span class="tk-fn">json</span>(result);
+});
+app.<span class="tk-fn">listen</span>(<span class="tk-num">5000</span>);`;
+
+// ── Doppler (CLI — same for both) ──────────────────────────────────────────
+
+const dopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
+
+<span class="tk-cm">  REGISTER      neuron=llama  capabilities=['chat']</span>
+<span class="tk-cm">  TASK          trace=trc_01...  neuron=llama</span>
+<span class="tk-cm">  AGENT_OUTPUT  trace=trc_01...  neuron=llama</span>
+
+<span class="tk-cm"># filter to specific signal types</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">-n</span> quickstart <span class="tk-op">--</span>type TASK <span class="tk-op">--</span>type AGENT_OUTPUT`;
+
+// ── Test it ────────────────────────────────────────────────────────────────
 
 const testSnippet = `<span class="tk-op">$</span> curl <span class="tk-op">-s</span> <span class="tk-op">-X</span> POST http://localhost:5000/task <span class="tk-op">\\</span>
        <span class="tk-op">-H</span> <span class="tk-str">"Content-Type: application/json"</span> <span class="tk-op">\\</span>
-       <span class="tk-op">-d</span> <span class="tk-str">'{"name": "Cosmonapse"}'</span>
+       <span class="tk-op">-d</span> <span class="tk-str">'{"prompt": "Say hello to Cosmonapse."}'</span>
 
-<span class="tk-cm">{"message": "Hello, Cosmonapse!"}</span>`;
+<span class="tk-cm">{"response": "Hello! Great to meet you, Cosmonapse..."}</span>`;
+
+// ── Page ───────────────────────────────────────────────────────────────────
 
 export default function QuickstartPage() {
   return (
@@ -123,9 +191,10 @@ export default function QuickstartPage() {
           <div className="page-eyebrow">// Quickstart</div>
           <h1 className="page-title">First five minutes.</h1>
           <p className="page-sub">
-            Install Cosmonapse, write a Neuron, wire an Axon and Dendrite, boot a local Synapse, watch
-            Signals flow. No Docker. No running broker. Just{" "}
-            <code className="inline">pip install</code> and a few files.
+            Install Cosmonapse, create a Neuron backed by Hugging Face, wire an Axon and Dendrite,
+            boot a local Synapse, watch Signals flow. No Docker. No running broker. Just{" "}
+            <code className="inline">pip install</code> (or{" "}
+            <code className="inline">npm install</code>) and a few files.
           </p>
         </div>
       </header>
@@ -134,9 +203,14 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">01 · Install</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            Python 3.11 or newer.
+            Python 3.11+ or Node 18+. The <code className="inline">cosmo</code> CLI ships with the
+            Python package — run it from your virtualenv even when using the TypeScript SDK.
           </p>
-          <CodeBlock html={installSnippet} maxWidth={720} />
+          <CodeSwitcher
+            python={{ html: installPy }}
+            typescript={{ html: installTs }}
+            maxWidth={720}
+          />
         </div>
       </section>
 
@@ -144,31 +218,43 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">02 · Start a Synapse</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON broker  - 
-            no Docker, no NATS, no Postgres. To watch Signals crossing the bus, attach{" "}
-            <code className="inline">cosmo doppler</code> in another terminal (Step 06). The{" "}
-            <code className="inline">--namespace</code> flag scopes all Signals so multiple projects can
-            share the same server.
+            <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON
+            broker — no Docker, no NATS, no Postgres. Swap the URL for{" "}
+            <code className="inline">nats://</code> or <code className="inline">kafka://</code> when
+            you move to production — the rest of your code stays the same.
           </p>
           <CodeBlock html={synapseSnippet} maxWidth={760} />
-          <p className="prose" style={{ marginTop: 16 }}>
-            Leave this terminal open. Swap the URL for{" "}
-            <code className="inline">nats://</code> or <code className="inline">kafka://</code> when you
-            move to production  -  the rest of your code stays the same.
-          </p>
         </div>
       </section>
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">03 · Write a Neuron</div>
+          <div className="sub-eyebrow">03 · Build a Neuron</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            A Neuron is a plain async function  -  no imports from Cosmonapse, no decorators, no protocol
-            knowledge. It receives <code className="inline">input</code> (the TASK payload) and{" "}
-            <code className="inline">context</code> (fetched by the Axon via{" "}
-            <code className="inline">context_ref</code>) and returns a plain dict.
+            A Neuron is a pure-function interface:{" "}
+            <code className="inline">async (input, context) → output</code>. The{" "}
+            <code className="inline">Neuron</code> factory wraps any LLM provider — Hugging Face,{" "}
+            <code className="inline">&quot;openai&quot;</code>,{" "}
+            <code className="inline">&quot;anthropic&quot;</code>,{" "}
+            <code className="inline">&quot;groq&quot;</code>,{" "}
+            <code className="inline">&quot;ollama&quot;</code>, MCP servers, or a plain async
+            function — behind that interface automatically. Set{" "}
+            <code className="inline">HF_TOKEN</code> to your{" "}
+            <a
+              href="https://huggingface.co/settings/tokens"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--accent-2)", textDecoration: "underline" }}
+            >
+              Hugging Face access token
+            </a>{" "}
+            before running.
           </p>
-          <CodeBlock html={neuronSnippet} maxWidth={760} />
+          <CodeSwitcher
+            python={{ html: neuronPy }}
+            typescript={{ html: neuronTs }}
+            maxWidth={760}
+          />
         </div>
       </section>
 
@@ -176,16 +262,16 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">04 · Wire an Axon and Dendrite</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            The <strong>Axon</strong> wraps the Neuron and gives it an identity on the bus. The{" "}
-            <strong>Dendrite</strong> is the only component that touches the Synapse  -  it hosts the Axon,
-            emits REGISTER / HEARTBEAT / DEREGISTER, and routes inbound TASKs.
+            The <strong>Axon</strong> wraps the Neuron and gives it a protocol identity. The{" "}
+            <strong>Dendrite</strong> is the only component that touches the Synapse — it hosts the
+            Axon, emits REGISTER / HEARTBEAT / DEREGISTER, and routes inbound TASKs. Run this in a
+            second terminal; it registers and waits for tasks.
           </p>
-          <CodeBlock filename="worker.py" html={axonDendriteSnippet} maxWidth={800} />
-          <p className="prose" style={{ marginTop: 16 }}>
-            Run this in a second terminal. The worker registers on the bus and waits for tasks. Any process
-            that dispatches a TASK to <code className="inline">"hello-neuron"</code> on namespace{" "}
-            <code className="inline">"quickstart"</code> will be routed here.
-          </p>
+          <CodeSwitcher
+            python={{ html: workerPy, filename: "worker.py" }}
+            typescript={{ html: workerTs, filename: "worker.ts" }}
+            maxWidth={820}
+          />
         </div>
       </section>
 
@@ -193,15 +279,17 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">05 · Connect an HTTP interface</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            An <code className="inline">role="orchestrator"</code> Dendrite has no Axon  -  its job is to
-            dispatch tasks and collect results, the counterpart to the{" "}
-            <code className="inline">role="worker"</code> Dendrite from Step 04. Flask is synchronous;
-            cosmonapse is async. The bridge is a{" "}
-            <code className="inline">concurrent.futures.Future</code> per{" "}
-            <code className="inline">trace_id</code>: the asyncio handler resolves it, the Flask route
-            blocks on it.
+            A <code className="inline">role=&quot;orchestrator&quot;</code> Dendrite has no Axon —
+            its job is to dispatch tasks and collect results. Keep your web framework at the edge and
+            dispatch TASK Signals from route handlers via the orchestrator Dendrite. Install Flask
+            with <code className="inline">pip install flask</code> or Express with{" "}
+            <code className="inline">npm install express</code>.
           </p>
-          <CodeBlock filename="server.py" html={flaskSnippet} maxWidth={820} />
+          <CodeSwitcher
+            python={{ html: serverPy, filename: "server.py" }}
+            typescript={{ html: serverTs, filename: "server.ts" }}
+            maxWidth={840}
+          />
         </div>
       </section>
 
@@ -209,8 +297,8 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">06 · Watch the Signals flow</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            Attach a Doppler to see every Signal as it crosses the Synapse. It is a passive read-only
-            subscriber  -  it never competes with Dendrites for messages.
+            Attach a Doppler to see every Signal as it crosses the Synapse. It is a passive
+            read-only subscriber — it never competes with Dendrites for messages.
           </p>
           <CodeBlock html={dopplerSnippet} maxWidth={760} />
         </div>
@@ -224,8 +312,8 @@ export default function QuickstartPage() {
           </p>
           <CodeBlock html={testSnippet} maxWidth={760} />
           <p className="prose" style={{ marginTop: 16 }}>
-            Watch the Doppler terminal  -  you'll see the full REGISTER → TASK → AGENT_OUTPUT trace as it
-            happens.
+            Watch the Doppler terminal — you&apos;ll see the full REGISTER → TASK → AGENT_OUTPUT
+            trace as it happens.
           </p>
         </div>
       </section>
@@ -239,15 +327,17 @@ export default function QuickstartPage() {
               <h3>Envelope spec</h3>
               <p>The canonical wire format. Every field, every message type, validation rules.</p>
             </Link>
-            <Link href="/decisions" className="card">
+            <Link href="/concepts" className="card">
               <div className="card-icon">→</div>
-              <h3>Design decisions</h3>
-              <p>Every architectural decision and the reasoning behind it.</p>
+              <h3>Concepts</h3>
+              <p>The full Cosmonapse vocabulary — Core, Engram, Doppler, Immune, and Cloud.</p>
             </Link>
             <Link href="/roadmap" className="card">
               <div className="card-icon">→</div>
               <h3>Roadmap</h3>
-              <p>v0.1 manual SDK · v0.2 Axon-as-MCP · v0.3 declarative router · v0.4 router agent.</p>
+              <p>
+                v0.1 manual SDK · v0.2 Axon-as-MCP · v0.3 declarative router · v0.4 router agent.
+              </p>
             </Link>
           </div>
         </div>
@@ -255,4 +345,3 @@ export default function QuickstartPage() {
     </>
   );
 }
- 
