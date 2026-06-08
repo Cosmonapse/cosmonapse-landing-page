@@ -29,18 +29,15 @@ const synapseSnippet = `<span class="tk-op">$</span> cosmo synapse start memory 
 // ── Neuron ─────────────────────────────────────────────────────────────────
 
 const neuronPy = `<span class="tk-kw">import</span> os
-<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Neuron
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon
 
-<span class="tk-cm"># The Neuron factory wraps any provider behind the same pure-function</span>
-<span class="tk-cm"># interface: async (input, context) -> output. Zero protocol knowledge.</span>
-<span class="tk-cm"># Set HF_TOKEN to your Hugging Face access token first.</span>
-neuron_fn <span class="tk-op">=</span> Neuron(
-    source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
+<span class="tk-cm"># Axon.huggingface() (and .openai(), .anthropic(), .ollama() ...) combines</span>
+<span class="tk-cm"># the Neuron factory + Axon wiring in one call. Set HF_TOKEN first.</span>
+axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
     endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
     model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
     api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
-    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>,
-)`;
+    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])`;
 
 const neuronTs = `<span class="tk-kw">import</span> { neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
@@ -57,18 +54,15 @@ const neuronTs = `<span class="tk-kw">import</span> { neuron } <span class="tk-k
 // ── Axon + Dendrite (worker) ───────────────────────────────────────────────
 
 const workerPy = `<span class="tk-kw">import</span> asyncio, os
-<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, Neuron, connect_synapse
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, connect_synapse
 
-neuron_fn <span class="tk-op">=</span> Neuron(
-    source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
+<span class="tk-cm"># Axon.huggingface() creates the Neuron and Axon in one step.</span>
+<span class="tk-cm"># role="worker": hosts Axons, replies to TASKs, cannot dispatch.</span>
+axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
     endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
     model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
     api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
-    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>,
-)
-
-<span class="tk-cm"># Axon: protocol identity for the Neuron. role="worker": replies to TASKs only.</span>
-axon <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"llama"</span>, neuron_fn<span class="tk-op">=</span>neuron_fn, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])
+    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])
 
 <span class="tk-kw">async def</span> <span class="tk-fn">main</span>():
     synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
@@ -181,8 +175,6 @@ const testSnippet = `<span class="tk-op">$</span> curl <span class="tk-op">-s</s
 
 <span class="tk-cm">{"response": "Hello! Great to meet you, Cosmonapse..."}</span>`;
 
-// ── Page ───────────────────────────────────────────────────────────────────
-
 export default function QuickstartPage() {
   return (
     <>
@@ -191,8 +183,8 @@ export default function QuickstartPage() {
           <div className="page-eyebrow">// Quickstart</div>
           <h1 className="page-title">First five minutes.</h1>
           <p className="page-sub">
-            Install Cosmonapse, create a Neuron backed by Hugging Face, wire an Axon and Dendrite,
-            boot a local Synapse, watch Signals flow. No Docker. No running broker. Just{" "}
+            Install Cosmonapse, build an Axon backed by Hugging Face, wire a Dendrite, boot a local
+            Synapse, watch Signals flow. No Docker. No running broker. Just{" "}
             <code className="inline">pip install</code> (or{" "}
             <code className="inline">npm install</code>) and a few files.
           </p>
@@ -229,16 +221,15 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">03 · Build a Neuron</div>
+          <div className="sub-eyebrow">03 · Build an Axon</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            A Neuron is a pure-function interface:{" "}
-            <code className="inline">async (input, context) → output</code>. The{" "}
-            <code className="inline">Neuron</code> factory wraps any LLM provider — Hugging Face,{" "}
-            <code className="inline">&quot;openai&quot;</code>,{" "}
-            <code className="inline">&quot;anthropic&quot;</code>,{" "}
-            <code className="inline">&quot;groq&quot;</code>,{" "}
-            <code className="inline">&quot;ollama&quot;</code>, MCP servers, or a plain async
-            function — behind that interface automatically. Set{" "}
+            <code className="inline">Axon.huggingface()</code> (and{" "}
+            <code className="inline">.openai()</code>,{" "}
+            <code className="inline">.anthropic()</code>,{" "}
+            <code className="inline">.ollama()</code>,{" "}
+            <code className="inline">.mcp()</code>) is the source-paired factory — it creates the
+            Neuron and wires the Axon in one call. The TypeScript SDK still uses the two-step{" "}
+            <code className="inline">neuron() + new Axon()</code> pattern. Set{" "}
             <code className="inline">HF_TOKEN</code> to your{" "}
             <a
               href="https://huggingface.co/settings/tokens"
@@ -260,12 +251,11 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">04 · Wire an Axon and Dendrite</div>
+          <div className="sub-eyebrow">04 · Wire a Dendrite</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            The <strong>Axon</strong> wraps the Neuron and gives it a protocol identity. The{" "}
-            <strong>Dendrite</strong> is the only component that touches the Synapse — it hosts the
-            Axon, emits REGISTER / HEARTBEAT / DEREGISTER, and routes inbound TASKs. Run this in a
-            second terminal; it registers and waits for tasks.
+            The <strong>Dendrite</strong> is the only component that touches the Synapse — it hosts
+            the Axon, emits REGISTER / HEARTBEAT / DEREGISTER, and routes inbound TASKs. Run this
+            in a second terminal; it registers and waits for tasks.
           </p>
           <CodeSwitcher
             python={{ html: workerPy, filename: "worker.py" }}

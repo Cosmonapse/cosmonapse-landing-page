@@ -7,18 +7,16 @@ const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 // ─── Hero code snippets ────────────────────────────────────────────────────
 
 const heroPy = `<span class="tk-kw">import</span> os
-<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, Neuron, connect_synapse
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, connect_synapse
 
-<span class="tk-cm"># 1.  LLM Neuron backed by Hugging Face — zero protocol knowledge.</span>
-neuron <span class="tk-op">=</span> Neuron(source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
+<span class="tk-cm"># 1.  Axon.huggingface() wires the Neuron and protocol identity in one call.</span>
+axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
     endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
     model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>], use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>)
+    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
+    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])
 
-<span class="tk-cm"># 2.  Axon — wraps the Neuron, gives it a protocol identity.</span>
-axon <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"llama"</span>, neuron_fn<span class="tk-op">=</span>neuron, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])
-
-<span class="tk-cm"># 3.  Dendrite — the only component that touches the Synapse.</span>
+<span class="tk-cm"># 2.  Dendrite — the only component that touches the Synapse.</span>
 synapse  <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
 dendrite <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>)
 dendrite.<span class="tk-fn">attach_axon</span>(axon)
