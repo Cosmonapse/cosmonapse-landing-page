@@ -25,28 +25,25 @@ dendrite.<span class="tk-fn">attach_axon</span>(axon)
     pw <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(
         neuron<span class="tk-op">=</span><span class="tk-str">"llama"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: <span class="tk-str">"Say hello to Cosmonapse."</span>})`;
 
-const heroTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse, neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+const heroTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
-<span class="tk-cm">// 1.  LLM Neuron backed by Hugging Face — zero protocol knowledge.</span>
-<span class="tk-kw">const</span> fn <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"huggingface"</span>, {
-  endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
-  model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-  apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>,
-  useChatApi: <span class="tk-kw">true</span>,
-});
+<span class="tk-cm">// 1.  Axon.huggingface() wires the Neuron and protocol identity in one call.</span>
+<span class="tk-kw">const</span> axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
+  { endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
+    model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>, useChatApi: <span class="tk-kw">true</span> },
+  { capabilities: [<span class="tk-str">"chat"</span>] });
 
-<span class="tk-cm">// 2.  Axon — wraps the Neuron, gives it a protocol identity.</span>
-<span class="tk-kw">const</span> axon <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({ neuronId: <span class="tk-str">"llama"</span>, neuronFn: fn, capabilities: [<span class="tk-str">"chat"</span>] });
-
-<span class="tk-cm">// 3.  Dendrite — the only component that touches the Synapse.</span>
+<span class="tk-cm">// 2.  Dendrite — the only component that touches the Synapse.</span>
 <span class="tk-kw">await using</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
   synapse: <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>),
   namespace: <span class="tk-str">"quickstart"</span>,
 });
 dendrite.<span class="tk-fn">attachAxon</span>(axon); <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
 
-<span class="tk-kw">const</span> pw <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({
-  neuron: <span class="tk-str">"llama"</span>, input: { prompt: <span class="tk-str">"Say hello to Cosmonapse."</span> },
+<span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({
+  neuron: <span class="tk-str">"llama"</span>,
+  input: { prompt: <span class="tk-str">"Say hello to Cosmonapse."</span> },
 });`;
 
 // ─── Product line data ─────────────────────────────────────────────────────

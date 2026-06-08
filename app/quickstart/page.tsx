@@ -39,17 +39,15 @@ axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<s
     api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
     use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])`;
 
-const neuronTs = `<span class="tk-kw">import</span> { neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+const neuronTs = `<span class="tk-kw">import</span> { Axon } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
-<span class="tk-cm">// The neuron() factory wraps any provider behind the same pure-function</span>
-<span class="tk-cm">// interface: async (input, context) => output. Zero protocol knowledge.</span>
-<span class="tk-cm">// Set HF_TOKEN in your environment first.</span>
-<span class="tk-kw">const</span> neuronFn <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"huggingface"</span>, {
-  endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
-  model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-  apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>,
-  useChatApi: <span class="tk-kw">true</span>,
-});`;
+<span class="tk-cm">// Axon.huggingface() (and .openai(), .anthropic(), .ollama() ...) combines</span>
+<span class="tk-cm">// neuron factory + Axon wiring in one call. Set HF_TOKEN first.</span>
+<span class="tk-kw">const</span> axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
+  { endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
+    model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>, useChatApi: <span class="tk-kw">true</span> },
+  { capabilities: [<span class="tk-str">"chat"</span>] });`;
 
 // ── Axon + Dendrite (worker) ───────────────────────────────────────────────
 
@@ -73,17 +71,16 @@ axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<s
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
-const workerTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse, neuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+const workerTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
-<span class="tk-kw">const</span> neuronFn <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"huggingface"</span>, {
-  endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
-  model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-  apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>,
-  useChatApi: <span class="tk-kw">true</span>,
-});
+<span class="tk-cm">// Axon.huggingface() creates the Neuron and Axon in one step.</span>
+<span class="tk-cm">// role: "worker" — hosts Axons, replies to TASKs, cannot dispatch.</span>
+<span class="tk-kw">const</span> axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
+  { endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
+    model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>, useChatApi: <span class="tk-kw">true</span> },
+  { capabilities: [<span class="tk-str">"chat"</span>] });
 
-<span class="tk-cm">// Axon: protocol identity. role: "worker" — replies to TASKs, cannot dispatch.</span>
-<span class="tk-kw">const</span> axon    <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({ neuronId: <span class="tk-str">"llama"</span>, neuronFn, capabilities: [<span class="tk-str">"chat"</span>] });
 <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
 <span class="tk-kw">const</span> worker  <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"quickstart"</span>, role: <span class="tk-str">"worker"</span> });
 worker.<span class="tk-fn">attachAxon</span>(axon);
