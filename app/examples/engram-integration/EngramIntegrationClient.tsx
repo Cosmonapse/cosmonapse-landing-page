@@ -76,7 +76,7 @@ worker.<span class="tk-fn">attach_axon</span>(
         neuron_id<span class="tk-op">=</span><span class="tk-str">"researcher"</span>,
         neuron_fn<span class="tk-op">=</span>researcher,
         capabilities<span class="tk-op">=</span>[<span class="tk-str">"research"</span>],
-        engrams<span class="tk-op">=</span>[EngramBinding(name<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, engram_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>)],
+        engrams<span class="tk-op">=</span>[EngramBinding(name<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, directed_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>)],
     )
 )
 
@@ -125,7 +125,7 @@ const opsSnippet = `<span class="tk-cm"># imprint operations</span>
 <span class="tk-kw">await</span> <span class="tk-fn">imprint</span>(<span class="tk-str">"ctx"</span>, op<span class="tk-op">=</span><span class="tk-str">"delete"</span>, entry<span class="tk-op">=</span>{...})                   <span class="tk-cm"># remove</span>
 
 <span class="tk-cm"># recall modes (configure default on the binding)</span>
-EngramBinding(name<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, engram_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, default_recall_mode<span class="tk-op">=</span><span class="tk-str">"merge"</span>)
+EngramBinding(name<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, directed_id<span class="tk-op">=</span><span class="tk-str">"ctx"</span>, default_recall_mode<span class="tk-op">=</span><span class="tk-str">"merge"</span>)
 <span class="tk-cm">#   "first"   -  return the best single match (default)</span>
 <span class="tk-cm">#   "merge"   -  combine matching entries across backends</span>
 <span class="tk-cm">#   "all"     -  return every match, partial flag if any backend timed out</span>`;

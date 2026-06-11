@@ -335,7 +335,7 @@ host.attach_engram(InMemoryEngram(engram_id=<span class="tk-str">"ctx"</span>, e
 
 worker.attach_axon(Axon(
     neuron_id=<span class="tk-str">"researcher"</span>, neuron_fn=researcher,
-    engrams=[EngramBinding(name=<span class="tk-str">"ctx"</span>, engram_id=<span class="tk-str">"ctx"</span>)],
+    engrams=[EngramBinding(name=<span class="tk-str">"ctx"</span>, directed_id=<span class="tk-str">"ctx"</span>)],
 ))`,
       },
     ],

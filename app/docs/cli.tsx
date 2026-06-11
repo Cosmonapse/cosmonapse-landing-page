@@ -22,8 +22,10 @@ export const cliToc: TocGroup = {
     { href: "#cli-prism", label: "cosmo doppler --prism" },
     { href: "#cli-validate", label: "cosmo validate" },
     { href: "#cli-completion", label: "cosmo completion" },
-    { href: "#cli-dispatch", label: "cosmo dispatch (planned)" },
-    { href: "#cli-registry", label: "cosmo registry (planned)" },
+    { href: "#cli-dispatch", label: "cosmo dispatch" },
+    { href: "#cli-registry", label: "cosmo registry" },
+    { href: "#cli-answer", label: "cosmo answer" },
+    { href: "#cli-schema", label: "cosmo schema" },
     { href: "#cli-config", label: "Configuration & env" },
     { href: "#cli-exit-codes", label: "Exit codes" },
   ],
@@ -42,13 +44,15 @@ Options
   <span class="tk-op">--</span>help      Show this message and exit.
 
 Commands
+  answer       Interactively answer CLARIFICATION / PERMISSION requests.
   completion   Print a shell-completion script (bash / zsh / fish).
+  dispatch     Dispatch a TASK and print the reply.
   doppler      Attach a read-only Doppler to a Synapse namespace.
   init         Scaffold a minimal Axon + Dendrite project.
+  registry     Inspect the Neuron registry of a namespace.
+  schema       Print the Signal envelope JSON Schema.
   synapse      Manage Cosmonapse synapse servers (start / view / stop).
-  validate     Validate Signal envelopes against the spec.
-
-<span class="tk-cm"># Planned for v0.2: dispatch, registry.</span>`;
+  validate     Validate Signal envelopes against the spec.`;
 
 const cliInitSnippet = `<span class="tk-op">$</span> cosmo init my-app <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
 
@@ -182,23 +186,100 @@ Examples
 
 <span class="tk-op">$</span> cosmo validate <span class="tk-op">--</span>live <span class="tk-op">--</span>namespace<span class="tk-op">=</span>dev <span class="tk-op">--</span>strict`;
 
-const cliDispatchSnippet = `<span class="tk-cm"># cosmo dispatch  -  planned for v0.2.</span>
-<span class="tk-cm"># Will fire a single TASK from the shell and optionally wait for FINAL / ERROR.</span>
-<span class="tk-cm"># Not available in v0.1  -  dispatch from Python instead:</span>
+const cliDispatchSnippet = `<span class="tk-op">$</span> cosmo dispatch --help
 
-<span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(
-    neuron<span class="tk-op">=</span><span class="tk-str">"answerer"</span>,
-    input<span class="tk-op">=</span>{<span class="tk-str">"q"</span>: <span class="tk-str">"hi"</span>},
-)`;
+Dispatch a TASK and print the reply.
 
-const cliRegistrySnippet = `<span class="tk-cm"># cosmo registry  -  planned for v0.2.</span>
-<span class="tk-cm"># Will inspect / query a RegistryStore (list, show, capabilities, prune)</span>
-<span class="tk-cm"># without writing Python. Not available in v0.1  -  read the registry from</span>
-<span class="tk-cm"># a Dendrite instead:</span>
+Usage
+  cosmo dispatch --url &lt;url&gt; [options]
 
-snapshot <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">registry_snapshot</span>(include_deregistered<span class="tk-op">=</span><span class="tk-kw">True</span>)
-<span class="tk-kw">for</span> rec <span class="tk-kw">in</span> snapshot:
-    <span class="tk-fn">print</span>(rec.neuron_id, rec.status, rec.capabilities)`;
+Options
+  --url &lt;url&gt;             Synapse URL (cosmo:// | nats:// | kafka://). Required.
+  --namespace, -n &lt;ns&gt;    Namespace to dispatch into.        Default: dev
+  --neuron &lt;id&gt;           Addressed dispatch: the target Axon's neuron_id.
+  --capabilities &lt;a,b&gt;    Capability-routed dispatch (comma-separated).
+  --input &lt;json&gt;          TASK input as a JSON object.       Default: {}
+  --offer                  Use TASK_OFFER / BID / TASK_AWARDED instead of direct dispatch.
+  --deadline-ms &lt;n&gt;       Bid-collection window for --offer. Default: 250
+  --select &lt;strategy&gt;     first_bid | lowest_cost | highest_confidence. Default: first_bid
+  --wait / --no-wait       Wait for the reply.                Default: --wait
+  --timeout &lt;s&gt;           Seconds to wait for a reply.       Default: 30.0
+  --scope &lt;scope&gt;         Pathway scope while waiting: all | terminal. Default: terminal
+  --json                   Print the raw reply Signal as JSON.
+
+Examples
+
+<span class="tk-cm"># Addressed dispatch, wait for the reply (terminal-handler finalize)</span>
+<span class="tk-op">$</span> cosmo dispatch --url=cosmo://127.0.0.1:7070 -n dev \\
+    --neuron=answerer --input='{"q": "hi"}'
+
+<span class="tk-cm"># Capability-routed</span>
+<span class="tk-op">$</span> cosmo dispatch --url=cosmo://127.0.0.1:7070 --capabilities=summarize \\
+    --input='{"text": "..."}'
+
+<span class="tk-cm"># Auction it instead: collect BIDs, award the cheapest</span>
+<span class="tk-op">$</span> cosmo dispatch --url=cosmo://127.0.0.1:7070 --offer \\
+    --capabilities=summarize --select=lowest_cost --input='{"text": "..."}'`;
+
+const cliRegistrySnippet = `<span class="tk-op">$</span> cosmo registry --help
+
+Inspect the Neuron registry of a namespace.
+
+Subcommands
+  list      Emit DISCOVER and print every Neuron that announces itself.
+
+Options (list)
+  --url &lt;url&gt;             Synapse URL (cosmo:// | nats:// | kafka://). Required.
+  --namespace, -n &lt;ns&gt;    Namespace.                          Default: dev
+  --capability &lt;cap&gt;      Only Neurons declaring this capability.
+  --timeout &lt;s&gt;           Seconds to collect REGISTER replies. Default: 1.5
+  --json                   Machine-readable output.
+
+Example
+
+<span class="tk-op">$</span> cosmo registry list --url=cosmo://127.0.0.1:7070 -n dev
+  NEURON       STATUS      CAPABILITIES
+  answerer     registered  text, qa
+  summarizer   registered  summarize, english`;
+
+const cliAnswerSnippet = `<span class="tk-op">$</span> cosmo answer --help
+
+Interactively answer CLARIFICATION / PERMISSION requests.
+
+Usage
+  cosmo answer --url &lt;url&gt; [options]
+
+Options
+  --url &lt;url&gt;             Synapse URL (cosmo:// | nats:// | kafka://). Required.
+  --namespace, -n &lt;ns&gt;    Namespace to watch.                 Default: dev
+  --trace &lt;trc_…&gt;         Only answer requests on this trace.
+  --redispatch             Reply by re-dispatching a follow-up TASK to the asking
+                           Neuron (respond_to_clarification / respond_to_permission)
+                           instead of emitting a discrete answer signal.
+
+Example
+
+<span class="tk-op">$</span> cosmo answer --url=cosmo://127.0.0.1:7070 -n dev
+  watching namespace 'dev' for CLARIFICATION / PERMISSION (Ctrl-C to quit)
+
+  [trc_01JV…] CLARIFICATION from neuron=answerer
+    question: Which topic?
+  your answer: billing
+  → CLARIFICATION_ANSWER emitted (parent_id = the request's id)`;
+
+const cliSchemaSnippet = `<span class="tk-op">$</span> cosmo schema --help
+
+Print the Signal envelope JSON Schema (protocol major version 1).
+
+Options
+  --types                  List the SignalType vocabulary instead of the schema.
+  --output, -o &lt;path&gt;     Write to a file instead of stdout.
+
+Examples
+
+<span class="tk-op">$</span> cosmo schema | jq '.properties | keys'
+<span class="tk-op">$</span> cosmo schema --types
+<span class="tk-op">$</span> cosmo schema -o signal.schema.json`;
 
 const exitCodesSnippet = `<span class="tk-cm"># cosmo commands use a small, conventional set of exit codes:</span>
 
@@ -207,7 +288,7 @@ const exitCodesSnippet = `<span class="tk-cm"># cosmo commands use a small, conv
   2    Invalid usage / arguments          <span class="tk-cm"># bad flags (from Click)</span>
   130  Interrupted by Ctrl-C              <span class="tk-cm"># standard POSIX SIGINT</span>`;
 
-const configSnippet = `<span class="tk-cm"># v0.1 has no TOML config file yet  -  flags are passed explicitly.</span>
+const configSnippet = `<span class="tk-cm"># 0.1.x has no TOML config file yet  -  flags are passed explicitly.</span>
 <span class="tk-cm"># The only environment variable the CLI reads today:</span>
 
   COSMONAPSE_STATE_DIR    <span class="tk-cm"># where 'cosmo synapse' keeps its run state.</span>
@@ -217,45 +298,6 @@ const configSnippet = `<span class="tk-cm"># v0.1 has no TOML config file yet  -
 <span class="tk-op">$</span> COSMONAPSE_STATE_DIR<span class="tk-op">=</span>./.cosmo-state cosmo synapse start memory <span class="tk-op">-n</span> dev`;
 
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
-
-/** Prominent callout marking a command that does not exist in the current release. */
-function NotYetAvailable() {
-  return (
-    <div
-      role="note"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.6rem",
-        margin: "0 0 1rem",
-        padding: "0.6rem 0.9rem",
-        borderRadius: "8px",
-        border: "1px solid rgba(251, 191, 36, 0.45)",
-        background: "rgba(251, 191, 36, 0.10)",
-        color: "#92400e",
-        fontSize: "0.85rem",
-        fontWeight: 600,
-      }}
-    >
-      <span
-        style={{
-          textTransform: "uppercase",
-          letterSpacing: "0.06em",
-          fontSize: "0.7rem",
-          padding: "0.1rem 0.5rem",
-          borderRadius: "999px",
-          background: "rgba(251, 191, 36, 0.25)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        Not yet available
-      </span>
-      <span style={{ fontWeight: 500 }}>
-        Planned for v0.2  -  not installed by the current release.
-      </span>
-    </div>
-  );
-}
 
 export default function CliDocs({ section }: { section?: string }) {
   const all = (
@@ -267,8 +309,8 @@ export default function CliDocs({ section }: { section?: string }) {
         </h2>
         <p className="docs-megasection-sub">
           <code className="inline">cosmo</code> is the operator&rsquo;s entry point: boot a dev
-          synapse, tail traffic, and validate envelopes. It is a Click application installed
-          alongside the Python SDK. Dispatch and registry subcommands are planned for v0.2.
+          synapse, tail traffic, dispatch and answer from the shell, inspect the registry, and
+          validate envelopes. It is a Click application installed alongside the Python SDK.
         </p>
       </div>
 
@@ -277,8 +319,10 @@ export default function CliDocs({ section }: { section?: string }) {
           <code className="inline">cosmo</code> is installed when you{" "}
           <code className="inline">pip install cosmonapse</code>  -  the CLI ships inside that single
           distribution (entry point <code className="inline">cosmo.main:cli</code>). Once installed,
-          the binary is on your <code className="inline">PATH</code>. In v0.1 it exposes{" "}
+          the binary is on your <code className="inline">PATH</code>. It exposes{" "}
           <code className="inline">init</code>, <code className="inline">synapse</code>,{" "}
+          <code className="inline">dispatch</code>, <code className="inline">registry</code>,{" "}
+          <code className="inline">answer</code>, <code className="inline">schema</code>,{" "}
           <code className="inline">doppler</code>, <code className="inline">validate</code>, and{" "}
           <code className="inline">completion</code>.
         </p>
@@ -364,38 +408,62 @@ export default function CliDocs({ section }: { section?: string }) {
       </Section>
 
       <Section id="cli-dispatch" eyebrow="CLI · 07" title="cosmo dispatch">
-        <NotYetAvailable />
         <p className="docs-p">
-          A one-off TASK from the shell is on the roadmap for v0.2. It is{" "}
-          <strong>not a command in v0.1</strong>  -  running <code className="inline">cosmo dispatch</code>{" "}
-          today exits with &ldquo;no such command.&rdquo; Until it ships, dispatch from Python with{" "}
-          <code className="inline">dispatch_task()</code>.
+          Fire a one-off TASK from the shell  -  addressed (<code className="inline">--neuron</code>),
+          capability-routed (<code className="inline">--capabilities</code>), or auctioned
+          (<code className="inline">--offer</code>)  -  and print the reply. By default it waits with{" "}
+          <code className="inline">--scope=terminal</code>, which tags the TASK with{" "}
+          <code className="inline">finalize</code> so a stock worker&rsquo;s AGENT_OUTPUT is promoted
+          to FINAL (terminal-handler finalize).
         </p>
         <CodeBlock html={cliDispatchSnippet} maxWidth={820} />
       </Section>
 
       <Section id="cli-registry" eyebrow="CLI · 08" title="cosmo registry">
-        <NotYetAvailable />
         <p className="docs-p">
-          A registry inspector (<code className="inline">list</code> / <code className="inline">show</code>{" "}
-          / <code className="inline">capabilities</code> / <code className="inline">prune</code>) is
-          also planned for v0.2 and is <strong>not a command in v0.1</strong>. For now, read the
-          registry from a Dendrite that was given a{" "}
-          <code className="inline">registry_store</code>.
+          Inspect the live Neuron registry of a namespace.{" "}
+          <code className="inline">cosmo registry list</code> emits a{" "}
+          <code className="inline">DISCOVER</code> Signal, collects the REGISTER replies for{" "}
+          <code className="inline">--timeout</code> seconds, and prints every Neuron that announced
+          itself  -  no <code className="inline">registry_store</code> required.
         </p>
         <CodeBlock html={cliRegistrySnippet} maxWidth={820} />
       </Section>
 
-      <Section id="cli-config" eyebrow="CLI · 09" title="Configuration & environment">
+      <Section id="cli-answer" eyebrow="CLI · 09" title="cosmo answer">
         <p className="docs-p">
-          v0.1 keeps configuration explicit  -  every option is a command-line flag. There is no TOML
+          Be the human in the loop from the shell. <code className="inline">cosmo answer</code>{" "}
+          watches a namespace for <code className="inline">CLARIFICATION</code> /{" "}
+          <code className="inline">PERMISSION</code> requests and prompts you for each one. By
+          default it emits the discrete <code className="inline">CLARIFICATION_ANSWER</code> /{" "}
+          <code className="inline">PERMISSION_DECISION</code> signal (consumed via{" "}
+          <code className="inline">await_decision()</code> or the matching handlers); pass{" "}
+          <code className="inline">--redispatch</code> to instead close the loop by re-dispatching a
+          follow-up TASK to the asking Neuron.
+        </p>
+        <CodeBlock html={cliAnswerSnippet} maxWidth={820} />
+      </Section>
+
+      <Section id="cli-schema" eyebrow="CLI · 10" title="cosmo schema">
+        <p className="docs-p">
+          Print the machine-checkable JSON Schema of the Signal envelope (protocol major version
+          1), or the <code className="inline">SignalType</code> vocabulary with{" "}
+          <code className="inline">--types</code>. Useful for wiring non-SDK producers and CI
+          contract checks.
+        </p>
+        <CodeBlock html={cliSchemaSnippet} maxWidth={820} />
+      </Section>
+
+      <Section id="cli-config" eyebrow="CLI · 11" title="Configuration & environment">
+        <p className="docs-p">
+          The 0.1.x line keeps configuration explicit  -  every option is a command-line flag. There is no TOML
           config file yet (a layered config file is a future addition). The one environment variable
           the CLI honours today controls where the dev synapse stores its run state.
         </p>
         <CodeBlock html={configSnippet} maxWidth={820} />
       </Section>
 
-      <Section id="cli-exit-codes" eyebrow="CLI · 10" title="Exit codes">
+      <Section id="cli-exit-codes" eyebrow="CLI · 12" title="Exit codes">
         <p className="docs-p">
           <code className="inline">cosmo</code> uses a small, conventional set of exit codes so CI
           scripts and shell pipelines stay predictable.

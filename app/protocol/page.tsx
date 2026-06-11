@@ -14,7 +14,7 @@ const envelopeSnippet = `{
   <span class="tk-fn">"trace_id"</span>:  <span class="tk-str">"trc_01JVBCDEF0000000000000000"</span>,
   <span class="tk-fn">"parent_id"</span>: <span class="tk-str">"evt_01JVBCDEF0000000000000001"</span>,
   <span class="tk-fn">"type"</span>:      <span class="tk-str">"THOUGHT_DELTA"</span>,
-  <span class="tk-fn">"neuron"</span>:    <span class="tk-str">"claude-debug"</span>,
+  <span class="tk-fn">"directed"</span>:  { <span class="tk-fn">"id"</span>: <span class="tk-str">"claude-debug"</span> },
   <span class="tk-fn">"ts"</span>:        <span class="tk-str">"2026-05-16T14:22:01.391Z"</span>,
   <span class="tk-fn">"payload"</span>: {
     <span class="tk-fn">"delta"</span>: <span class="tk-str">"reading the traceback..."</span>,
@@ -27,15 +27,13 @@ const envelopeSnippet = `{
 }`;
 
 // Connect + validate snippets shown in the switcher alongside the envelope
-const connectPy = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> connect_synapse, validateSignal
+const connectPy = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Signal, connect_synapse
 
 <span class="tk-cm"># Connect to any Synapse — memory, NATS, Kafka.</span>
 synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
 
-<span class="tk-cm"># Validate an envelope against the spec.</span>
-ok, errors <span class="tk-op">=</span> <span class="tk-fn">validateSignal</span>(envelope_dict)
-<span class="tk-kw">if not</span> ok:
-    <span class="tk-kw">print</span>(errors)
+<span class="tk-cm"># Validate an envelope against the spec (pydantic raises on violation).</span>
+sig <span class="tk-op">=</span> Signal.<span class="tk-fn">model_validate</span>(envelope_dict)
 
 <span class="tk-cm"># Or use the CLI:</span>
 <span class="tk-cm"># $ cosmo validate &lt; signals.ndjson</span>`;
@@ -45,9 +43,8 @@ const connectTs = `<span class="tk-kw">import</span> { connectSynapse, validateS
 <span class="tk-cm">// Connect to any Synapse — memory, NATS, Kafka.</span>
 <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
 
-<span class="tk-cm">// Validate an envelope against the spec.</span>
-<span class="tk-kw">const</span> { ok, errors } <span class="tk-op">=</span> <span class="tk-fn">validateSignal</span>(envelopeObj);
-<span class="tk-kw">if</span> (!ok) console.<span class="tk-fn">log</span>(errors);
+<span class="tk-cm">// Validate an envelope against the spec (throws on violation).</span>
+<span class="tk-fn">validateSignal</span>(envelopeObj);
 
 <span class="tk-cm">// Or use the CLI:</span>
 <span class="tk-cm">// $ cosmo validate &lt; signals.ndjson</span>`;
@@ -232,10 +229,14 @@ export default function ProtocolPage() {
                 <div className="field-desc">Message type. One of the values catalogued below.</div>
               </div>
               <div className="field">
-                <div className="field-name">neuron</div>
+                <div className="field-name">directed</div>
                 <div className="field-desc">
-                  Emitting Neuron ID. Omitted for client-originated events (e.g. a root TASK dispatched by
-                  an external workflow trigger).
+                  Unified addressing: <code className="inline">id</code> (direct  -  a neuron_id or
+                  engram_id), <code className="inline">type</code> (a neuron type or engram_kind), and{" "}
+                  <code className="inline">capabilities</code>. Precedence on receive: id &gt; type &gt;
+                  capabilities. Also carries producer identity on replies (an AGENT_OUTPUT&rsquo;s{" "}
+                  <code className="inline">directed.id</code> is the producing neuron). Omitted when no
+                  addressing applies.
                 </div>
               </div>
               <div className="field">
@@ -373,13 +374,13 @@ export default function ProtocolPage() {
                 <td>Addressed</td>
                 <td><code className="inline">cosmonapse.&lt;ns&gt;.TASK</code></td>
                 <td>Broadcast (every Dendrite subscribes, only the named host acts)</td>
-                <td>TASK carries a <code className="inline">neuron</code> field</td>
+                <td>TASK sets <code className="inline">directed.id</code></td>
               </tr>
               <tr>
                 <td>Capability-routed</td>
                 <td><code className="inline">cosmonapse.&lt;ns&gt;.TASK.routed</code></td>
                 <td>Queue group <code className="inline">caps:&lt;sorted-aggregate&gt;</code>  -  broker delivers exactly once per matching cap profile</td>
-                <td>TASK omits <code className="inline">neuron</code> and sets <code className="inline">payload.capabilities</code></td>
+                <td>TASK omits <code className="inline">directed.id</code> and sets <code className="inline">payload.capabilities</code></td>
               </tr>
             </tbody>
           </table>

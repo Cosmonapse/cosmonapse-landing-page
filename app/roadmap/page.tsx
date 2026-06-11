@@ -27,14 +27,14 @@ export default function RoadmapPage() {
         <div className="container container-narrow">
           <div className="timeline">
             <div className="timeline-item current">
-              <div className="timeline-version">0.1.0 · current  -  public alpha</div>
+              <div className="timeline-version">0.1.x · current (0.1.3)  -  public alpha</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>
                   The first public release. The developer reads the envelope spec, writes an Axon and
                   Dendrite using the SDK primitives, chooses a Synapse adapter, and wires their own
                   orchestration logic. Full control, full complexity, appropriate for early adopters. The
-                  Python SDK is the complete reference implementation; the TypeScript SDK ships as a preview.
+                  Python SDK is the complete reference implementation; as of 0.1.3 the TypeScript SDK is at full parity.
                 </p>
                 <p>What 0.1.0 ships:</p>
                 <ul>
@@ -90,15 +90,12 @@ export default function RoadmapPage() {
                     <code className="inline">dispatch_and_subscribe(...)</code>
                   </li>
                   <li>
-                    TypeScript SDK (preview)  -  envelope, builders, Axon, Dendrite,
-                    MemorySynapse, NatsSynapse, in-memory RegistryStore, and the express / MCP
-                    / unified <code className="inline">neuron()</code> factory.{" "}
-                    <strong>Not yet in TypeScript:</strong> DevSynapse,{" "}
-                    <code className="inline">connectSynapse(url)</code>, LifecycleHooks, Ollama /
-                    HuggingFace neuron sources, KafkaSynapse, SQLite / Postgres RegistryStore,
-                    and Engram. Tracked in{" "}
-                    <code className="inline">packages/ts-sdk/PORTING_STATUS.md</code> and slated
-                    for 0.5.0  -  until then, the Python SDK is the reference implementation.
+                    TypeScript SDK  -  full parity as of 0.1.3: envelope, builders, Axon,
+                    Dendrite (Pathway dispatch, offers / bidding, interactive cognition), all
+                    four Synapse adapters with{" "}
+                    <code className="inline">connectSynapse(url)</code>, all three RegistryStore
+                    backends, LifecycleHooks, the LLM / MCP / unified{" "}
+                    <code className="inline">neuron()</code> source factories, and Engram.
                   </li>
                 </ul>
               </div>
@@ -161,21 +158,20 @@ export default function RoadmapPage() {
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-version">0.5.0 · future  -  parity</div>
+              <div className="timeline-version">0.5.0 · future  -  parity, proven</div>
               <h2 className="timeline-title">TypeScript becomes first-class.</h2>
               <div className="timeline-body">
                 <p>
-                  Promote the TypeScript SDK from preview to parity by closing the gaps that block
-                  authoring decentralised workflows.
+                  The feature surface reached parity early  -  0.1.3 shipped lifecycle hooks,{" "}
+                  <code className="inline">connectSynapse(url)</code>, DevSynapse, the LLM provider
+                  neuron factories, all three RegistryStore backends, and Engram in TypeScript.
+                  0.5.0 makes that parity provable rather than asserted.
                 </p>
                 <p>What 0.5.0 adds:</p>
                 <ul>
-                  <li>Lifecycle hooks (on_connect / on_refresh / on_schedule)  -  the headline gap for p2p workflows</li>
-                  <li><code className="inline">connectSynapse(url)</code> URL factory</li>
-                  <li>DevSynapse / dev broker client so TS-first users need no Python process</li>
-                  <li>LLM provider neuron factories (Ollama, HuggingFace)</li>
-                  <li>SqliteRegistryStore (+ Postgres where a driver allows)</li>
                   <li>The cross-language conformance corpus running in TS CI</li>
+                  <li>Byte-level envelope golden tests between the two SDKs</li>
+                  <li>Published, versioned <code className="inline">@cosmonapse/sdk</code> releases in lock-step with PyPI</li>
                 </ul>
               </div>
             </div>
@@ -212,7 +208,7 @@ export default function RoadmapPage() {
             <li>0.2.0  -  CI enforced on every commit (provable baseline)</li>
             <li>0.3.0  -  frozen, machine-checkable envelope spec + JSON Schema</li>
             <li>0.4.0  -  integration tests against real NATS / Kafka / Postgres</li>
-            <li>0.5.0  -  TypeScript SDK at parity with Python</li>
+            <li>0.5.0  -  TypeScript parity proven by a cross-language conformance corpus</li>
             <li>1.0.0  -  docs, semver policy, security audit, tag + publish</li>
           </ol>
         </div>

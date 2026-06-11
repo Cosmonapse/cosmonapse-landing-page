@@ -146,52 +146,6 @@ export default function BuildOnCosmonapse() {
           </aside>
         </div>
       </div>
-
-      <style>{`
-        .boc-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
-        .boc-tab {
-          display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px;
-          font-family: var(--font-mono, ui-monospace, monospace);
-          color: var(--text-dim); background: var(--bg-card, var(--surface));
-          border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px;
-          cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
-        }
-        .boc-tab:hover { border-color: var(--border-strong); color: var(--text); transform: translateY(-1px); }
-        .boc-tab.active {
-          color: #fff; border-color: rgba(139,92,246,0.55);
-          background: linear-gradient(180deg, rgba(139,92,246,0.16), rgba(34,211,238,0.06));
-          box-shadow: 0 8px 26px -14px rgba(139,92,246,0.7);
-        }
-        .boc-tab-label { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; }
-        .boc-tab-url   { font-size: 11.5px; color: var(--text-faint); letter-spacing: 0.02em; }
-        .boc-tab.active .boc-tab-url { color: rgba(255,255,255,0.7); }
-        .boc-grid {
-          display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr);
-          gap: 28px; align-items: start;
-        }
-        @media (max-width: 900px) { .boc-grid { grid-template-columns: 1fr; } }
-        .boc-side-eyebrow {
-          font-family: var(--font-mono, ui-monospace, monospace); font-size: 11.5px;
-          color: var(--accent-2, #a78bfa); letter-spacing: 0.06em; margin-bottom: 8px; text-transform: uppercase;
-        }
-        .boc-side-prose { color: var(--text-dim); font-size: 14px; line-height: 1.6; margin: 0 0 18px; }
-        .boc-side-list {
-          list-style: none; padding: 0; margin: 0 0 20px;
-          display: grid; gap: 10px; color: var(--text-dim); font-size: 13.5px; line-height: 1.55;
-        }
-        .boc-side-list li { padding-left: 14px; position: relative; }
-        .boc-side-list li::before {
-          content: "→"; position: absolute; left: 0; top: 0;
-          color: var(--accent-2, #a78bfa); font-family: var(--font-mono); font-size: 12px;
-        }
-        .boc-side-list strong { color: var(--text); font-weight: 600; }
-        .boc-side-callout {
-          padding: 14px 16px; border-radius: 10px;
-          border: 1px solid rgba(139,92,246,0.35); background: rgba(139,92,246,0.08);
-          color: var(--text-dim); font-size: 13px; line-height: 1.6;
-        }
-        .boc-side-callout strong { color: var(--text); }
-      `}</style>
     </section>
   );
 }

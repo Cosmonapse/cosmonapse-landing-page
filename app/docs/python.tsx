@@ -91,10 +91,16 @@ const topImportSnippet = `<span class="tk-kw">from</span> cosmonapse <span class
     <span class="tk-cm"># Envelope + helpers</span>
     Signal,
     SignalType,
+    Directed,
+    directed_to,
     AXON_TYPES,
     SYNAPSE_TYPES,
     new_trace_id,
     new_event_id,
+    task_signal,
+    agent_output_signal,
+    <span class="tk-cm"># ... one typed builder per SignalType, task_offer_signal through</span>
+    <span class="tk-cm"># imprinted_signal</span>
 
     <span class="tk-cm"># SDK-raised exceptions</span>
     DendriteProtocolError,
@@ -125,7 +131,11 @@ cloud <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><sp
 <span class="tk-cm"># 3 · MCP server  -  wrap any stdio MCP server's tools as a Neuron</span>
 files <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"files"</span>,
              neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, server<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>,
-                              args<span class="tk-op">=</span>[<span class="tk-str">"/data"</span>], tool<span class="tk-op">=</span><span class="tk-str">"read_file"</span>))`;
+                              args<span class="tk-op">=</span>[<span class="tk-str">"/data"</span>], tool<span class="tk-op">=</span><span class="tk-str">"read_file"</span>))
+
+<span class="tk-cm"># Shortcut: the source-paired factories  -  Axon.ollama() / .huggingface()</span>
+<span class="tk-cm"># / .openai() / .anthropic() / .mcp()  -  do both steps in one call AND</span>
+<span class="tk-cm"># wire the matching recogniser. See the Axon section below.</span>`;
 
 const axonClassSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Axon</span>(LifecycleHooks):
     <span class="tk-kw">def</span> __init__(
@@ -135,12 +145,53 @@ const axonClassSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">A
         neuron_fn:       Callable[[dict, list], Awaitable[dict]],
         capabilities:    list[str] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
         version:         str <span class="tk-op">|</span> <span class="tk-kw">None</span>      <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        neuron_kind:     str <span class="tk-op">=</span> <span class="tk-str">"neuron"</span>,
         context_fetcher: Callable[[str], Awaitable[list]] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        engrams:         list[EngramBinding] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        output_parser:   OutputParser <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
     ) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+
+    <span class="tk-cm"># ── Source-paired factories ─────────────────────────────────</span>
+    <span class="tk-cm"># Create the Neuron AND the Axon in one call, wired with the</span>
+    <span class="tk-cm"># matching recogniser. Every factory returns a plain Axon.</span>
+    <span class="tk-op">@</span>classmethod
+    <span class="tk-kw">def</span> <span class="tk-fn">from_source</span>(cls, source, *, neuron_id,
+                    capabilities<span class="tk-op">=</span><span class="tk-kw">None</span>, version<span class="tk-op">=</span><span class="tk-kw">None</span>, neuron_kind<span class="tk-op">=</span><span class="tk-str">"neuron"</span>,
+                    context_fetcher<span class="tk-op">=</span><span class="tk-kw">None</span>, engrams<span class="tk-op">=</span><span class="tk-kw">None</span>,
+                    recognize<span class="tk-op">=</span><span class="tk-kw">True</span>, teach_intents<span class="tk-op">=</span><span class="tk-kw">None</span>,
+                    <span class="tk-op">**</span>source_kwargs) <span class="tk-op">-></span> <span class="tk-str">"Axon"</span>: ...
+    <span class="tk-cm"># source: ollama | huggingface/hf | openai | anthropic | groq |</span>
+    <span class="tk-cm">#         openrouter | together | mistral | mcp</span>
+
+    <span class="tk-cm"># Shorthands over from_source():</span>
+    <span class="tk-op">@</span>classmethod
+    <span class="tk-kw">def</span> <span class="tk-fn">ollama</span>(cls, neuron_id, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> <span class="tk-str">"Axon"</span>: ...       <span class="tk-cm"># model= required</span>
+    <span class="tk-op">@</span>classmethod
+    <span class="tk-kw">def</span> <span class="tk-fn">huggingface</span>(cls, neuron_id, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> <span class="tk-str">"Axon"</span>: ...  <span class="tk-cm"># endpoint= required; alias Axon.hf</span>
+    <span class="tk-op">@</span>classmethod
+    <span class="tk-kw">def</span> <span class="tk-fn">openai</span>(cls, neuron_id, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> <span class="tk-str">"Axon"</span>: ...       <span class="tk-cm"># model= required; api_key or OPENAI_API_KEY</span>
+    <span class="tk-op">@</span>classmethod
+    <span class="tk-kw">def</span> <span class="tk-fn">anthropic</span>(cls, neuron_id, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> <span class="tk-str">"Axon"</span>: ...    <span class="tk-cm"># model= required; api_key or ANTHROPIC_API_KEY</span>
+    <span class="tk-op">@</span>classmethod
+    <span class="tk-kw">def</span> <span class="tk-fn">mcp</span>(cls, neuron_id, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> <span class="tk-str">"Axon"</span>: ...          <span class="tk-cm"># command= or server= (+ args, tool)</span>
 
     <span class="tk-kw">async def</span> <span class="tk-fn">handle_task</span>(self, task: Signal) <span class="tk-op">-></span> Signal: ...
     <span class="tk-cm"># Called by the Dendrite. Resolves context_ref, invokes neuron_fn,</span>
     <span class="tk-cm"># wraps the result in AGENT_OUTPUT / CLARIFICATION / PERMISSION / ERROR.</span>
+
+    <span class="tk-cm"># Pre-task hook  -  transform / validate / reject the TASK input.</span>
+    <span class="tk-cm"># Return a dict to replace the input, None to pass through, or raise</span>
+    <span class="tk-cm"># to reject (surfaces as ERROR code NEURON_EXCEPTION).</span>
+    <span class="tk-op">@</span>axon.before_task
+
+    <span class="tk-cm"># Detectors over the Neuron's RAW output  -  named detects_* to stay</span>
+    <span class="tk-cm"># distinct from the Dendrite's on_* (which consume inbound Signals).</span>
+    <span class="tk-cm"># Return the intent's fields (dict) to match, None to fall through.</span>
+    <span class="tk-cm"># Precedence: error -> clarification -> permission -> output.</span>
+    <span class="tk-op">@</span>axon.detects_output           <span class="tk-cm"># -> AGENT_OUTPUT payload</span>
+    <span class="tk-op">@</span>axon.detects_clarification    <span class="tk-cm"># -> {"question": ..., "context": ...}</span>
+    <span class="tk-op">@</span>axon.detects_permission       <span class="tk-cm"># -> {"action": ..., "scope": ..., "reason": ...}</span>
+    <span class="tk-op">@</span>axon.detects_error            <span class="tk-cm"># -> {"code": ..., "message": ..., "recoverable": ...}</span>
 
     <span class="tk-cm"># Inherited from LifecycleHooks:</span>
     <span class="tk-op">@</span>axon.on_connect          <span class="tk-cm"># after the hosting Dendrite emits REGISTER</span>
@@ -174,6 +225,8 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
         heartbeat_s:             float <span class="tk-op">=</span> <span class="tk-num">30.0</span>,
         reregister_on_heartbeat: bool  <span class="tk-op">=</span> <span class="tk-kw">True</span>,
         role:            str   <span class="tk-op">=</span> <span class="tk-str">"orchestrator"</span>,  <span class="tk-cm"># or "worker"</span>
+        auto_bid:        bool  <span class="tk-op">=</span> <span class="tk-kw">True</span>,   <span class="tk-cm"># default bidder for hosted Axons</span>
+        stale_after_s:   float <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,  <span class="tk-cm"># liveness sweep; default 3 heartbeats</span>
     ) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
 
     <span class="tk-cm"># Aggregate of every attached Axon's capabilities (sorted, deduped).</span>
@@ -189,7 +242,8 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
 
     <span class="tk-cm"># ── Axon lifecycle ──────────────────────────────────────────</span>
     <span class="tk-kw">def</span>    <span class="tk-fn">attach_axon</span>(self, axon: Axon) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
-    <span class="tk-kw">def</span>    <span class="tk-fn">detach_axon</span>(self, neuron_id: str) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">detach_axon</span>(self, neuron_id: str, *, reason<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">add_axon</span>(self, axon: Axon) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...   <span class="tk-cm"># attach while running</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">start</span>(self) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
     <span class="tk-kw">async def</span> <span class="tk-fn">stop</span>(self, reason: str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
     <span class="tk-kw">async def</span> __aenter__(self) <span class="tk-op">-></span> <span class="tk-str">"Dendrite"</span>: ...
@@ -205,6 +259,7 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
         parent_id:    str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
         context_ref:  str  <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
         capabilities: list[str] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        finalize:     bool <span class="tk-op">=</span> <span class="tk-kw">False</span>,  <span class="tk-cm"># worker promotes AGENT_OUTPUT to FINAL</span>
         meta:         dict <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
     ) <span class="tk-op">-></span> Signal: ...        <span class="tk-cm"># fire-and-forget; returns the emitted TASK</span>
 
@@ -215,14 +270,17 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
         input:        dict,
         capabilities: list[str] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
         scope:        str  <span class="tk-op">=</span> <span class="tk-str">"all"</span>,
+        finalize:     bool <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,  <span class="tk-cm"># default: True when scope="terminal"</span>
         <span class="tk-cm"># ... trace_id, parent_id, context_ref, meta as above ...</span>
     ) <span class="tk-op">-></span> Pathway: ...
 
     <span class="tk-cm"># Sugar: dispatch, block until terminal Signal, close, return Signal.</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">dispatch_and_wait</span>(
         self, *, neuron<span class="tk-op">=</span><span class="tk-kw">None</span>, input, capabilities<span class="tk-op">=</span><span class="tk-kw">None</span>,
-        timeout_s: float <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-num">30.0</span>, scope<span class="tk-op">=</span><span class="tk-str">"all"</span>, <span class="tk-op">**</span>kw,
+        timeout_s: float <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-num">30.0</span>, scope<span class="tk-op">=</span><span class="tk-str">"all"</span>, finalize<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw,
     ) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-cm"># scope="terminal" waits for FINAL/ERROR only; finalize defaults True</span>
+    <span class="tk-cm"># there, so a stock worker's AGENT_OUTPUT is promoted to FINAL.</span>
 
     <span class="tk-cm"># Sugar: dispatch, return the live Pathway (caller wires @pw.on(...)).</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">dispatch_and_subscribe</span>(
@@ -242,6 +300,18 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
 
     <span class="tk-cm"># Watch a trace another peer started (no TASK emitted).</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">observe_pathway</span>(self, trace_id: str) <span class="tk-op">-></span> Pathway: ...
+
+    <span class="tk-cm"># ── Interactive cognition (CLARIFICATION / PERMISSION loop) ─</span>
+    <span class="tk-cm"># Await the discrete CLARIFICATION_ANSWER / PERMISSION_DECISION</span>
+    <span class="tk-cm"># whose parent_id == request.id (op-pathway under the hood).</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">await_decision</span>(self, request: Signal, *, timeout_s<span class="tk-op">=</span><span class="tk-num">30.0</span>) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">answer_clarification</span>(self, request: Signal, *, answer, meta<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> Signal: ...
+
+    <span class="tk-cm"># ── Engram  -  shared memory (RECALL / IMPRINT) ─────────────</span>
+    <span class="tk-kw">def</span>       <span class="tk-fn">attach_engram</span>(self, engram: Engram) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">detach_engram</span>(self, engram_id: str) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">recall</span>(self, *, engram_id<span class="tk-op">=</span><span class="tk-kw">None</span>, engram_kind<span class="tk-op">=</span><span class="tk-kw">None</span>, query, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> RecallResult: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">imprint</span>(self, *, engram_id<span class="tk-op">=</span><span class="tk-kw">None</span>, engram_kind<span class="tk-op">=</span><span class="tk-kw">None</span>, op, entry, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> ImprintReceipt <span class="tk-op">|</span> <span class="tk-kw">None</span>: ...
 
     <span class="tk-cm"># Worker side: react to TASK_OFFER + emit a BID (bypasses role guard).</span>
     <span class="tk-kw">def</span>       <span class="tk-fn">on_task_offer</span>(self, fn<span class="tk-op">=</span><span class="tk-kw">None</span>, *, capability<span class="tk-op">=</span><span class="tk-kw">None</span>, trace_id<span class="tk-op">=</span><span class="tk-kw">None</span>): ...
@@ -270,13 +340,60 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
     <span class="tk-cm"># type guard (only SYNAPSE_TYPES accepted). bid() uses _publish to bypass.</span>
 
     <span class="tk-cm"># ── Inbound handler decorators ──────────────────────────────</span>
+    <span class="tk-cm"># One per SignalType, all accepting the same optional filters:</span>
+    <span class="tk-cm">#   (neuron=, capability=, trace_id=)</span>
+
+    <span class="tk-cm"># Lifecycle</span>
+    <span class="tk-op">@</span>dendrite.on_task_signal
     <span class="tk-op">@</span>dendrite.on_agent_output
+    <span class="tk-op">@</span>dendrite.on_final
+    <span class="tk-op">@</span>dendrite.on_error_signal
+
+    <span class="tk-cm"># Routing / bidding</span>
+    <span class="tk-op">@</span>dendrite.on_task_offer                     <span class="tk-cm"># registering one suppresses the auto-bidder</span>
+    <span class="tk-op">@</span>dendrite.on_bid
+    <span class="tk-op">@</span>dendrite.on_task_awarded
+    <span class="tk-op">@</span>dendrite.on_task_declined
+
+    <span class="tk-cm"># Cognition</span>
+    <span class="tk-op">@</span>dendrite.on_plan
+    <span class="tk-op">@</span>dendrite.on_thought_delta
+    <span class="tk-op">@</span>dendrite.on_tool_call
+    <span class="tk-op">@</span>dendrite.on_tool_result
+    <span class="tk-op">@</span>dendrite.on_memory_append
+    <span class="tk-op">@</span>dendrite.on_critique
+    <span class="tk-op">@</span>dendrite.on_escalation
+    <span class="tk-op">@</span>dendrite.on_consensus
+    <span class="tk-op">@</span>dendrite.on_context_sync
+
+    <span class="tk-cm"># Interactive cognition (see await_decision)</span>
     <span class="tk-op">@</span>dendrite.on_clarification
     <span class="tk-op">@</span>dendrite.on_permission
-    <span class="tk-op">@</span>dendrite.on_error            <span class="tk-cm"># alias of on_error_signal</span>
-    <span class="tk-op">@</span>dendrite.on_register         <span class="tk-cm"># alias of on_register_signal</span>
-    <span class="tk-op">@</span>dendrite.on_deregister       <span class="tk-cm"># alias of on_deregister_signal</span>
-    <span class="tk-op">@</span>dendrite.on_heartbeat        <span class="tk-cm"># alias of on_heartbeat_signal</span>
+    <span class="tk-op">@</span>dendrite.on_clarification_answer
+    <span class="tk-op">@</span>dendrite.on_permission_decision
+
+    <span class="tk-cm"># Engram</span>
+    <span class="tk-op">@</span>dendrite.on_recall_signal                  <span class="tk-cm"># requests crossing the bus</span>
+    <span class="tk-op">@</span>dendrite.on_imprint_signal
+    <span class="tk-op">@</span>dendrite.on_recalled                       <span class="tk-cm"># responses (observability)</span>
+    <span class="tk-op">@</span>dendrite.on_imprinted
+
+    <span class="tk-cm"># Agent management + discovery</span>
+    <span class="tk-op">@</span>dendrite.on_register_signal
+    <span class="tk-op">@</span>dendrite.on_deregister_signal
+    <span class="tk-op">@</span>dendrite.on_heartbeat_signal
+    <span class="tk-op">@</span>dendrite.on_discover
+    <span class="tk-cm"># (on_error / on_register / on_deregister / on_heartbeat are</span>
+    <span class="tk-cm">#  DEPRECATED short aliases  -  prefer the *_signal names)</span>
+
+    <span class="tk-cm"># Generic escape hatches</span>
+    <span class="tk-op">@</span>dendrite.on_signal(SignalType.X, neuron<span class="tk-op">=</span>..., capability<span class="tk-op">=</span>..., trace_id<span class="tk-op">=</span>...)
+    <span class="tk-op">@</span>dendrite.on_trace(trace_id, *types)   <span class="tk-cm"># every (or selected) type on one trace</span>
+
+    <span class="tk-cm"># Inherited from LifecycleHooks</span>
+    <span class="tk-op">@</span>dendrite.on_connect                        <span class="tk-cm"># after this Dendrite registers</span>
+    <span class="tk-op">@</span>dendrite.on_refresh                        <span class="tk-cm"># heartbeat / register / deregister</span>
+    <span class="tk-op">@</span>dendrite.on_schedule(every_s<span class="tk-op">=</span>N)    <span class="tk-cm"># periodic background coroutine</span>
 
     <span class="tk-cm"># subscribe() is a coroutine, NOT a decorator:</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">subscribe</span>(self, signal_type: SignalType, handler, *, queue_group<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> Subscription: ...
@@ -456,7 +573,7 @@ const signalSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Sign
     trace_id:  str                     <span class="tk-cm"># trc_&lt;ULID&gt;, auto-generated</span>
     parent_id: str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>
     type:      SignalType
-    neuron:    str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>
+    directed:  Directed <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>  <span class="tk-cm"># unified addressing</span>
     ts:        datetime                <span class="tk-cm"># UTC, auto-set on construction</span>
     payload:   dict <span class="tk-op">=</span> {}
     meta:      dict <span class="tk-op">=</span> {}
@@ -465,7 +582,17 @@ const signalSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Sign
     <span class="tk-kw">def</span> <span class="tk-fn">encode</span>(self) <span class="tk-op">-></span> bytes: ...            <span class="tk-cm"># compact JSON bytes for the wire</span>
     <span class="tk-op">@</span>classmethod
     <span class="tk-kw">def</span> <span class="tk-fn">decode</span>(cls, data: bytes <span class="tk-op">|</span> str) <span class="tk-op">-></span> <span class="tk-str">"Signal"</span>: ...
-    <span class="tk-kw">def</span> <span class="tk-fn">reply</span>(self, *, type, payload<span class="tk-op">=</span><span class="tk-kw">None</span>, neuron<span class="tk-op">=</span><span class="tk-kw">None</span>, meta<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> <span class="tk-str">"Signal"</span>: ...`;
+    <span class="tk-kw">def</span> <span class="tk-fn">reply</span>(self, type, payload<span class="tk-op">=</span><span class="tk-kw">None</span>, directed<span class="tk-op">=</span><span class="tk-kw">None</span>, meta<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> <span class="tk-str">"Signal"</span>: ...
+    <span class="tk-cm"># Child Signal sharing this trace, parented to this id. directed</span>
+    <span class="tk-cm"># propagates from the source unless overridden.</span>
+
+<span class="tk-kw">class</span> <span class="tk-fn">Directed</span>(BaseModel):   <span class="tk-cm"># precedence on receive: id > type > capabilities</span>
+    id:           str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>   <span class="tk-cm"># direct address (neuron_id or engram_id)</span>
+    type:         str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>   <span class="tk-cm"># type routing (neuron type or engram_kind)</span>
+    capabilities: list[str] <span class="tk-op">=</span> []     <span class="tk-cm"># capability routing</span>
+
+<span class="tk-cm"># Producer identity rides directed too: an AGENT_OUTPUT's directed.id</span>
+<span class="tk-cm"># is the neuron_id that produced it (there is no Signal.neuron field).</span>`;
 
 const signalTypeSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">SignalType</span>(str, Enum):
     <span class="tk-cm"># Lifecycle</span>
@@ -499,10 +626,19 @@ const signalTypeSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">
     PERMISSION_DECISION  <span class="tk-op">=</span> <span class="tk-str">"PERMISSION_DECISION"</span>
     CLARIFICATION_ANSWER <span class="tk-op">=</span> <span class="tk-str">"CLARIFICATION_ANSWER"</span>
 
+    <span class="tk-cm"># Engram  -  shared memory</span>
+    RECALL          <span class="tk-op">=</span> <span class="tk-str">"RECALL"</span>
+    RECALLED        <span class="tk-op">=</span> <span class="tk-str">"RECALLED"</span>
+    IMPRINT         <span class="tk-op">=</span> <span class="tk-str">"IMPRINT"</span>
+    IMPRINTED       <span class="tk-op">=</span> <span class="tk-str">"IMPRINTED"</span>
+
     <span class="tk-cm"># Agent management</span>
     REGISTER        <span class="tk-op">=</span> <span class="tk-str">"REGISTER"</span>
     DEREGISTER      <span class="tk-op">=</span> <span class="tk-str">"DEREGISTER"</span>
     HEARTBEAT       <span class="tk-op">=</span> <span class="tk-str">"HEARTBEAT"</span>
+
+    <span class="tk-cm"># Discovery</span>
+    DISCOVER        <span class="tk-op">=</span> <span class="tk-str">"DISCOVER"</span>
 
 <span class="tk-cm"># Frozensets defining who may emit what:</span>
 <span class="tk-fn">AXON_TYPES</span>     <span class="tk-cm"># AGENT_OUTPUT, CLARIFICATION, PERMISSION, ERROR, REGISTER, DEREGISTER, HEARTBEAT</span>
@@ -517,9 +653,15 @@ eid   <span class="tk-op">=</span> <span class="tk-fn">new_event_id</span>()    
 <span class="tk-cm"># Call new_trace_id() at the top of any externally-triggered request</span>
 <span class="tk-cm"># so you can correlate Doppler output with HTTP request IDs.</span>`;
 
-const errorsSnippet = `<span class="tk-cm"># The SDK raises exactly one custom exception type today.</span>
-<span class="tk-kw">class</span> <span class="tk-fn">DendriteProtocolError</span>(ValueError): ...   <span class="tk-cm"># illegal emit() type</span>
+const errorsSnippet = `<span class="tk-cm"># Protocol misuse:</span>
+<span class="tk-kw">class</span> <span class="tk-fn">DendriteProtocolError</span>(ValueError): ...   <span class="tk-cm"># illegal emit() / await_decision type</span>
 CortexProtocolError <span class="tk-op">=</span> DendriteProtocolError   <span class="tk-cm"># back-compat alias</span>
+
+<span class="tk-cm"># Engram errors (see the Engram reference):</span>
+<span class="tk-cm">#   EngramError, EngramTimeout, EngramCancelled, EngramNotBound, EngramOverloaded</span>
+
+<span class="tk-cm"># Pathway:</span>
+<span class="tk-cm">#   PathwayClosedError  -  Pathway closed before a matching Signal arrived</span>
 
 <span class="tk-cm"># Everything else surfaces as a stdlib / dependency exception:</span>
 <span class="tk-cm">#   ValueError        -  bad envelope id prefix, unknown synapse URL scheme</span>
@@ -532,6 +674,32 @@ CortexProtocolError <span class="tk-op">=</span> DendriteProtocolError   <span c
     <span class="tk-kw">await</span> dendrite.<span class="tk-fn">emit</span>(some_agent_output_signal)
 <span class="tk-kw">except</span> DendriteProtocolError <span class="tk-kw">as</span> e:
     log.error(<span class="tk-str">"Dendrite may only emit synapse-side types: %s"</span>, e)`;
+
+const axonFactorySnippet = `<span class="tk-kw">import</span> os
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon
+
+<span class="tk-cm"># One call: Neuron factory + Axon wiring + recogniser. Equivalent to</span>
+<span class="tk-cm"># Axon(neuron_id=..., neuron_fn=Neuron(source=...), output_parser=...).</span>
+chat = Axon.<span class="tk-fn">huggingface</span>(
+    neuron_id<span class="tk-op">=</span><span class="tk-str">"llama"</span>,
+    endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
+    model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
+    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
+    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>,
+    capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>],
+)
+
+cloud = Axon.<span class="tk-fn">openai</span>(neuron_id<span class="tk-op">=</span><span class="tk-str">"gpt"</span>, model<span class="tk-op">=</span><span class="tk-str">"gpt-4o"</span>)         <span class="tk-cm"># api_key falls back to OPENAI_API_KEY</span>
+local = Axon.<span class="tk-fn">ollama</span>(neuron_id<span class="tk-op">=</span><span class="tk-str">"chat"</span>, model<span class="tk-op">=</span><span class="tk-str">"llama3"</span>)
+files = Axon.<span class="tk-fn">mcp</span>(neuron_id<span class="tk-op">=</span><span class="tk-str">"files"</span>, server<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>, args<span class="tk-op">=</span>[<span class="tk-str">"/data"</span>])
+
+<span class="tk-cm"># recognize=True (default) wires the source-family recogniser: the LLM</span>
+<span class="tk-cm"># recogniser parses a {"cosmo": ...} intent block out of the model's text</span>
+<span class="tk-cm"># (so it can emit CLARIFICATION / PERMISSION / ERROR, not just output);</span>
+<span class="tk-cm"># the MCP recogniser maps is_error -> ERROR. teach_intents (default: on</span>
+<span class="tk-cm"># for system=-capable LLM sources) appends COSMO_INTENT_SYSTEM_PROMPT so</span>
+<span class="tk-cm"># the model knows the convention. Opt out of both:</span>
+raw = Axon.<span class="tk-fn">openai</span>(neuron_id<span class="tk-op">=</span><span class="tk-str">"raw"</span>, model<span class="tk-op">=</span><span class="tk-str">"gpt-4o"</span>, recognize<span class="tk-op">=</span><span class="tk-kw">False</span>)`;
 
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
 
@@ -706,6 +874,26 @@ export default function PythonDocs({ section }: { section?: string }) {
         <h3 className="docs-h3">Methods</h3>
         <ApiCard kind="async method" name="Axon.handle_task(task: Signal) -> Signal" summary="Called by the Dendrite for each inbound TASK. Resolves context_ref, invokes neuron_fn, and returns the corresponding outbound Signal (AGENT_OUTPUT, CLARIFICATION, PERMISSION, or ERROR). Application code never calls this directly." />
 
+        <h3 className="docs-h3">Source-paired factories</h3>
+        <p className="docs-p">
+          The second way to build an Axon. <code className="inline">Axon.from_source(source, ...)</code>{" "}
+          and its shorthands  -  <code className="inline">Axon.ollama()</code>,{" "}
+          <code className="inline">Axon.huggingface()</code> (alias{" "}
+          <code className="inline">Axon.hf</code>), <code className="inline">Axon.openai()</code>,{" "}
+          <code className="inline">Axon.anthropic()</code>,{" "}
+          <code className="inline">Axon.mcp()</code>  -  create the provider-backed Neuron{" "}
+          <em>and</em> the Axon in one call. Extra kwargs flow to the{" "}
+          <code className="inline">Neuron(source=...)</code> factory; the Axon kwargs
+          (<code className="inline">capabilities</code>, <code className="inline">version</code>,{" "}
+          <code className="inline">engrams</code>, ...) keep their meaning. By default the Axon is
+          also wired with the source family&rsquo;s recogniser{" "}
+          (<code className="inline">recognize=True</code>) and the model is taught the{" "}
+          <code className="inline">{"{\"cosmo\": ...}"}</code> intent convention{" "}
+          (<code className="inline">teach_intents</code>) where the source accepts a{" "}
+          <code className="inline">system=</code> prompt.
+        </p>
+        <CodeBlock filename="factories.py" html={axonFactorySnippet} maxWidth={880} />
+
         <h3 className="docs-h3">Example</h3>
         <CodeBlock filename="answerer.py" html={axonUseSnippet} maxWidth={820} />
       </Section>
@@ -785,9 +973,14 @@ export default function PythonDocs({ section }: { section?: string }) {
 
         <h3 className="docs-h3">Inbound handlers</h3>
         <p className="docs-p">
-          The six <code className="inline">on_*</code> methods are decorators you apply to a coroutine.
-          For any other type, <code className="inline">subscribe()</code> is a coroutine  -  not a
-          decorator  -  that takes the type and a handler and returns a{" "}
+          Every SignalType has a named <code className="inline">on_*</code> decorator you apply to a
+          coroutine, and all of them accept the same optional filters:{" "}
+          <code className="inline">neuron=</code>, <code className="inline">capability=</code>,{" "}
+          <code className="inline">trace_id=</code>.{" "}
+          <code className="inline">on_signal(SignalType.X, ...)</code> is the generic escape hatch
+          behind the named sugar, <code className="inline">on_trace(trace_id, *types)</code> registers
+          one handler across a whole trace, and <code className="inline">subscribe()</code> is a
+          coroutine  -  not a decorator  -  returning a raw{" "}
           <code className="inline">Subscription</code>.
         </p>
         <table className="spec-table">
@@ -798,14 +991,26 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </thead>
           <tbody>
-            <tr><td>@dendrite.on_agent_output</td><td>Every AGENT_OUTPUT on the namespace.</td></tr>
-            <tr><td>@dendrite.on_clarification</td><td>Every CLARIFICATION on the namespace.</td></tr>
-            <tr><td>@dendrite.on_permission</td><td>Every PERMISSION request. Reply with respond_to_permission / grant_permission / deny_permission.</td></tr>
-            <tr><td>@dendrite.on_error</td><td>Every ERROR on the namespace.</td></tr>
-            <tr><td>@dendrite.on_register</td><td>Every REGISTER (including re-registers attached to HEARTBEATs).</td></tr>
-            <tr><td>@dendrite.on_deregister</td><td>Every DEREGISTER.</td></tr>
-            <tr><td>@dendrite.on_heartbeat</td><td>Every HEARTBEAT.</td></tr>
-            <tr><td>await dendrite.subscribe(SignalType.X, handler)</td><td>Any other type. Returns a Subscription you can later unsubscribe.</td></tr>
+            <tr><td>@dendrite.on_task_signal</td><td>Every TASK on the namespace.</td></tr>
+            <tr><td>@dendrite.on_agent_output</td><td>Every AGENT_OUTPUT.</td></tr>
+            <tr><td>@dendrite.on_final</td><td>Every FINAL  -  workflow conclusion.</td></tr>
+            <tr><td>@dendrite.on_error_signal</td><td>Every ERROR. (@dendrite.on_error is a deprecated alias.)</td></tr>
+            <tr><td>@dendrite.on_task_offer</td><td>Every TASK_OFFER. Registering one suppresses the default auto-bidder.</td></tr>
+            <tr><td>@dendrite.on_bid / on_task_awarded / on_task_declined</td><td>The bidding flow  -  market observability.</td></tr>
+            <tr><td>@dendrite.on_plan / on_thought_delta / on_tool_call / on_tool_result</td><td>The cognition stream.</td></tr>
+            <tr><td>@dendrite.on_memory_append / on_critique / on_escalation / on_consensus / on_context_sync</td><td>The remaining cognition / coordination types.</td></tr>
+            <tr><td>@dendrite.on_clarification</td><td>Every CLARIFICATION. Reply with answer_clarification (discrete) or respond_to_clarification (re-dispatch).</td></tr>
+            <tr><td>@dendrite.on_permission</td><td>Every PERMISSION request. Reply with grant_permission / deny_permission / respond_to_permission.</td></tr>
+            <tr><td>@dendrite.on_clarification_answer / on_permission_decision</td><td>The discrete answers  -  the decorator counterparts of await_decision().</td></tr>
+            <tr><td>@dendrite.on_recall_signal / on_imprint_signal</td><td>Engram requests crossing the bus.</td></tr>
+            <tr><td>@dendrite.on_recalled / on_imprinted</td><td>Engram responses (observability; EngramClient owns correlation).</td></tr>
+            <tr><td>@dendrite.on_register_signal</td><td>Every REGISTER, including re-registers attached to HEARTBEATs. (on_register is a deprecated alias.)</td></tr>
+            <tr><td>@dendrite.on_deregister_signal / on_heartbeat_signal</td><td>DEREGISTER / HEARTBEAT. (Short aliases deprecated.)</td></tr>
+            <tr><td>@dendrite.on_discover</td><td>Every DISCOVER  -  answer with your hosted Axons (cosmo registry list uses this).</td></tr>
+            <tr><td>@dendrite.on_signal(SignalType.X, neuron=…, capability=…, trace_id=…)</td><td>Any SignalType  -  the generic form with the same filters.</td></tr>
+            <tr><td>@dendrite.on_trace(trace_id, *types)</td><td>Every (or the selected) type on one trace.</td></tr>
+            <tr><td>@dendrite.on_connect / on_refresh / on_schedule(every_s=N)</td><td>LifecycleHooks  -  not Signals: fired on registration, registry refresh, and a timer.</td></tr>
+            <tr><td>await dendrite.subscribe(SignalType.X, handler)</td><td>Raw subscription. Returns a Subscription you can later unsubscribe.</td></tr>
           </tbody>
         </table>
 
@@ -1084,12 +1289,14 @@ export default function PythonDocs({ section }: { section?: string }) {
       {/* ─── Errors (protocol exceptions) ─── */}
       <Section id="errors" eyebrow="SDK · 12" title="Protocol errors">
         <p className="docs-p">
-          The SDK is deliberately thin on bespoke exceptions. The only custom type is{" "}
+          The SDK is deliberately thin on bespoke exceptions.{" "}
           <code className="inline">DendriteProtocolError</code> (a{" "}
-          <code className="inline">ValueError</code> subclass), raised when you try to{" "}
-          <code className="inline">emit()</code> a Signal whose type isn&rsquo;t in{" "}
-          <code className="inline">SYNAPSE_TYPES</code>. Everything else surfaces as a standard library
-          or dependency exception.
+          <code className="inline">ValueError</code> subclass) is raised for protocol misuse  -  e.g.
+          when you <code className="inline">emit()</code> a Signal whose type isn&rsquo;t in{" "}
+          <code className="inline">SYNAPSE_TYPES</code>. The Engram surface adds{" "}
+          <code className="inline">EngramError</code> and its subclasses, and Pathways raise{" "}
+          <code className="inline">PathwayClosedError</code> when closed early. Everything else
+          surfaces as a standard library or dependency exception.
         </p>
         <CodeBlock filename="errors.py" html={errorsSnippet} maxWidth={840} />
         <table className="spec-table">

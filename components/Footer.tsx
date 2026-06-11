@@ -11,8 +11,8 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-brand">
             <Link href="/" className="logo">
-              <Image src={mark} alt="" width={24} height={24} className="logo-mark-img" />
-              Cosmonapse
+              <Image src={mark} alt="" width={34} height={34} className="logo-mark-img" />
+              <span className="brand-word">Cosmonapse</span>
             </Link>
             <p>
               Distributed cognition protocol for autonomous AI agents. One envelope. One channel. Replaceable
@@ -95,7 +95,7 @@ export default function Footer() {
         </div>
         <div className="footer-bottom">
           <span>© 2026 Cosmonapse  -  Research preview</span>
-          <span>v0.1.0-alpha</span>
+          <span>v0.1.3-alpha</span>
         </div>
       </div>
     </footer>

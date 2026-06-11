@@ -47,8 +47,8 @@ export default function Nav() {
     <nav className="nav">
       <div className="container nav-inner">
         <Link href="/" className="logo">
-          <Image src={mark} alt="" width={24} height={24} className="logo-mark-img" priority />
-          Cosmonapse
+          <Image src={mark} alt="" width={34} height={34} className="logo-mark-img" priority />
+          <span className="brand-word">Cosmonapse</span>
         </Link>
         <ul className="nav-links">
           {links.map((l) => (

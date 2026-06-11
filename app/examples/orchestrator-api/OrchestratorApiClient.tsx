@@ -335,7 +335,7 @@ const pyDecorators = `<span class="tk-cm"># Attach these to your orchestrator De
 <span class="tk-cm"># use the decorator for side-effects (logging, metrics, webhooks).</span>
 <span class="tk-op">@</span>orchestrator.<span class="tk-fn">on_agent_output</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">_log_output</span>(sig):
-    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"[{sig.trace_id[:8]}] output from {sig.neuron}"</span>)
+    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"[{sig.trace_id[:8]}] output from {sig.directed.id if sig.directed else '?'}"</span>)
 
 <span class="tk-op">@</span>orchestrator.<span class="tk-fn">on_agent_output</span>(neuron<span class="tk-op">=</span><span class="tk-str">"worker"</span>)            <span class="tk-cm"># narrow by id</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">_worker_done</span>(sig): ...
@@ -400,11 +400,11 @@ const pyDecorators = `<span class="tk-cm"># Attach these to your orchestrator De
 <span class="tk-cm"># Use to maintain a live worker roster or drive health dashboards.</span>
 <span class="tk-op">@</span>orchestrator.<span class="tk-fn">on_register_signal</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">_on_register</span>(sig):
-    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"worker joined: {sig.neuron}  caps={sig.payload.get('capabilities')}"</span>)
+    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"worker joined: {sig.directed.id if sig.directed else '?'}  caps={sig.payload.get('capabilities')}"</span>)
 
 <span class="tk-op">@</span>orchestrator.<span class="tk-fn">on_heartbeat_signal</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">_on_heartbeat</span>(sig):
-    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"heartbeat: {sig.neuron}"</span>)
+    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"heartbeat: {sig.directed.id if sig.directed else '?'}"</span>)
 
 
 <span class="tk-cm"># ── on_trace — every Signal for one workflow ──────────────────────────────</span>
@@ -414,7 +414,7 @@ trace_id <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()
 
 <span class="tk-op">@</span>orchestrator.<span class="tk-fn">on_trace</span>(trace_id)
 <span class="tk-kw">async def</span> <span class="tk-fn">_trace_all</span>(sig):
-    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"  [{sig.type.value:20}] {sig.neuron}"</span>)
+    <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"  [{sig.type.value:20}] {sig.directed.id if sig.directed else '?'}"</span>)
 
 reply <span class="tk-op">=</span> <span class="tk-kw">await</span> orchestrator.<span class="tk-fn">dispatch_and_wait</span>(
     neuron<span class="tk-op">=</span><span class="tk-str">"worker"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: prompt}, trace_id<span class="tk-op">=</span>trace_id,
@@ -425,7 +425,7 @@ const tsDecorators = `<span class="tk-cm">// Attach to the module-level Dendrite
 
 <span class="tk-cm">// ── onAgentOutput ─────────────────────────────────────────────────────────</span>
 dendrite.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`[\${sig.trace_id.slice(0, 8)}] output from \${sig.neuron}\`</span>));
+  console.<span class="tk-fn">log</span>(<span class="tk-str">\`[\${sig.trace_id.slice(0, 8)}] output from \${sig.directed.id if sig.directed else '?'}\`</span>));
 
 dendrite.<span class="tk-fn">onAgentOutput</span>({ neuron: <span class="tk-str">"worker"</span> }, (sig) <span class="tk-op">=&gt;</span> { <span class="tk-cm">/* narrow by id */</span> });
 dendrite.<span class="tk-fn">onAgentOutput</span>({ capability: <span class="tk-str">"text-generation"</span> }, (sig) <span class="tk-op">=&gt;</span> { <span class="tk-cm">/* narrow by cap */</span> });
@@ -467,15 +467,15 @@ dendrite.<span class="tk-fn">onToolResult</span>((sig) <span class="tk-op">=&gt;
 
 <span class="tk-cm">// ── onRegisterSignal / onHeartbeatSignal ──────────────────────────────────</span>
 dendrite.<span class="tk-fn">onRegisterSignal</span>((sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`worker joined: \${sig.neuron}\`</span>));
+  console.<span class="tk-fn">log</span>(<span class="tk-str">\`worker joined: \${sig.directed.id if sig.directed else '?'}\`</span>));
 dendrite.<span class="tk-fn">onHeartbeatSignal</span>((sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`heartbeat: \${sig.neuron}\`</span>));
+  console.<span class="tk-fn">log</span>(<span class="tk-str">\`heartbeat: \${sig.directed.id if sig.directed else '?'}\`</span>));
 
 
 <span class="tk-cm">// ── onTrace — every Signal for one workflow ───────────────────────────────</span>
 <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
 dendrite.<span class="tk-fn">onTrace</span>(traceId, (sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`  [\${sig.type.padEnd(20)}] \${sig.neuron}\`</span>));
+  console.<span class="tk-fn">log</span>(<span class="tk-str">\`  [\${sig.type.padEnd(20)}] \${sig.directed.id if sig.directed else '?'}\`</span>));
 <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"worker"</span>, input: { prompt }, traceId });`;
 
 const decoratorProseShared = (

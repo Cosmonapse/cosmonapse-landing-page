@@ -91,24 +91,19 @@ process.<span class="tk-fn">on</span>(<span class="tk-str">"SIGINT"</span>, () <
 
 // ── HTTP interface (orchestrator) ──────────────────────────────────────────
 
-const serverPy = `<span class="tk-kw">import</span> asyncio, concurrent.futures, threading
-<span class="tk-kw">from</span> flask <span class="tk-kw">import</span> Flask, request, jsonify
-<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, connect_synapse, new_trace_id
+const serverPy = `<span class="tk-kw">import</span> asyncio, threading
+<span class="tk-kw">from</span> flask <span class="tk-kw">import</span> Flask, jsonify, request
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, connect_synapse
 
 <span class="tk-cm"># asyncio loop in a background thread — Flask stays synchronous.</span>
 loop <span class="tk-op">=</span> asyncio.<span class="tk-fn">new_event_loop</span>()
 threading.<span class="tk-fn">Thread</span>(target<span class="tk-op">=</span>loop.run_forever, daemon<span class="tk-op">=</span><span class="tk-kw">True</span>).<span class="tk-fn">start</span>()
-pending: dict[str, concurrent.futures.Future] <span class="tk-op">=</span> {}
 orch: Dendrite <span class="tk-op">=</span> <span class="tk-kw">None</span>
 
 <span class="tk-kw">async def</span> <span class="tk-fn">setup</span>():
     <span class="tk-kw">global</span> orch
     synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
     orch <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>, role<span class="tk-op">=</span><span class="tk-str">"orchestrator"</span>)
-    <span class="tk-op">@</span>orch.<span class="tk-fn">on_agent_output</span>
-    <span class="tk-kw">async def</span> <span class="tk-fn">on_output</span>(sig):
-        fut <span class="tk-op">=</span> pending.<span class="tk-fn">pop</span>(sig.trace_id, <span class="tk-kw">None</span>)
-        <span class="tk-kw">if</span> fut <span class="tk-kw">and not</span> fut.<span class="tk-fn">done</span>(): fut.<span class="tk-fn">set_result</span>(sig.payload[<span class="tk-str">"output"</span>])
     <span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>()
 
 asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(<span class="tk-fn">setup</span>(), loop).<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">10</span>)
@@ -116,40 +111,35 @@ app <span class="tk-op">=</span> <span class="tk-fn">Flask</span>(__name__)
 
 <span class="tk-op">@</span>app.<span class="tk-fn">post</span>(<span class="tk-str">"/task"</span>)
 <span class="tk-kw">def</span> <span class="tk-fn">submit</span>():
-    trace_id <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()
-    fut <span class="tk-op">=</span> concurrent.futures.<span class="tk-fn">Future</span>()
-    pending[trace_id] <span class="tk-op">=</span> fut
-    <span class="tk-kw">async def</span> <span class="tk-fn">_dispatch</span>():
-        <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatch_task</span>(neuron<span class="tk-op">=</span><span class="tk-str">"llama"</span>,
-                                  input<span class="tk-op">=</span>request.<span class="tk-fn">get_json</span>(), trace_id<span class="tk-op">=</span>trace_id)
-    asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(<span class="tk-fn">_dispatch</span>(), loop).<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">5</span>)
-    <span class="tk-kw">return</span> <span class="tk-fn">jsonify</span>(fut.<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">10</span>))
+    <span class="tk-cm"># dispatch_and_wait: emit a TASK, await the first terminal Signal,</span>
+    <span class="tk-cm"># close the Pathway, return the Signal. No manual future plumbing.</span>
+    fut <span class="tk-op">=</span> asyncio.<span class="tk-fn">run_coroutine_threadsafe</span>(
+        orch.<span class="tk-fn">dispatch_and_wait</span>(neuron<span class="tk-op">=</span><span class="tk-str">"llama"</span>,
+                               input<span class="tk-op">=</span>request.<span class="tk-fn">get_json</span>(), timeout_s<span class="tk-op">=</span><span class="tk-num">30.0</span>),
+        loop,
+    )
+    reply <span class="tk-op">=</span> fut.<span class="tk-fn">result</span>(timeout<span class="tk-op">=</span><span class="tk-num">32</span>)
+    <span class="tk-kw">return</span> <span class="tk-fn">jsonify</span>(reply.payload[<span class="tk-str">"output"</span>])
 
 app.<span class="tk-fn">run</span>(port<span class="tk-op">=</span><span class="tk-num">5000</span>)`;
 
 const serverTs = `<span class="tk-kw">import</span> express <span class="tk-kw">from</span> <span class="tk-str">"express"</span>;
-<span class="tk-kw">import</span> { Dendrite, connectSynapse, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+<span class="tk-kw">import</span> { Dendrite, connectSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
-<span class="tk-kw">const</span> app     <span class="tk-op">=</span> <span class="tk-fn">express</span>().<span class="tk-fn">use</span>(express.<span class="tk-fn">json</span>());
-<span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> Map();
+<span class="tk-kw">const</span> app <span class="tk-op">=</span> <span class="tk-fn">express</span>().<span class="tk-fn">use</span>(express.<span class="tk-fn">json</span>());
 
-<span class="tk-cm">// role: "orchestrator" — dispatches TASKs, collects AGENT_OUTPUT replies.</span>
+<span class="tk-cm">// role: "orchestrator" — dispatches TASKs, collects replies.</span>
 <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
 <span class="tk-kw">const</span> orch    <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"quickstart"</span>, role: <span class="tk-str">"orchestrator"</span> });
-
-orch.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=></span> {
-  <span class="tk-kw">const</span> resolve <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-  <span class="tk-kw">if</span> (resolve) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">resolve</span>(sig.payload.output); }
-});
 <span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>();
 
 app.<span class="tk-fn">post</span>(<span class="tk-str">"/task"</span>, <span class="tk-kw">async</span> (req, res) <span class="tk-op">=></span> {
-  <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
-  <span class="tk-kw">const</span> result  <span class="tk-op">=</span> <span class="tk-kw">await new</span> <span class="tk-fn">Promise</span>((resolve) <span class="tk-op">=></span> {
-    pending.<span class="tk-fn">set</span>(traceId, resolve);
-    orch.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"llama"</span>, input: req.body, traceId });
+  <span class="tk-cm">// dispatchAndWait: emit a TASK, await the first terminal Signal,</span>
+  <span class="tk-cm">// close the Pathway, return the Signal. No manual promise plumbing.</span>
+  <span class="tk-kw">const</span> reply <span class="tk-op">=</span> <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatchAndWait</span>({
+    neuron: <span class="tk-str">"llama"</span>, input: req.body, timeoutMs: <span class="tk-num">30_000</span>,
   });
-  res.<span class="tk-fn">json</span>(result);
+  res.<span class="tk-fn">json</span>(reply.payload.output);
 });
 app.<span class="tk-fn">listen</span>(<span class="tk-num">5000</span>);`;
 
@@ -225,8 +215,8 @@ export default function QuickstartPage() {
             <code className="inline">.anthropic()</code>,{" "}
             <code className="inline">.ollama()</code>,{" "}
             <code className="inline">.mcp()</code>) is the source-paired factory — it creates the
-            Neuron and wires the Axon in one call. The TypeScript SDK still uses the two-step{" "}
-            <code className="inline">neuron() + new Axon()</code> pattern. Set{" "}
+            Neuron and wires the Axon in one call  -  in both SDKs (the two-step{" "}
+            <code className="inline">neuron() + new Axon()</code> pattern also works). Set{" "}
             <code className="inline">HF_TOKEN</code> to your{" "}
             <a
               href="https://huggingface.co/settings/tokens"

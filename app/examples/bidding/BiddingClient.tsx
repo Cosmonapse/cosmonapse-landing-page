@@ -65,7 +65,8 @@ const producerSnippet = `<span class="tk-cm"># producer.py - emit TASK_OFFER, co
             select<span class="tk-op">=</span><span class="tk-str">"lowest_cost"</span>,    <span class="tk-cm"># or first_bid / highest_confidence</span>
         )
         sig <span class="tk-op">=</span> <span class="tk-kw">await</span> pw.<span class="tk-fn">wait</span>(timeout_s<span class="tk-op">=</span><span class="tk-num">5.0</span>)
-        <span class="tk-fn">print</span>(<span class="tk-str">"winner:"</span>, sig.neuron, <span class="tk-str">"result:"</span>, sig.payload[<span class="tk-str">"output"</span>])
+        winner <span class="tk-op">=</span> sig.directed.id <span class="tk-kw">if</span> sig.directed <span class="tk-kw">else</span> <span class="tk-str">"?"</span>
+        <span class="tk-fn">print</span>(<span class="tk-str">"winner:"</span>, winner, <span class="tk-str">"result:"</span>, sig.payload[<span class="tk-str">"output"</span>])
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 

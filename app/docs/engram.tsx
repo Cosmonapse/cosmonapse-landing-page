@@ -59,8 +59,8 @@ const importSnippet = `<span class="tk-cm"># Everything public is re-exported fr
 const bindingSnippet = `<span class="tk-nd">@dataclass</span>(frozen=<span class="tk-kw">True</span>)
 <span class="tk-kw">class</span> <span class="tk-fn">EngramBinding</span>:
     name:                 <span class="tk-fn">str</span>
-    engram_id:            <span class="tk-fn">str</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>
-    engram_kind:          <span class="tk-fn">str</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>
+    directed_id:          <span class="tk-fn">str</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>   <span class="tk-cm"># the engram_id (directed.id on the wire)</span>
+    directed_type:        <span class="tk-fn">str</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>   <span class="tk-cm"># the engram_kind (directed.type)</span>
     default_deadline_ms:  <span class="tk-fn">int</span> | <span class="tk-kw">None</span> = <span class="tk-kw">None</span>
     default_recall_mode:  <span class="tk-fn">str</span> = <span class="tk-str">"first"</span>   <span class="tk-cm"># "first" | "merge" | "all"</span>`;
 
@@ -72,11 +72,11 @@ axon = Axon(
     neuron_fn=summariser,
     engrams=[
         <span class="tk-cm"># Addressed routing  -  Neuron says recall("notes", ...)</span>
-        EngramBinding(name=<span class="tk-str">"notes"</span>, engram_id=<span class="tk-str">"notes-default"</span>),
+        EngramBinding(name=<span class="tk-str">"notes"</span>, directed_id=<span class="tk-str">"notes-default"</span>),
         <span class="tk-cm"># Slot routing  -  deployment owns the concrete vector store</span>
         EngramBinding(
             name=<span class="tk-str">"memory"</span>,
-            engram_kind=<span class="tk-str">"semantic"</span>,
+            directed_type=<span class="tk-str">"semantic"</span>,
             default_deadline_ms=<span class="tk-num">250</span>,
             default_recall_mode=<span class="tk-str">"merge"</span>,
         ),
@@ -478,14 +478,14 @@ export default function EngramDocs() {
               <td>Local handle the Neuron passes to <code className="inline">recall()</code> / <code className="inline">imprint()</code>. Unique per Axon.</td>
             </tr>
             <tr>
-              <td>engram_id</td>
+              <td>directed_id</td>
               <td>str | None</td>
-              <td>Explicit target for predictable routing. Preferred. One of <code className="inline">engram_id</code> / <code className="inline">engram_kind</code> is required.</td>
+              <td>Explicit target (the engram_id; becomes <code className="inline">directed.id</code> on the wire). Preferred. One of <code className="inline">directed_id</code> / <code className="inline">directed_type</code> is required.</td>
             </tr>
             <tr>
-              <td>engram_kind</td>
+              <td>directed_type</td>
               <td>str | None</td>
-              <td>Slot routing  -  deployment owns the concrete implementation behind a kind.</td>
+              <td>Slot routing (the engram_kind; becomes <code className="inline">directed.type</code>)  -  deployment owns the concrete implementation behind a kind.</td>
             </tr>
             <tr>
               <td>default_deadline_ms</td>

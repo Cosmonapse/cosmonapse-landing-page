@@ -105,7 +105,8 @@ const observeSnippet = `<span class="tk-cm"># observe_pathway - watch a trace an
     pw <span class="tk-op">=</span> <span class="tk-kw">await</span> monitor_dendrite.<span class="tk-fn">observe_pathway</span>(trace_id<span class="tk-op">=</span><span class="tk-str">"trc_01J..."</span>)
     <span class="tk-kw">assert</span> pw.role <span class="tk-op">==</span> <span class="tk-str">"observer"</span>
     <span class="tk-kw">async for</span> sig <span class="tk-kw">in</span> pw:
-        log.<span class="tk-fn">info</span>(<span class="tk-str">"observed"</span>, type<span class="tk-op">=</span>sig.type.value, neuron<span class="tk-op">=</span>sig.neuron)`;
+        log.<span class="tk-fn">info</span>(<span class="tk-str">"observed"</span>, type<span class="tk-op">=</span>sig.type.value,
+                 neuron<span class="tk-op">=</span>sig.directed.id <span class="tk-kw">if</span> sig.directed <span class="tk-kw">else</span> <span class="tk-kw">None</span>)`;
 
 export default function PathwayClient() {
   return (

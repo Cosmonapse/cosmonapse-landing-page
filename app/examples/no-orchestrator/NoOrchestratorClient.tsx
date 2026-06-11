@@ -77,7 +77,8 @@ SYNAPSE_URL <span class="tk-op">=</span> <span class="tk-str">"${url}"</span>
     <span class="tk-kw">async def</span> <span class="tk-fn">_on_output</span>(sig):
         fut <span class="tk-op">=</span> pending.<span class="tk-fn">pop</span>(sig.trace_id, <span class="tk-kw">None</span>)
         <span class="tk-kw">if</span> fut <span class="tk-kw">and not</span> fut.<span class="tk-fn">done</span>():
-            fut.<span class="tk-fn">set_result</span>((sig.neuron, sig.payload.<span class="tk-fn">get</span>(<span class="tk-str">"output"</span>, {})))
+            who <span class="tk-op">=</span> sig.directed.id <span class="tk-kw">if</span> sig.directed <span class="tk-kw">else</span> <span class="tk-str">"?"</span>
+            fut.<span class="tk-fn">set_result</span>((who, sig.payload.<span class="tk-fn">get</span>(<span class="tk-str">"output"</span>, {})))
 
     prompts <span class="tk-op">=</span> [<span class="tk-str">"the sun"</span>, <span class="tk-str">"the moon"</span>, <span class="tk-str">"the sea"</span>, <span class="tk-str">"the wind"</span>]
     <span class="tk-kw">try</span>:
@@ -152,7 +153,7 @@ const tsProducerNats = `<span class="tk-kw">import</span> { Dendrite, NatsSynaps
   <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Map</span>();
   dendrite.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span> {
     <span class="tk-kw">const</span> r <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-    <span class="tk-kw">if</span> (r) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">r</span>([sig.neuron, (sig.payload <span class="tk-kw">as</span> any).output]); }
+    <span class="tk-kw">if</span> (r) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">r</span>([sig.directed?.id, (sig.payload <span class="tk-kw">as</span> any).output]); }
   });
   <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
 
@@ -209,7 +210,7 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
   <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Map</span>();
   producer.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span> {
     <span class="tk-kw">const</span> r <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-    <span class="tk-kw">if</span> (r) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">r</span>([sig.neuron, (sig.payload <span class="tk-kw">as</span> any).output]); }
+    <span class="tk-kw">if</span> (r) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">r</span>([sig.directed?.id, (sig.payload <span class="tk-kw">as</span> any).output]); }
   });
   <span class="tk-kw">await</span> producer.<span class="tk-fn">start</span>();
 
@@ -286,7 +287,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
             <code className="inline">&quot;pool&quot;</code> and waits for
             results. It never picks a worker  -  the{" "}
             <code className="inline">AGENT_OUTPUT</code> tells it who answered
-            via <code className="inline">sig.neuron</code>.
+            via <code className="inline">sig.directed.id</code>.
           </>
         ),
         filename: "producer.py",
@@ -324,7 +325,7 @@ function tsNatsData(): ComboData {
           <>
             Dispatches to the logical{" "}
             <code className="inline">&quot;pool&quot;</code> neuron and reads{" "}
-            <code className="inline">sig.neuron</code> off each output to see who
+            <code className="inline">sig.directed.id</code> off each output to see who
             answered.
           </>
         ),
