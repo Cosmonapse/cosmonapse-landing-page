@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-// Geometric display face used for the "Cosmonapse" wordmark — closest
+// Geometric display face used for the "Cosmonapse" wordmark  -  closest
 // Google-hosted match to the NASA "worm" logotype style.
 const michroma = Michroma({
   subsets: ["latin"],

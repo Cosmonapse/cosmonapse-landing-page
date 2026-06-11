@@ -434,7 +434,7 @@ export default function NoOrchestratorClient() {
           <h1 className="page-title">
             No Cortex.
             <br />
-            The Dendrites decide.
+            The Dendrites Decide.
           </h1>
           <p className="page-sub">
             Drop the orchestrator entirely. A producer drops tasks into the

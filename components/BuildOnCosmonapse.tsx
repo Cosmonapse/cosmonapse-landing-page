@@ -8,7 +8,7 @@ type Lang = "python" | "typescript";
 
 const TRANSPORTS: { id: TransportId; label: string; synapse: string; scale: string; highlight?: boolean }[] = [
   { id: "memory", label: "MemorySynapse", synapse: "memory://",         scale: "In-process. Tests, prototypes, single-host demos." },
-  { id: "nats",   label: "NatsSynapse",   synapse: "nats://broker:4222", scale: "Production default — clean fit for the protocol." },
+  { id: "nats",   label: "NatsSynapse",   synapse: "nats://broker:4222", scale: "Production default  -  clean fit for the protocol." },
   { id: "kafka",  label: "KafkaSynapse",  synapse: "kafka://broker:9092",scale: "Durable, replayable log of every Signal that crossed the bus.", highlight: true },
 ];
 
@@ -68,7 +68,7 @@ export default function BuildOnCosmonapse() {
         <div className="section-eyebrow">// Build on Cosmonapse</div>
         <h2 className="section-title">~20 lines. Three transports.</h2>
         <p className="section-sub">
-          A working multi-agent system is about twenty lines — define an async
+          A working multi-agent system is about twenty lines  -  define an async
           function, wrap it in an <code className="inline">Axon</code>, attach
           it to a <code className="inline">Dendrite</code>, call{" "}
           <code className="inline">dispatch_and_wait</code>. No protocol
@@ -120,7 +120,7 @@ export default function BuildOnCosmonapse() {
             <p className="boc-side-prose">{transport.scale}</p>
             <ul className="boc-side-list">
               <li>
-                <strong>Axon.huggingface()</strong> — one call creates the
+                <strong>Axon.huggingface()</strong>  -  one call creates the
                 Neuron and wires the Axon. Also{" "}
                 <code className="inline">.openai()</code>,{" "}
                 <code className="inline">.anthropic()</code>,{" "}
@@ -128,11 +128,11 @@ export default function BuildOnCosmonapse() {
                 <code className="inline">.mcp()</code>.
               </li>
               <li>
-                <strong>Dendrite</strong> — the only thing that touches the
+                <strong>Dendrite</strong>  -  the only thing that touches the
                 Synapse. Hosts the Axon, routes inbound TASKs.
               </li>
               <li>
-                <strong>dispatch_and_wait</strong> — emit a TASK, await the
+                <strong>dispatch_and_wait</strong>  -  emit a TASK, await the
                 terminal Signal, return. Zero extra state.
               </li>
             </ul>

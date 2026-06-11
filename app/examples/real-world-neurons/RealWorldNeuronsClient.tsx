@@ -436,9 +436,9 @@ export default function RealWorldNeuronsClient() {
         <div className="container">
           <div className="page-eyebrow">// 04 · Real-world Neurons</div>
           <h1 className="page-title">
-            An MCP server is a Neuron.
+            An MCP Server Is a Neuron.
             <br />
-            Your API is the edge.
+            Your API Is the Edge.
           </h1>
           <p className="page-sub">
             A Neuron is <em>anything that interacts with the real world</em>  -  a

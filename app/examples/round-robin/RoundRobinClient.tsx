@@ -416,7 +416,7 @@ export default function RoundRobinClient() {
           <div className="page-eyebrow">// 01 · Orchestration</div>
           <h1 className="page-title">
             Two Neurons. Two Axons.
-            <br />
+            One Synapse. One Cortex.
             One Synapse. One Cortex.
           </h1>
           <p className="page-sub">

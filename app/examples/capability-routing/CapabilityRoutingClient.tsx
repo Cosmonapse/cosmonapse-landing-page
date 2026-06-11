@@ -509,9 +509,9 @@ export default function CapabilityRoutingClient() {
         <div className="container">
           <div className="page-eyebrow">// 03 · Discovery</div>
           <h1 className="page-title">
-            Route by what a worker can do,
+            Route by What a Worker Can Do,
             <br />
-            not by its name.
+            Not by Its Name.
           </h1>
           <p className="page-sub">
             A router Dendrite holds a <code className="inline">RegistryStore</code>{" "}

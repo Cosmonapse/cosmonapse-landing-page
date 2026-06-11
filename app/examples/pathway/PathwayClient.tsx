@@ -4,6 +4,14 @@ import React from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 
+const watchSnippet = `<span class="tk-cm"># terminal 1  -  the bus</span>
+<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
+
+<span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071).</span>
+<span class="tk-cm"># Every Signal on the trace  -  PLAN, THOUGHT_DELTA, AGENT_OUTPUT  -  animates</span>
+<span class="tk-cm"># across the bus as the three shapes consume it.</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo`;
+
 const workerSnippet = `<span class="tk-cm"># worker.py - one Axon that streams PLAN / THOUGHT_DELTA / AGENT_OUTPUT</span>
 <span class="tk-kw">import</span> asyncio
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, SignalType, connect_synapse
@@ -114,10 +122,10 @@ export default function PathwayClient() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Example 05 \u00b7 Pathway</div>
-          <h1 className="page-title">Pathway \u2014 three shapes, one primitive.</h1>
+          <h1 className="page-title">Pathway  -  Three Shapes, One Primitive.</h1>
           <p className="page-sub">
             <code className="inline">dendrite.dispatch(...)</code> returns a{" "}
-            <Link href="/concepts" className="inline-link">Pathway</Link> \u2014 a per-trace event
+            <Link href="/concepts" className="inline-link">Pathway</Link>  -  a per-trace event
             handle that exposes <strong>three consumption shapes</strong> on the same primitive.
             The developer picks the shape that fits the workflow; the SDK doesn&apos;t force a style.
           </p>
@@ -129,7 +137,7 @@ export default function PathwayClient() {
           <div className="sub-eyebrow">Worker side</div>
           <h2 className="sub-title">One Axon serves every shape.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            The worker has no idea which shape the caller will use \u2014 it just declares a
+            The worker has no idea which shape the caller will use  -  it just declares a
             capability and replies with AGENT_OUTPUT. The shape lives entirely on the
             orchestrator side.
           </p>
@@ -140,7 +148,7 @@ export default function PathwayClient() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Shape 1</div>
-          <h2 className="sub-title">await pw.wait() \u2014 sequential.</h2>
+          <h2 className="sub-title">await pw.wait()  -  sequential.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             The familiar request/reply shape. Blocks until the first AGENT_OUTPUT,
             CLARIFICATION, ERROR, or FINAL arrives. Pathway auto-closes when the call
@@ -153,7 +161,7 @@ export default function PathwayClient() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Shape 2</div>
-          <h2 className="sub-title">@pw.on(SignalType.X) \u2014 reactive.</h2>
+          <h2 className="sub-title">@pw.on(SignalType.X)  -  reactive.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             Trace-scoped callbacks. Each callback fires for matching Signals on{" "}
             <em>this</em> trace, not the whole namespace. Useful for streaming
@@ -167,7 +175,7 @@ export default function PathwayClient() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Shape 3</div>
-          <h2 className="sub-title">async for sig in pw \u2014 streaming.</h2>
+          <h2 className="sub-title">async for sig in pw  -  streaming.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             Walks every Signal on the trace as it arrives. Closes on FINAL / ERROR or
             when you break out of the loop. The natural shape for log pipes, UI streams,
@@ -180,11 +188,11 @@ export default function PathwayClient() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">scope</div>
-          <h2 className="sub-title">scope=&quot;terminal&quot; \u2014 decentralised.</h2>
+          <h2 className="sub-title">scope=&quot;terminal&quot;  -  decentralised.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             <code className="inline">scope=&quot;all&quot;</code> (the default) delivers every
             PATHWAY_TYPES Signal on the trace. <code className="inline">scope=&quot;terminal&quot;</code>{" "}
-            filters to FINAL / ERROR / CLARIFICATION only \u2014 the decentralised pattern
+            filters to FINAL / ERROR / CLARIFICATION only  -  the decentralised pattern
             where intermediate orchestration happens peer-to-peer and the Cortex only
             wakes for events that demand its attention. FINAL and ERROR still auto-close
             the Pathway regardless of scope.
@@ -204,6 +212,10 @@ export default function PathwayClient() {
             secondary orchestrators that want to follow a workflow without driving it.
           </p>
           <CodeBlock filename="observe.py" html={observeSnippet} maxWidth={840} />
+
+          <div className="sub-eyebrow" style={{ marginTop: 32 }}>Watch it</div>
+          <h2 className="section-title">See every shape in Prism.</h2>
+          <CodeBlock filename="terminal" html={watchSnippet} maxWidth={840} />
         </div>
       </section>
 
@@ -214,7 +226,7 @@ export default function PathwayClient() {
             <Link href="/examples/bidding" className="card">
               <div className="card-icon">\u2192</div>
               <h3>Bidding</h3>
-              <p>dispatch_offer / on_task_offer / bid \u2014 atomic claim for heterogeneous capability routing.</p>
+              <p>dispatch_offer / on_task_offer / bid  -  atomic claim for heterogeneous capability routing.</p>
             </Link>
             <Link href="/examples/capability-routing" className="card">
               <div className="card-icon">\u2192</div>
@@ -224,7 +236,7 @@ export default function PathwayClient() {
             <Link href="/docs#pathway" className="card">
               <div className="card-icon">\u2192</div>
               <h3>Pathway API</h3>
-              <p>Full reference for the Pathway class \u2014 wait, wait_for, on, iteration, scope, lifecycle.</p>
+              <p>Full reference for the Pathway class  -  wait, wait_for, on, iteration, scope, lifecycle.</p>
             </Link>
           </div>
         </div>

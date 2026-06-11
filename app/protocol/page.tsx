@@ -3,7 +3,7 @@ import CodeBlock from "@/components/CodeBlock";
 import CodeSwitcher from "@/components/CodeSwitcher";
 
 export const metadata: Metadata = {
-  title: "Envelope Specification — Cosmonapse Protocol",
+  title: "Envelope Specification  -  Cosmonapse Protocol",
   description:
     "The envelope is the single shared contract of Cosmonapse. Every Signal on the channel is a valid envelope.",
 };
@@ -29,7 +29,7 @@ const envelopeSnippet = `{
 // Connect + validate snippets shown in the switcher alongside the envelope
 const connectPy = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Signal, connect_synapse
 
-<span class="tk-cm"># Connect to any Synapse — memory, NATS, Kafka.</span>
+<span class="tk-cm"># Connect to any Synapse  -  memory, NATS, Kafka.</span>
 synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
 
 <span class="tk-cm"># Validate an envelope against the spec (pydantic raises on violation).</span>
@@ -40,7 +40,7 @@ sig <span class="tk-op">=</span> Signal.<span class="tk-fn">model_validate</span
 
 const connectTs = `<span class="tk-kw">import</span> { connectSynapse, validateSignal } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
-<span class="tk-cm">// Connect to any Synapse — memory, NATS, Kafka.</span>
+<span class="tk-cm">// Connect to any Synapse  -  memory, NATS, Kafka.</span>
 <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
 
 <span class="tk-cm">// Validate an envelope against the spec (throws on violation).</span>
@@ -126,7 +126,7 @@ export default function ProtocolPage() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Protocol</div>
-          <h1 className="page-title">Envelope specification</h1>
+          <h1 className="page-title">Envelope Specification</h1>
           <p className="page-sub">
             The envelope is the single shared contract of Cosmonapse. Every Signal crossing a Synapse
             is a valid envelope  -  regardless of which Neuron produced it, which Synapse carries it,
@@ -638,19 +638,19 @@ export default function ProtocolPage() {
           >
             <div style={{ marginBottom: 12 }}>
               <strong style={{ color: "#f87171", fontFamily: "var(--font-mono)" }}>Immune</strong>{" "}
-               — Genome · Myelin · Reflex · AntiBody
+                -  Genome · Myelin · Reflex · AntiBody
             </div>
             <div>
               Planned signal types include{" "}
-              <code className="inline">IDENTITY_ASSERT</code> (Genome — neuron identity proof),{" "}
-              <code className="inline">KEY_ROTATE</code> (Myelin — in-band key refresh), and{" "}
-              <code className="inline">THREAT_SIGNAL</code> (Reflex/AntiBody — anomaly broadcast).
+              <code className="inline">IDENTITY_ASSERT</code> (Genome  -  neuron identity proof),{" "}
+              <code className="inline">KEY_ROTATE</code> (Myelin  -  in-band key refresh), and{" "}
+              <code className="inline">THREAT_SIGNAL</code> (Reflex/AntiBody  -  anomaly broadcast).
               These will extend the envelope spec in a future revision and remain backwards-compatible
               with v1 consumers.
             </div>
             <div style={{ marginTop: 16 }}>
               <strong style={{ color: "#fb923c", fontFamily: "var(--font-mono)" }}>Cloud</strong>{" "}
-               — Membrane
+                -  Membrane
             </div>
             <div style={{ marginTop: 4 }}>
               Membrane isolation signals are infrastructure-layer only and will not appear on the
@@ -696,7 +696,7 @@ export default function ProtocolPage() {
           </ol>
           <p className="prose" style={{ marginTop: 16 }}>
             <code className="inline">cosmo validate</code> checks these rules against a stream of
-            envelopes. Validity is purely structural — Cosmonapse does not enforce sequencing or
+            envelopes. Validity is purely structural  -  Cosmonapse does not enforce sequencing or
             lifecycle rules. What constitutes a completed task, what happens after an error, and how
             envelopes flow over time are decisions you make in your Dendrite.
           </p>

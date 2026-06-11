@@ -4,6 +4,13 @@ import React from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 
+const watchSnippet = `<span class="tk-cm"># terminal 1  -  the bus</span>
+<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
+
+<span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071).</span>
+<span class="tk-cm"># Watch the TASK_OFFER / BID / TASK_AWARDED auction animate in real time.</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo`;
+
 const whySnippet = `<span class="tk-cm"># Capability-routed dispatch on a separate subject + queue group gives</span>
 <span class="tk-cm"># once-only delivery WITHIN a matching cap profile. But heterogeneous</span>
 <span class="tk-cm"># deployments - different Dendrites with different but overlapping</span>
@@ -103,7 +110,7 @@ export default function BiddingClient() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Example 06 \u00b7 Bidding</div>
-          <h1 className="page-title">Competitive bidding for capability dispatch.</h1>
+          <h1 className="page-title">Competitive Bidding for Capability Dispatch.</h1>
           <p className="page-sub">
             TASK_OFFER / BID / TASK_AWARDED is the <strong>atomic-claim</strong> variant of
             capability-routed dispatch. Use it when multiple Dendrites can do the work but
@@ -156,6 +163,10 @@ export default function BiddingClient() {
           <div className="sub-eyebrow">Wire</div>
           <h2 className="sub-title">What crosses the bus.</h2>
           <CodeBlock filename="flow.txt" html={flowSnippet} maxWidth={840} />
+
+          <div className="sub-eyebrow" style={{ marginTop: 32 }}>Watch it</div>
+          <h2 className="section-title">See the auction in Prism.</h2>
+          <CodeBlock filename="terminal" html={watchSnippet} maxWidth={840} />
         </div>
       </section>
 
@@ -174,7 +185,7 @@ export default function BiddingClient() {
             <Link href="/examples/capability-routing" className="card">
               <div className="card-icon">\u2192</div>
               <h3>Capability routing</h3>
-              <p>The simpler variant \u2014 queue groups on the .routed subject. Once-only within a matching cap profile.</p>
+              <p>The simpler variant  -  queue groups on the .routed subject. Once-only within a matching cap profile.</p>
             </Link>
             <Link href="/examples/pathway" className="card">
               <div className="card-icon">\u2192</div>

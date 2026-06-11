@@ -1325,7 +1325,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
             <tr>
               <td>Transport exception</td>
-              <td>Raised directly from <code className="inline">nats-py</code>, <code className="inline">aiokafka</code>, or <code className="inline">asyncpg</code> — not wrapped.</td>
+              <td>Raised directly from <code className="inline">nats-py</code>, <code className="inline">aiokafka</code>, or <code className="inline">asyncpg</code>  -  not wrapped.</td>
             </tr>
           </tbody>
         </table>

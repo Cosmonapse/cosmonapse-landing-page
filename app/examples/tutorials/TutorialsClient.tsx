@@ -85,7 +85,10 @@ orch = Dendrite(synapse=synapse, namespace=<span class="tk-str">"demo"</span>)
 cosmo synapse start memory <span class="tk-op">--namespace</span>=demo
 
 <span class="tk-cm"># Terminal 2  -  watch every signal</span>
-cosmo doppler <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo`,
+cosmo doppler <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo
+
+<span class="tk-cm"># …or open Prism, the live browser view (http://127.0.0.1:7071)</span>
+cosmo doppler <span class="tk-op">--prism</span> <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo`,
       },
       {
         html: `<span class="tk-cm"># worker.py  -  one URL change, everything else identical</span>
@@ -465,6 +468,7 @@ const cliCards: CliCard[] = [
     title: "cosmo doppler",
     commands: [
       { html: `cosmo doppler <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=dev` },
+      { html: `cosmo doppler <span class="tk-op">--prism</span> <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># browser view</span>` },
     ],
     description:
       "Passive read-only signal watcher. Attaches a Doppler to the synapse and streams every signal type to stdout. Zero side-effects on the bus.",
@@ -497,6 +501,7 @@ const cliCards: CliCard[] = [
       { html: "cosmo init" },
       { html: `cosmo synapse start memory <span class="tk-op">--namespace</span>=dev` },
       { html: `cosmo doppler <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># separate terminal</span>` },
+      { html: `cosmo doppler <span class="tk-op">--prism</span> <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># …or in the browser</span>` },
       { html: `python worker.py  <span class="tk-cm"># separate terminal</span>` },
       { html: `cosmo validate <span class="tk-op">--namespace</span>=dev` },
     ],
@@ -527,7 +532,7 @@ export default function TutorialsClient() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Examples</div>
-          <h1 className="page-title">Tutorials, ordered.</h1>
+          <h1 className="page-title">Tutorials, Ordered.</h1>
           <p className="page-sub">
             Ten tutorials, sorted by what you need next. Start with the Neuron
             in twelve lines; finish on the production switch from

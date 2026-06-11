@@ -130,6 +130,19 @@ EngramBinding(name<span class="tk-op">=</span><span class="tk-str">"ctx"</span>,
 <span class="tk-cm">#   "merge"   -  combine matching entries across backends</span>
 <span class="tk-cm">#   "all"     -  return every match, partial flag if any backend timed out</span>`;
 
+const prismSnippet = `<span class="tk-cm"># This example runs in-process on MemorySynapse, which Prism cannot</span>
+<span class="tk-cm"># attach to. To watch it live, run a dev synapse and point the code at it:</span>
+
+<span class="tk-cm"># terminal 1  -  the bus</span>
+<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
+
+<span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo
+
+<span class="tk-cm"># in the code  -  swap one line:</span>
+<span class="tk-cm"># synapse = MemorySynapse()</span>
+synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)`;
+
 export default function EngramIntegrationClient() {
   return (
     <>
@@ -235,6 +248,19 @@ export default function EngramIntegrationClient() {
             set a default on the binding.
           </p>
           <CodeBlock filename="ops.py" html={opsSnippet} maxWidth={880} />
+        </div>
+      </section>
+
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">06 · Watch it in Prism</div>
+          <h2 className="sub-title">RECALL and IMPRINT, live on the bus.</h2>
+          <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
+            <code className="inline">cosmo doppler --prism</code> shows the full memory
+            round-trip  -  RECALL, RECALLED, IMPRINT, IMPRINTED  -  threaded through the
+            same trace as the TASK that caused it.
+          </p>
+          <CodeBlock filename="terminal" html={prismSnippet} maxWidth={880} />
         </div>
       </section>
 

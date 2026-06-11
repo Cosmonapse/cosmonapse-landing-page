@@ -4,7 +4,7 @@ import CodeBlock from "@/components/CodeBlock";
 import CodeSwitcher from "@/components/CodeSwitcher";
 
 export const metadata: Metadata = {
-  title: "Quickstart — Cosmonapse",
+  title: "Quickstart  -  Cosmonapse",
   description:
     "Install Cosmonapse, create a Hugging Face Neuron, wire an Axon and Dendrite, boot a local Synapse, watch Signals flow.",
 };
@@ -17,7 +17,7 @@ pip install cosmonapse httpx`;
 const installTs = `<span class="tk-cm">// Node 18+</span>
 npm install @cosmonapse/sdk`;
 
-// ── Synapse start (CLI — same for both) ────────────────────────────────────
+// ── Synapse start (CLI  -  same for both) ────────────────────────────────────
 
 const synapseSnippet = `<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart
 
@@ -74,7 +74,7 @@ asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 const workerTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
 <span class="tk-cm">// Axon.huggingface() creates the Neuron and Axon in one step.</span>
-<span class="tk-cm">// role: "worker" — hosts Axons, replies to TASKs, cannot dispatch.</span>
+<span class="tk-cm">// role: "worker"  -  hosts Axons, replies to TASKs, cannot dispatch.</span>
 <span class="tk-kw">const</span> axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
   { endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
     model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
@@ -95,7 +95,7 @@ const serverPy = `<span class="tk-kw">import</span> asyncio, threading
 <span class="tk-kw">from</span> flask <span class="tk-kw">import</span> Flask, jsonify, request
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, connect_synapse
 
-<span class="tk-cm"># asyncio loop in a background thread — Flask stays synchronous.</span>
+<span class="tk-cm"># asyncio loop in a background thread  -  Flask stays synchronous.</span>
 loop <span class="tk-op">=</span> asyncio.<span class="tk-fn">new_event_loop</span>()
 threading.<span class="tk-fn">Thread</span>(target<span class="tk-op">=</span>loop.run_forever, daemon<span class="tk-op">=</span><span class="tk-kw">True</span>).<span class="tk-fn">start</span>()
 orch: Dendrite <span class="tk-op">=</span> <span class="tk-kw">None</span>
@@ -128,7 +128,7 @@ const serverTs = `<span class="tk-kw">import</span> express <span class="tk-kw">
 
 <span class="tk-kw">const</span> app <span class="tk-op">=</span> <span class="tk-fn">express</span>().<span class="tk-fn">use</span>(express.<span class="tk-fn">json</span>());
 
-<span class="tk-cm">// role: "orchestrator" — dispatches TASKs, collects replies.</span>
+<span class="tk-cm">// role: "orchestrator"  -  dispatches TASKs, collects replies.</span>
 <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
 <span class="tk-kw">const</span> orch    <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"quickstart"</span>, role: <span class="tk-str">"orchestrator"</span> });
 <span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>();
@@ -143,7 +143,7 @@ app.<span class="tk-fn">post</span>(<span class="tk-str">"/task"</span>, <span c
 });
 app.<span class="tk-fn">listen</span>(<span class="tk-num">5000</span>);`;
 
-// ── Doppler (CLI — same for both) ──────────────────────────────────────────
+// ── Doppler (CLI  -  same for both) ──────────────────────────────────────────
 
 const dopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
 
@@ -152,7 +152,10 @@ const dopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span class="
 <span class="tk-cm">  AGENT_OUTPUT  trace=trc_01...  neuron=llama</span>
 
 <span class="tk-cm"># filter to specific signal types</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">-n</span> quickstart <span class="tk-op">--</span>type TASK <span class="tk-op">--</span>type AGENT_OUTPUT`;
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">-n</span> quickstart <span class="tk-op">--</span>type TASK <span class="tk-op">--</span>type AGENT_OUTPUT
+
+<span class="tk-cm"># or open Prism  -  the live browser visualization (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart`;
 
 // ── Test it ────────────────────────────────────────────────────────────────
 
@@ -168,7 +171,7 @@ export default function QuickstartPage() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Quickstart</div>
-          <h1 className="page-title">First five minutes.</h1>
+          <h1 className="page-title">First Five Minutes.</h1>
           <p className="page-sub">
             Install Cosmonapse, build an Axon backed by Hugging Face, wire a Dendrite, boot a local
             Synapse, watch Signals flow. No Docker. No running broker. Just{" "}
@@ -183,7 +186,7 @@ export default function QuickstartPage() {
           <div className="sub-eyebrow">01 · Install</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             Python 3.11+ or Node 18+. The <code className="inline">cosmo</code> CLI ships with the
-            Python package — run it from your virtualenv even when using the TypeScript SDK.
+            Python package  -  run it from your virtualenv even when using the TypeScript SDK.
           </p>
           <CodeSwitcher
             python={{ html: installPy }}
@@ -198,9 +201,9 @@ export default function QuickstartPage() {
           <div className="sub-eyebrow">02 · Start a Synapse</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON
-            broker — no Docker, no NATS, no Postgres. Swap the URL for{" "}
+            broker  -  no Docker, no NATS, no Postgres. Swap the URL for{" "}
             <code className="inline">nats://</code> or <code className="inline">kafka://</code> when
-            you move to production — the rest of your code stays the same.
+            you move to production  -  the rest of your code stays the same.
           </p>
           <CodeBlock html={synapseSnippet} maxWidth={760} />
         </div>
@@ -214,7 +217,7 @@ export default function QuickstartPage() {
             <code className="inline">.openai()</code>,{" "}
             <code className="inline">.anthropic()</code>,{" "}
             <code className="inline">.ollama()</code>,{" "}
-            <code className="inline">.mcp()</code>) is the source-paired factory — it creates the
+            <code className="inline">.mcp()</code>) is the source-paired factory  -  it creates the
             Neuron and wires the Axon in one call  -  in both SDKs (the two-step{" "}
             <code className="inline">neuron() + new Axon()</code> pattern also works). Set{" "}
             <code className="inline">HF_TOKEN</code> to your{" "}
@@ -240,7 +243,7 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">04 · Wire a Dendrite</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            The <strong>Dendrite</strong> is the only component that touches the Synapse — it hosts
+            The <strong>Dendrite</strong> is the only component that touches the Synapse  -  it hosts
             the Axon, emits REGISTER / HEARTBEAT / DEREGISTER, and routes inbound TASKs. Run this
             in a second terminal; it registers and waits for tasks.
           </p>
@@ -256,7 +259,7 @@ export default function QuickstartPage() {
         <div className="container">
           <div className="sub-eyebrow">05 · Connect an HTTP interface</div>
           <p className="prose" style={{ marginBottom: 16 }}>
-            A <code className="inline">role=&quot;orchestrator&quot;</code> Dendrite has no Axon —
+            A <code className="inline">role=&quot;orchestrator&quot;</code> Dendrite has no Axon -
             its job is to dispatch tasks and collect results. Keep your web framework at the edge and
             dispatch TASK Signals from route handlers via the orchestrator Dendrite. Install Flask
             with <code className="inline">pip install flask</code> or Express with{" "}
@@ -275,7 +278,7 @@ export default function QuickstartPage() {
           <div className="sub-eyebrow">06 · Watch the Signals flow</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             Attach a Doppler to see every Signal as it crosses the Synapse. It is a passive
-            read-only subscriber — it never competes with Dendrites for messages.
+            read-only subscriber  -  it never competes with Dendrites for messages.
           </p>
           <CodeBlock html={dopplerSnippet} maxWidth={760} />
         </div>
@@ -289,7 +292,7 @@ export default function QuickstartPage() {
           </p>
           <CodeBlock html={testSnippet} maxWidth={760} />
           <p className="prose" style={{ marginTop: 16 }}>
-            Watch the Doppler terminal — you&apos;ll see the full REGISTER → TASK → AGENT_OUTPUT
+            Watch the Doppler terminal  -  you&apos;ll see the full REGISTER → TASK → AGENT_OUTPUT
             trace as it happens.
           </p>
         </div>
@@ -307,7 +310,7 @@ export default function QuickstartPage() {
             <Link href="/concepts" className="card">
               <div className="card-icon">→</div>
               <h3>Concepts</h3>
-              <p>The full Cosmonapse vocabulary — Core, Engram, Doppler, Immune, and Cloud.</p>
+              <p>The full Cosmonapse vocabulary  -  Core, Engram, Doppler, Immune, and Cloud.</p>
             </Link>
             <Link href="/roadmap" className="card">
               <div className="card-icon">→</div>

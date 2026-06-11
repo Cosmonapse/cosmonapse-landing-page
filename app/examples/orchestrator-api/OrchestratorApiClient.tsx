@@ -58,6 +58,9 @@ const flaskWorker = `<span class="tk-cm"># terminal 1  -  the bus</span>
 <span class="tk-cm"># terminal 2  -  the Neuron worker</span>
 <span class="tk-op">$</span> python worker.py
 
+<span class="tk-cm"># optional  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
+
 <span class="tk-cm"># terminal 3  -  Flask</span>
 <span class="tk-op">$</span> python flask_app.py`;
 
@@ -126,6 +129,9 @@ const fastapiRun = `<span class="tk-cm"># terminal 1  -  the bus</span>
 
 <span class="tk-cm"># terminal 2  -  the Neuron worker</span>
 <span class="tk-op">$</span> python worker.py
+
+<span class="tk-cm"># optional  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
 
 <span class="tk-cm"># terminal 3  -  FastAPI via uvicorn</span>
 <span class="tk-op">$</span> uvicorn fastapi_app:app <span class="tk-op">--</span>port <span class="tk-num">8000</span>`;
@@ -255,6 +261,9 @@ const wsgiRun = `<span class="tk-cm"># terminal 1  -  the bus</span>
 <span class="tk-cm"># terminal 2  -  the Neuron worker</span>
 <span class="tk-op">$</span> python worker.py
 
+<span class="tk-cm"># optional  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
+
 <span class="tk-cm"># terminal 3  -  raw WSGI (wsgiref dev server)</span>
 <span class="tk-op">$</span> python wsgi_app.py
 
@@ -324,9 +333,9 @@ const wsgiCurl = `<span class="tk-op">$</span> curl <span class="tk-op">-X</span
 // Decorator snippets
 // ---------------------------------------------------------------------------
 
-// Python — shared across Flask / FastAPI / WSGI
+// Python  -  shared across Flask / FastAPI / WSGI
 const pyDecorators = `<span class="tk-cm"># Attach these to your orchestrator Dendrite after connecting.</span>
-<span class="tk-cm"># They fire for every matching Signal in the namespace — perfect for</span>
+<span class="tk-cm"># They fire for every matching Signal in the namespace  -  perfect for</span>
 <span class="tk-cm"># logging, metrics, clarification handling, and live progress feeds.</span>
 
 <span class="tk-cm"># ── AGENT_OUTPUT ──────────────────────────────────────────────────────────</span>
@@ -407,7 +416,7 @@ const pyDecorators = `<span class="tk-cm"># Attach these to your orchestrator De
     <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"heartbeat: {sig.directed.id if sig.directed else '?'}"</span>)
 
 
-<span class="tk-cm"># ── on_trace — every Signal for one workflow ──────────────────────────────</span>
+<span class="tk-cm"># ── on_trace  -  every Signal for one workflow ──────────────────────────────</span>
 <span class="tk-cm"># Subscribe to all Signal types for a specific trace_id in one call.</span>
 <span class="tk-cm"># Useful for per-request audit logs or live progress feeds.</span>
 trace_id <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()
@@ -472,7 +481,7 @@ dendrite.<span class="tk-fn">onHeartbeatSignal</span>((sig) <span class="tk-op">
   console.<span class="tk-fn">log</span>(<span class="tk-str">\`heartbeat: \${sig.directed.id if sig.directed else '?'}\`</span>));
 
 
-<span class="tk-cm">// ── onTrace — every Signal for one workflow ───────────────────────────────</span>
+<span class="tk-cm">// ── onTrace  -  every Signal for one workflow ───────────────────────────────</span>
 <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
 dendrite.<span class="tk-fn">onTrace</span>(traceId, (sig) <span class="tk-op">=&gt;</span>
   console.<span class="tk-fn">log</span>(<span class="tk-str">\`  [\${sig.type.padEnd(20)}] \${sig.directed.id if sig.directed else '?'}\`</span>));
@@ -481,7 +490,7 @@ dendrite.<span class="tk-fn">onTrace</span>(traceId, (sig) <span class="tk-op">=
 const decoratorProseShared = (
   <>
     Decorators register async callbacks on the Dendrite for specific Signal
-    types. They fire on every matching Signal in the namespace — independently
+    types. They fire on every matching Signal in the namespace  -  independently
     of <code className="inline">dispatch_and_wait</code>, which resolves its own
     future on the same Signal. Use decorators for side-effects: logging,
     metrics, clarification handling, and live progress feeds.
@@ -611,7 +620,7 @@ const STEPS: Record<Framework, Step[]> = {
       prose: (
         <>
           The TypeScript SDK uses method calls instead of Python decorators, but
-          the semantics are identical — callbacks fire for every matching Signal
+          the semantics are identical  -  callbacks fire for every matching Signal
           in the namespace. All filter options (<code className="inline">neuron</code>,{" "}
           <code className="inline">capability</code>,{" "}
           <code className="inline">traceId</code>) are available as an optional
@@ -724,8 +733,8 @@ export default function OrchestratorApiClient() {
         <div className="container">
           <div className="page-eyebrow">// 09 · Orchestration</div>
           <h1 className="page-title">
-            Your framework at the edge.<br />
-            Dendrite in the middle.
+            Your Framework at the Edge.<br />
+            Dendrite in the Middle.
           </h1>
           <p className="page-sub">
             Flask, FastAPI, Express, or raw WSGI  -  whichever HTTP layer you

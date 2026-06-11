@@ -142,7 +142,10 @@ export function brokerStep(combo: Combo): Step | null {
 <span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10
 
 <span class="tk-cm"># …or, if you have it on PATH:</span>
-<span class="tk-op">$</span> nats-server`,
+<span class="tk-op">$</span> nats-server
+
+<span class="tk-cm"># optional  -  watch it live in Prism (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>nats://127.0.0.1:4222 <span class="tk-op">-n</span> quickstart`,
       };
     case "py-kafka":
       return {
@@ -161,7 +164,10 @@ export function brokerStep(combo: Combo): Step | null {
     redpandadata/redpanda:latest \\
     redpanda start <span class="tk-op">--</span>smp 1 <span class="tk-op">--</span>overprovisioned \\
     <span class="tk-op">--</span>kafka-addr PLAINTEXT://0.0.0.0:9092 \\
-    <span class="tk-op">--</span>advertise-kafka-addr PLAINTEXT://127.0.0.1:9092`,
+    <span class="tk-op">--</span>advertise-kafka-addr PLAINTEXT://127.0.0.1:9092
+
+<span class="tk-cm"># optional  -  watch it live in Prism (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>kafka://127.0.0.1:9092 <span class="tk-op">-n</span> quickstart`,
       };
     case "ts-dev":
     default:

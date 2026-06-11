@@ -146,7 +146,7 @@ export default function ExamplesPage() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Examples</div>
-          <h1 className="page-title">End-to-end topologies.</h1>
+          <h1 className="page-title">End-to-End Topologies.</h1>
           <p className="page-sub">
             Runnable example setups built on Cosmonapse primitives. Copy any of
             them, swap the Synapse URL, and adapt for your own agents. Sorted

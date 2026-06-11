@@ -132,6 +132,19 @@ endpoint<span class="tk-op">=</span><span class="tk-str">"http://localhost:8080"
 <span class="tk-cm"># For Ollama, switch source  -  same Axon, same Dendrite.</span>
 greeter <span class="tk-op">=</span> Neuron(source<span class="tk-op">=</span><span class="tk-str">"ollama"</span>, model<span class="tk-op">=</span><span class="tk-str">"llama3"</span>)`;
 
+const prismSnippet = `<span class="tk-cm"># This example runs in-process on MemorySynapse, which Prism cannot</span>
+<span class="tk-cm"># attach to. To watch it live, run a dev synapse and point the code at it:</span>
+
+<span class="tk-cm"># terminal 1  -  the bus</span>
+<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
+
+<span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo
+
+<span class="tk-cm"># in the code  -  swap one line:</span>
+<span class="tk-cm"># synapse = MemorySynapse()</span>
+synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)`;
+
 export default function BuildingNeuronClient() {
   return (
     <>
@@ -270,6 +283,19 @@ export default function BuildingNeuronClient() {
             the <code className="inline">source</code>.
           </p>
           <CodeBlock filename="providers.py" html={swapEndpointSnippet} maxWidth={880} />
+        </div>
+      </section>
+
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">07 · Watch it in Prism</div>
+          <h2 className="sub-title">See the Signals animate in the browser.</h2>
+          <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
+            <code className="inline">cosmo doppler --prism</code> opens a live, read-only
+            visualization of every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT  - 
+            as the greeter answers.
+          </p>
+          <CodeBlock filename="terminal" html={prismSnippet} maxWidth={880} />
         </div>
       </section>
 
