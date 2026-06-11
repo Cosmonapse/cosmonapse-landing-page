@@ -132,9 +132,9 @@ export default function HomePage() {
             v0.1.3 · Research preview
           </div>
           <h1 className="hero-title">
-            The nervous system
+            The Nervous System
             <br />
-            for <span className="gradient-text">autonomous AI agents</span>.
+            for <span className="gradient-text">Autonomous AI Agents</span>.
           </h1>
           <p className="hero-lead">
             Cosmonapse is an open protocol and SDK for autonomous AI agents. Start with the Core
@@ -164,13 +164,13 @@ export default function HomePage() {
             Open source · MIT licensed · Python + TypeScript SDK
           </p>
 
-          <div style={{ maxWidth: 780, margin: "0 auto", textAlign: "left" }}>
+          {/* <div style={{ maxWidth: 780, margin: "0 auto", textAlign: "left" }}>
             <CodeSwitcher
               python={{ html: heroPy, filename: "main.py" }}
               typescript={{ html: heroTs, filename: "main.ts" }}
               variant="elevated"
             />
-          </div>
+          </div> */}
         </div>
       </header>
 
