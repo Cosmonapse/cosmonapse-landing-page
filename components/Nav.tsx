@@ -157,6 +157,12 @@ export default function Nav() {
               GitHub ↗
             </a>
           </li>
+          <li className="nav-mobile-cta-item">
+            <Link href="/quickstart" className="nav-cta nav-mobile-cta">
+              Get started
+              <span className="arrow">→</span>
+            </Link>
+          </li>
         </ul>
       </div>
     </nav>
