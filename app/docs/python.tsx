@@ -757,6 +757,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         </ApiCard>
 
         <h3 className="docs-h3">Available sources</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -805,6 +806,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <p className="docs-p">
           The <code className="inline">&quot;mcp&quot;</code> source ships{" "}
@@ -834,6 +836,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         </ApiCard>
 
         <h3 className="docs-h3">Constructor parameters</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -870,6 +873,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Methods</h3>
         <ApiCard kind="async method" name="Axon.handle_task(task: Signal) -> Signal" summary="Called by the Dendrite for each inbound TASK. Resolves context_ref, invokes neuron_fn, and returns the corresponding outbound Signal (AGENT_OUTPUT, CLARIFICATION, PERMISSION, or ERROR). Application code never calls this directly." />
@@ -912,6 +916,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         </ApiCard>
 
         <h3 className="docs-h3">Constructor parameters</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -953,6 +958,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Axon lifecycle</h3>
         <ApiCard kind="method" name="Dendrite.attach_axon(axon: Axon) -> None" summary="Register an Axon on this Dendrite. If the Dendrite is already started, the next start cycle emits REGISTER. Raises if neuron_id is already attached." />
@@ -983,6 +989,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           coroutine  -  not a decorator  -  returning a raw{" "}
           <code className="inline">Subscription</code>.
         </p>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -1013,6 +1020,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             <tr><td>await dendrite.subscribe(SignalType.X, handler)</td><td>Raw subscription. Returns a Subscription you can later unsubscribe.</td></tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">RegistryStore reads</h3>
         <ApiCard kind="async method" name="Dendrite.find_neurons(*, capability=None) -> list[NeuronRecord]" summary="Return live (non-deregistered) Neurons on the namespace, optionally filtered to those advertising the given capability. Requires a registry_store." />
@@ -1030,6 +1038,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           <strong>three consumption shapes on the same primitive</strong>, so the developer picks the
           shape that fits the workflow rather than the SDK forcing a style.
         </p>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr><th>Shape</th><th>When to use</th></tr>
@@ -1049,6 +1058,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
         <p className="docs-p" style={{ marginTop: 24 }}>
           <strong>Scope filter.</strong>{" "}
           <code className="inline">Pathway(scope=&quot;all&quot;)</code> (default, centralised pattern)
@@ -1118,6 +1128,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           <code className="inline">LifecycleHooks</code>. The same three decorators are available on
           each.
         </p>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -1140,6 +1151,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
         <ApiCard kind="async method" name="component.refresh(*, reason='manual', neuron_id=None, extra=None) -> None" summary="Manually fire on_refresh handlers with the supplied RefreshEvent. Use when your own code knows state has changed but the SDK can't detect it." />
         <CodeBlock filename="hooks.py" html={lifecycleSnippet} maxWidth={820} />
       </Section>
@@ -1157,6 +1169,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         </ApiCard>
 
         <h3 className="docs-h3">Bundled adapters</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -1188,12 +1201,14 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">URL factory</h3>
         <ApiCard kind="function" name="synapse_from_url(url: str) -> Synapse" summary="Map a cosmo:// / nats:// / kafka:// URL to a non-connected adapter instance. Raises ValueError for any other scheme. MemorySynapse has no URL  -  build it directly." />
         <ApiCard kind="async function" name="connect_synapse(url: str) -> Synapse" summary="Same as synapse_from_url but immediately calls connect()." />
         <CodeBlock filename="urls.py" html={synapseUrlSnippet} maxWidth={780} />
 
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -1208,6 +1223,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             <tr><td>(no URL)</td><td>MemorySynapse  -  construct directly, it is process-local</td></tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Subjects</h3>
         <p className="docs-p">
@@ -1236,6 +1252,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         <CodeBlock filename="record.pyi" html={neuronRecordSnippet} maxWidth={760} />
 
         <h3 className="docs-h3">Bundled backends</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -1258,6 +1275,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
       </Section>
 
       {/* ─── Signal ─── */}
@@ -1299,6 +1317,7 @@ export default function PythonDocs({ section }: { section?: string }) {
           surfaces as a standard library or dependency exception.
         </p>
         <CodeBlock filename="errors.py" html={errorsSnippet} maxWidth={840} />
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -1329,6 +1348,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
       </Section>
     </>
   );

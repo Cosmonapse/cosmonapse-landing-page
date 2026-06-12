@@ -620,6 +620,7 @@ export default function ConceptsPage() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Glossary cheatsheet</div>
+          <div className="table-scroll">
           <table className="spec-table">
             <thead>
               <tr>
@@ -780,6 +781,7 @@ export default function ConceptsPage() {
               ))}
             </tbody>
           </table>
+          </div>
           <p className="prose" style={{ marginTop: 24, fontSize: 13, color: "var(--text-faint)" }}>
             Note: <strong>Cortex</strong> is kept as a back-compat alias for Dendrite. New code
             Note: <strong>Cortex</strong> is kept as a back-compat alias for Dendrite. New code

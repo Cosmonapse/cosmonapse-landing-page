@@ -369,6 +369,7 @@ export default function EngramDocs() {
         </p>
 
         <h3 className="docs-h3">Five invariants</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -410,6 +411,7 @@ export default function EngramDocs() {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">engram_kind  -  conventional values</h3>
         <p className="docs-p">
@@ -463,6 +465,7 @@ export default function EngramDocs() {
         </ApiCard>
 
         <h3 className="docs-h3">Fields</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -499,6 +502,7 @@ export default function EngramDocs() {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Example</h3>
         <CodeBlock filename="wire_axon.py" html={bindingUseSnippet} maxWidth={760} />
@@ -525,6 +529,7 @@ export default function EngramDocs() {
           <CodeBlock filename="recall.pyi" html={recallSigSnippet} maxWidth={760} />
         </ApiCard>
 
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
@@ -540,6 +545,7 @@ export default function EngramDocs() {
             <tr><td>meta</td><td>dict | None</td><td>Free-form envelope metadata (e.g. <code className="inline">broadcast</code>).</td></tr>
           </tbody>
         </table>
+        </div>
 
         <ApiCard
           kind="async helper"
@@ -549,6 +555,7 @@ export default function EngramDocs() {
           <CodeBlock filename="imprint.pyi" html={imprintSigSnippet} maxWidth={760} />
         </ApiCard>
 
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
@@ -562,8 +569,10 @@ export default function EngramDocs() {
             <tr><td>meta</td><td>dict | None</td><td>Free-form metadata. <code className="inline">meta.broadcast = true</code> opts into multi-receiver writes.</td></tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">op semantics</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr><th>op</th><th>Behaviour</th></tr>
@@ -576,6 +585,7 @@ export default function EngramDocs() {
             <tr><td>delete</td><td>Remove by id or <code className="inline">merge_key</code>.</td></tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">End-to-end inside a Neuron</h3>
         <CodeBlock filename="summariser.py" html={helperSnippet} maxWidth={820} />
@@ -601,6 +611,7 @@ export default function EngramDocs() {
         </ApiCard>
 
         <h3 className="docs-h3">Members</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr><th>Member</th><th>Kind</th><th>Description</th></tr>
@@ -617,6 +628,7 @@ export default function EngramDocs() {
             <tr><td>can_serve(query)</td><td>async, optional</td><td>Return <code className="inline">False</code> to decline a query (e.g. BM25 engram asked for vectors). Default serves all.</td></tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Implementing a custom backend</h3>
         <CodeBlock filename="redis_engram.py" html={customEngramSnippet} maxWidth={840} />
@@ -635,6 +647,7 @@ export default function EngramDocs() {
         <CodeBlock filename="results.pyi" html={resultsSnippet} maxWidth={820} />
 
         <h3 className="docs-h3">recall_mode → what RecallResult contains</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr><th>mode</th><th>Resolution</th><th>hits</th></tr>
@@ -645,6 +658,7 @@ export default function EngramDocs() {
             <tr><td>all</td><td>Accumulates until the deadline; caller iterates the stream.</td><td>Every responder&rsquo;s hits, with <code className="inline">engram_ids</code> populated.</td></tr>
           </tbody>
         </table>
+        </div>
       </Section>
 
       {/* ─── Backends ─── */}
@@ -759,6 +773,7 @@ export default function EngramDocs() {
           rather than a separate <code className="inline">ERROR</code> signal  -  so a shed write does
           not terminate the parent TASK.
         </p>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr><th>Exception</th><th>Raised when</th></tr>
@@ -771,6 +786,7 @@ export default function EngramDocs() {
             <tr><td>EngramOverloaded</td><td>A backend sheds load. Reported on the <code className="inline">IMPRINTED</code> receipt&rsquo;s <code className="inline">error</code> field.</td></tr>
           </tbody>
         </table>
+        </div>
       </Section>
 
       {/* ─── ID helpers ─── */}

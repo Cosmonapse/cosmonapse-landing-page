@@ -691,6 +691,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         </ApiCard>
 
         <h3 className="docs-h3">Constructor options</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -727,6 +728,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Source-paired factories</h3>
         <p className="docs-p">
@@ -795,6 +797,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         </ApiCard>
 
         <h3 className="docs-h3">Constructor options</h3>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -836,6 +839,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Inbound handlers</h3>
         <p className="docs-p">
@@ -845,6 +849,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           use <code className="inline">onSignal(type, fn, filter?)</code>, or{" "}
           <code className="inline">subscribe()</code> for a raw <code className="inline">Subscription</code>.
         </p>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -874,6 +879,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             <tr><td>await dendrite.subscribe(type, fn)</td><td>Raw subscription. Returns a Subscription.</td></tr>
           </tbody>
         </table>
+        </div>
 
         <h3 className="docs-h3">Example</h3>
         <CodeBlock filename="worker.ts" html={dendriteUseSnippet} maxWidth={880} />
@@ -917,6 +923,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         <ApiCard kind="interface" name="Synapse" summary="The contract every adapter implements. The caller builds, connects, and closes it; the Dendrite only uses it.">
           <CodeBlock filename="synapse.ts" html={synapseInterfaceSnippet} maxWidth={840} />
         </ApiCard>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -943,6 +950,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             </tr>
           </tbody>
         </table>
+        </div>
       </Section>
 
       {/* ─── Registry ─── */}
@@ -1057,6 +1065,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           hooks. The 92-test suite mirrors the Python one. Remaining differences are idiomatic,
           not functional:
         </p>
+        <div className="table-scroll">
         <table className="spec-table">
           <thead>
             <tr>
@@ -1072,6 +1081,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             <tr><td>asyncio.TimeoutError on Pathway.wait timeout</td><td>A plain Error with a timeout message.</td></tr>
           </tbody>
         </table>
+        </div>
       </Section>
     </>
   );

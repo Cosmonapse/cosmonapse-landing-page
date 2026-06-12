@@ -449,12 +449,9 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 720px) {
   .spec-table {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
+    width: max-content;
+    min-width: 100%;
     white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
   }
   pre.codeblock {
     font-size: 12px;

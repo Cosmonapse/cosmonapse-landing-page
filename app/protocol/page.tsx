@@ -309,6 +309,7 @@ export default function ProtocolPage() {
             lowercase type prefix, an underscore, and a 26-character canonical ULID. Globally unique without
             coordination; lexicographically sortable by creation time.
           </p>
+          <div className="table-scroll">
           <table className="spec-table">
             <thead>
               <tr>
@@ -348,6 +349,7 @@ export default function ProtocolPage() {
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       </section>
 
@@ -360,6 +362,7 @@ export default function ProtocolPage() {
             The protocol exposes two transport-level routing modes for TASKs. The mode is chosen at
             dispatch time; both ride the same envelope.
           </p>
+          <div className="table-scroll">
           <table className="spec-table">
             <thead>
               <tr>
@@ -384,6 +387,7 @@ export default function ProtocolPage() {
               </tr>
             </tbody>
           </table>
+          </div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, lineHeight: 1.65, marginTop: 24 }}>
             The split exists because a single queue group on a shared subject would break addressed
             routing (the broker could deliver an addressed TASK to a Dendrite that doesn&rsquo;t host
