@@ -641,6 +641,7 @@ code.inline {
   padding: 1px 6px;
   border-radius: 4px;
   font-size: 0.92em;
+  overflow-wrap: anywhere;
 }
 
 /* Section */
@@ -787,6 +788,7 @@ code.inline {
   gap: 24px;
   margin-bottom: 56px;
 }
+.envelope-grid > * { min-width: 0; }
 @media (max-width: 880px) { .envelope-grid { grid-template-columns: 1fr; } }
 .field-ref {
   background: var(--bg-card);
@@ -806,7 +808,7 @@ code.inline {
 }
 .field {
   display: grid;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 120px minmax(0, 1fr);
   gap: 14px;
   padding: 12px 20px;
   border-bottom: 1px solid var(--border);
@@ -834,7 +836,7 @@ code.inline {
 /* Message types */
 .msg-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 10px;
   margin-bottom: 56px;
 }
