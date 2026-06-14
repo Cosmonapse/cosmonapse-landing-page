@@ -71,6 +71,11 @@ export default function Footer() {
             <h5>Community</h5>
             <ul>
               <li>
+                <a href="https://discord.gg/PGU5PFy3" target="_blank" rel="noopener noreferrer">
+                  Discord
+                </a>
+              </li>
+              <li>
                 <a href="https://x.com/Cosmonapse" target="_blank" rel="noopener noreferrer">
                   X / Twitter
                 </a>

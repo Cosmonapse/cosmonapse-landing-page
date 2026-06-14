@@ -11,7 +11,12 @@ const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 const links = [
   { href: "/protocol", label: "Protocol" },
   { href: "/concepts", label: "Concepts" },
+];
+
+const learnLinks = [
   { href: "/quickstart", label: "Quickstart" },
+  { href: "/examples", label: "Examples" },
+  { href: "/community-examples", label: "Community Examples" },
 ];
 
 const docsLinks = [
@@ -21,12 +26,15 @@ const docsLinks = [
 ];
 
 const trailingLinks = [
-  { href: "/examples", label: "Examples" },
   { href: "/roadmap", label: "Roadmap" },
 ];
 
 export default function Nav() {
   const pathname = usePathname();
+  const learnActive =
+    pathname?.startsWith("/quickstart") ||
+    pathname?.startsWith("/examples") ||
+    pathname?.startsWith("/community-examples");
   const docsActive = pathname?.startsWith("/docs");
   const [open, setOpen] = useState(false);
 
@@ -58,6 +66,38 @@ export default function Nav() {
               </Link>
             </li>
           ))}
+
+          {/* Learn dropdown */}
+          <li className="nav-dropdown">
+            <Link
+              href="/quickstart"
+              className={`nav-dropdown-trigger ${learnActive ? "active" : ""}`}
+              aria-haspopup="true"
+            >
+              Learn
+              <svg
+                className="nav-caret"
+                viewBox="0 0 10 6"
+                width="10"
+                height="6"
+                aria-hidden="true"
+              >
+                <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </Link>
+            <div className="nav-dropdown-menu" role="menu">
+              {learnLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  role="menuitem"
+                  className={pathname?.startsWith(l.href) ? "active" : ""}
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </li>
 
           {/* Docs dropdown */}
           <li className="nav-dropdown">
@@ -130,6 +170,17 @@ export default function Nav() {
           {links.map((l) => (
             <li key={l.href}>
               <Link href={l.href} className={pathname?.startsWith(l.href) ? "active" : ""}>
+                {l.label}
+              </Link>
+            </li>
+          ))}
+          <li className="nav-mobile-group-label">Learn</li>
+          {learnLinks.map((l) => (
+            <li key={l.href}>
+              <Link
+                href={l.href}
+                className={`nav-mobile-sub${pathname?.startsWith(l.href) ? " active" : ""}`}
+              >
                 {l.label}
               </Link>
             </li>
