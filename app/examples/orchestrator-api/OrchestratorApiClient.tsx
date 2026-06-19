@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
+import PrismPreview from "@/components/PrismPreview";
 
 // ---------------------------------------------------------------------------
 // Framework tab type
@@ -842,6 +843,19 @@ export default function OrchestratorApiClient() {
       </section>
 
       {/* Related */}
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">Watch it</div>
+          <h2 className="sub-title">See it live in Prism.</h2>
+          <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
+            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            every Signal on the bus as it fires. Run it against the dev synapse above to watch
+            this workflow animate.
+          </p>
+          <PrismPreview namespace="api-demo" src="/prism/orchestrator-api.gif" />
+        </div>
+      </section>
+
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Related</div>

@@ -205,7 +205,7 @@ sig = <span class="tk-kw">await</span> pw.wait(timeout_s=<span class="tk-num">10
 print(sig.payload[<span class="tk-str">"output"</span>])
 
 <span class="tk-cm"># Shape 2  -  callbacks (reactive / streaming)</span>
-pw = orch.dispatch_and_subscribe(neuron=<span class="tk-str">"streamer"</span>, input={...})
+pw = <span class="tk-kw">await</span> orch.dispatch_and_subscribe(neuron=<span class="tk-str">"streamer"</span>, input={...})
 
 <span class="tk-op">@</span>pw.on(SignalType.AGENT_OUTPUT)
 <span class="tk-kw">async def</span> <span class="tk-fn">on_chunk</span>(sig):
@@ -285,7 +285,7 @@ results: dict = {}
 
 <span class="tk-op">@</span>orch.on_agent_output
 <span class="tk-kw">async def</span> <span class="tk-fn">collect</span>(sig):
-    results[sig.payload[<span class="tk-str">"neuron"</span>]] = sig.payload[<span class="tk-str">"output"</span>]
+    results[sig.directed.id] = sig.payload[<span class="tk-str">"output"</span>]
     <span class="tk-kw">if</span> {<span class="tk-str">"design"</span>, <span class="tk-str">"arch"</span>} <= results.keys():
         p1_done.set()
 
@@ -381,11 +381,56 @@ sig = <span class="tk-kw">await</span> pw.wait()
     ],
   },
 
-  // -------------------------------------------------------------------------
-  // PRODUCTION  -  10
-  // -------------------------------------------------------------------------
   {
     number: 10,
+    title: "Retry & cancellation  -  surviving flaky workers",
+    surface: "RetryStrategy · run_with_retry · dispatch_and_wait(retry=) · stop_trace · STOP / STOPPED",
+    tier: "advanced",
+    note: (
+      <>
+        Hand a <code className="inline">RetryStrategy</code> to{" "}
+        <code className="inline">run_with_retry</code> (or{" "}
+        <code className="inline">dispatch_and_wait(retry=…)</code>) to re-dispatch on
+        timeouts, early closes, or recoverable errors. Each new-trace attempt STOPs
+        the abandoned one  -  optionally rolling back its Engram writes  -  so a
+        stalled worker can&rsquo;t outlive the retry.
+      </>
+    ),
+    blocks: [
+      {
+        html: `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> RetryStrategy
+
+<span class="tk-cm"># 5 attempts, exponential backoff, a fresh trace per try. A new-trace retry</span>
+<span class="tk-cm"># broadcasts STOP on the abandoned attempt first, so a stalled worker can't</span>
+<span class="tk-cm"># keep running (or keep writing Engram) behind the retry.</span>
+sig = <span class="tk-kw">await</span> orch.run_with_retry(
+    neuron=<span class="tk-str">"flaky"</span>, input={<span class="tk-str">"q"</span>: <span class="tk-str">"hi"</span>},
+    retry=RetryStrategy(
+        max_attempts=<span class="tk-num">5</span>, timeout_s=<span class="tk-num">10.0</span>,
+        backoff=<span class="tk-kw">lambda</span> a: <span class="tk-num">2</span> ** a,   <span class="tk-cm"># 1s, 2s, 4s, ...</span>
+        rollback_on_retry=<span class="tk-kw">True</span>,    <span class="tk-cm"># undo each abandoned attempt's Engram writes</span>
+    ),
+)
+
+<span class="tk-cm"># dispatch_and_wait takes the same policy inline</span>
+sig = <span class="tk-kw">await</span> orch.dispatch_and_wait(
+    neuron=<span class="tk-str">"flaky"</span>, input={...}, retry=RetryStrategy(max_attempts=<span class="tk-num">3</span>),
+)
+
+<span class="tk-cm"># Cancel a whole workflow yourself  -  broadcasts STOP, peers ack with STOPPED</span>
+acks = <span class="tk-kw">await</span> orch.stop_trace(
+    trace_id, rollback=<span class="tk-kw">True</span>, reason=<span class="tk-str">"superseded"</span>, collect_acks=<span class="tk-kw">True</span>,
+)`,
+      },
+    ],
+    deeperLink: { href: "/examples/retry", label: "Retry & rollback  -  full walkthrough" },
+  },
+
+  // -------------------------------------------------------------------------
+  // PRODUCTION  -  11
+  // -------------------------------------------------------------------------
+  {
+    number: 11,
     title: "Production  -  persistent registry + NATS/Kafka",
     surface: "SqliteRegistryStore · PostgresRegistryStore · NatsSynapse · KafkaSynapse",
     tier: "production",
@@ -534,7 +579,7 @@ export default function TutorialsClient() {
           <div className="page-eyebrow">// Examples</div>
           <h1 className="page-title">Tutorials, Ordered.</h1>
           <p className="page-sub">
-            Ten tutorials, sorted by what you need next. Start with the Neuron
+            Eleven tutorials, sorted by what you need next. Start with the Neuron
             in twelve lines; finish on the production switch from
             MemorySynapse to NATS or Kafka. Then the CLI reference, in one
             page.

@@ -2,6 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
+import CodeBlock from "@/components/CodeBlock";
+import PrismPreview from "@/components/PrismPreview";
 import ComboExample, {
   type Combo,
   type ComboData,
@@ -415,6 +417,19 @@ const DATA: Record<Combo, ComboData> = {
   "ts-nats": tsNatsData(),
 };
 
+const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a MemorySynapse, which Prism can't attach to.</span>
+<span class="tk-cm"># To watch it live, start a dev synapse and point the code at it:</span>
+
+<span class="tk-cm"># terminal 1  -  the bus</span>
+<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=quickstart
+
+<span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
+<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
+
+<span class="tk-cm"># in the code  -  swap one line:</span>
+<span class="tk-cm"># synapse = MemorySynapse()</span>
+synapse = await connect_synapse("cosmo://127.0.0.1:7070")`;
+
 export default function NoOrchestratorClient() {
   return (
     <>
@@ -447,6 +462,23 @@ export default function NoOrchestratorClient() {
       </header>
 
       <ComboExample data={DATA} defaultCombo="py-dev" />
+
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">Watch it in Prism</div>
+          <h2 className="sub-title">See the Signals fire in the browser.</h2>
+          <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
+            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT, FINAL  -  as the workflow
+            runs. The demo runs in-process on a <code className="inline">MemorySynapse</code>,
+            which Prism can&apos;t attach to, so start a dev synapse and point the code at it.
+          </p>
+          <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />
+          <div style={{ marginTop: 24 }}>
+            <PrismPreview namespace="quickstart" src="/prism/no-orchestrator.gif" />
+          </div>
+        </div>
+      </section>
 
       <section className="section-sm">
         <div className="container">

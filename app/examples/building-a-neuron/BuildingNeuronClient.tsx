@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
+import PrismPreview from "@/components/PrismPreview";
 
 // ---------------------------------------------------------------------------
 // Snippets  -  kept in sync with cosmonapse-core/examples/building_a_neuron/main.py
@@ -296,6 +297,9 @@ export default function BuildingNeuronClient() {
             as the greeter answers.
           </p>
           <CodeBlock filename="terminal" html={prismSnippet} maxWidth={880} />
+          <div style={{ marginTop: 24 }}>
+            <PrismPreview namespace="demo" src="/prism/building-a-neuron.gif" />
+          </div>
         </div>
       </section>
 

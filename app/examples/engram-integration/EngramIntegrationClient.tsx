@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
+import PrismPreview from "@/components/PrismPreview";
 
 // ---------------------------------------------------------------------------
 // Snippets  -  kept in sync with cosmonapse-core/examples/engram_integration/main.py
@@ -261,6 +262,9 @@ export default function EngramIntegrationClient() {
             same trace as the TASK that caused it.
           </p>
           <CodeBlock filename="terminal" html={prismSnippet} maxWidth={880} />
+          <div style={{ marginTop: 24 }}>
+            <PrismPreview namespace="demo" src="/prism/engram-integration.gif" />
+          </div>
         </div>
       </section>
 

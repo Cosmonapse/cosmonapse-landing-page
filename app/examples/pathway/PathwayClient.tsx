@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
+import PrismPreview from "@/components/PrismPreview";
 
 const watchSnippet = `<span class="tk-cm"># terminal 1  -  the bus</span>
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
@@ -216,6 +217,9 @@ export default function PathwayClient() {
           <div className="sub-eyebrow" style={{ marginTop: 32 }}>Watch it</div>
           <h2 className="section-title">See every shape in Prism.</h2>
           <CodeBlock filename="terminal" html={watchSnippet} maxWidth={840} />
+          <div style={{ marginTop: 24 }}>
+            <PrismPreview namespace="demo" src="/prism/pathway.gif" />
+          </div>
         </div>
       </section>
 
