@@ -23,12 +23,9 @@ export const engramToc: TocGroup = {
 
 /* ─────────────────────────────  CODE SNIPPETS  ───────────────────────────── */
 
-const installSnippet = `<span class="tk-cm"># Engram ships inside the base cosmonapse package  -  nothing extra for</span>
-<span class="tk-cm"># InMemoryEngram and SqliteEngram (stdlib sqlite3).</span>
-<span class="tk-op">$</span> pip install cosmonapse
-
-<span class="tk-cm"># PostgresEngram lazy-imports asyncpg; install the extra to use it:</span>
-<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[postgres]"</span>`;
+const installSnippet = `<span class="tk-cm"># Engram ships inside the base cosmonapse package  -  InMemoryEngram,</span>
+<span class="tk-cm"># SqliteEngram and PostgresEngram all included.</span>
+<span class="tk-op">$</span> pip install cosmonapse`;
 
 const importSnippet = `<span class="tk-cm"># Everything public is re-exported from cosmonapse.engram.</span>
 <span class="tk-kw">from</span> cosmonapse.engram <span class="tk-kw">import</span> (

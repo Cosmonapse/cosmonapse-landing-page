@@ -530,6 +530,38 @@ export default function ProtocolPage() {
               <code className="inline">{`{ status, load?, in_flight? }`}</code>
             </Msg>
           </div>
+
+          <div style={{ marginTop: 56 }}>
+            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+          </div>
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Workflow control</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
+            Cooperative cancellation of a whole trace. <code className="inline">STOP</code> is
+            orchestrator-gated and broadcast on the trace; every Dendrite filters by{" "}
+            <code className="inline">trace_id</code>, self-selects, cancels its in-flight Neuron work
+            and Engram I/O, optionally rolls back its Engram writes via the per-trace saga journal,
+            then acks with <code className="inline">STOPPED</code>. This is also the mechanism a
+            new-trace <code className="inline">RetryStrategy</code> uses to preempt an abandoned
+            attempt before launching the next one  -  so a stalled worker (and its half-finished
+            Engram writes) can&rsquo;t outlive the retry.
+          </p>
+          <div className="msg-grid">
+            <Msg name="STOP" by="Dendrite (orchestrator)">
+              Broadcasts a cooperative-cancellation request for an entire trace. Every Dendrite
+              filters by trace_id and self-selects. Fire-and-forget and idempotent  -  a peer that
+              never saw it simply isn&rsquo;t stopped. Payload:{" "}
+              <code className="inline">{`{ rollback?, reason? }`}</code> where{" "}
+              <code className="inline">rollback</code> replays each hosted Engram&rsquo;s per-trace
+              saga journal in reverse. Note: rollback reverses Engram state only  -  external side
+              effects need a Neuron-registered compensator.
+            </Msg>
+            <Msg name="STOPPED" by="Dendrite">
+              One Dendrite&rsquo;s ack that it has quiesced its share of the trace.{" "}
+              <code className="inline">parent_id</code> is the STOP&rsquo;s id so the originator can
+              correlate acks. Payload:{" "}
+              <code className="inline">{`{ rolled_back, cancelled, compensated, node? }`}</code>.
+            </Msg>
+          </div>
         </div>
       </section>
 

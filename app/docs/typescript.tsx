@@ -249,6 +249,13 @@ const dendriteClassSnippet = `<span class="tk-kw">interface</span> DendriteOptio
   }): Promise&lt;Pathway>;
   observePathway(traceId: <span class="tk-kw">string</span>): Promise&lt;Pathway>;   <span class="tk-cm">// watch a peer's trace</span>
 
+  <span class="tk-cm">// ── Resilience & cancellation (orchestrator-role only) ──</span>
+  runWithRetry(args &amp; { retry: RetryStrategy; timeoutMs? }): Promise&lt;Signal>;
+  emitStop(args: { traceId; rollback?; reason? }): Promise&lt;Signal>;
+  stopTrace(traceId: <span class="tk-kw">string</span>, opts?: {
+    rollback?; reason?; collectAcks?; timeoutMs?;
+  }): Promise&lt;Signal[]>;
+
   <span class="tk-cm">// Worker side: register your own bidder (suppresses the auto-bidder).</span>
   onTaskOffer(fn: SignalHandler, filter?: HandlerFilter): SignalHandler;
   bid(offer: Signal, args: { neuron; cost; etaMs?; confidence? }): Promise&lt;Signal>;
@@ -437,12 +444,44 @@ const signalTypeSnippet = `<span class="tk-cm">// SignalType is a const object (
   REGISTER: <span class="tk-str">"REGISTER"</span>,
   DEREGISTER: <span class="tk-str">"DEREGISTER"</span>,
   HEARTBEAT: <span class="tk-str">"HEARTBEAT"</span>,
+  <span class="tk-cm">// Workflow control  -  cooperative cancellation of a whole trace</span>
+  STOP: <span class="tk-str">"STOP"</span>,
+  STOPPED: <span class="tk-str">"STOPPED"</span>,
 } <span class="tk-kw">as</span> <span class="tk-kw">const</span>;
 <span class="tk-kw">type</span> SignalType = (<span class="tk-kw">typeof</span> SignalType)[<span class="tk-kw">keyof</span> <span class="tk-kw">typeof</span> SignalType];
 
 <span class="tk-cm">// Sets controlling who may emit what:</span>
 AXON_TYPES: ReadonlySet&lt;SignalType>;
 SYNAPSE_TYPES: ReadonlySet&lt;SignalType>;`;
+
+const retrySnippet = `<span class="tk-kw">import</span> { Dendrite, type RetryStrategy } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+
+<span class="tk-cm">// Declarative retry policy for the request/reply shape.</span>
+<span class="tk-kw">interface</span> RetryStrategy {
+  maxAttempts?:     <span class="tk-kw">number</span>;   <span class="tk-cm">// total tries incl. the first (>= 1). Default 3</span>
+  timeoutMs?:       <span class="tk-kw">number</span>;   <span class="tk-cm">// per-attempt terminal timeout. Default 30_000</span>
+  backoffMs?:       (attempt: <span class="tk-kw">number</span>) => <span class="tk-kw">number</span>;  <span class="tk-cm">// default 0</span>
+  retryOn?:         (outcome: Signal | Error) => <span class="tk-kw">boolean</span>;  <span class="tk-cm">// default defaultRetryOn</span>
+  newTrace?:        <span class="tk-kw">boolean</span>;  <span class="tk-cm">// fresh trace + STOP the abandoned one. Default true</span>
+  rollbackOnRetry?: <span class="tk-kw">boolean</span>;  <span class="tk-cm">// also roll back its Engram writes. Default false</span>
+  onRetry?:         (attempt: <span class="tk-kw">number</span>, outcome: Signal | Error) => <span class="tk-kw">void</span>;
+  reason?:          <span class="tk-kw">string</span>;   <span class="tk-cm">// carried on the preemptive STOP. Default "retry"</span>
+}
+
+<span class="tk-cm">// defaultRetryOn retries on a TimeoutError, a Pathway that closed before a</span>
+<span class="tk-cm">// terminal, or an ERROR flagged recoverable. FINAL / AGENT_OUTPUT /</span>
+<span class="tk-cm">// CLARIFICATION / PERMISSION are never retried.</span>
+<span class="tk-kw">const</span> sig = <span class="tk-kw">await</span> orch.runWithRetry({
+  neuron: <span class="tk-str">"flaky-worker"</span>, input: { q: <span class="tk-str">"hi"</span> },
+  retry: {
+    maxAttempts: <span class="tk-num">5</span>, timeoutMs: <span class="tk-num">10_000</span>,
+    backoffMs: (a) => <span class="tk-num">1000</span> * <span class="tk-num">2</span> ** a,  <span class="tk-cm">// 1s, 2s, 4s, ...</span>
+    rollbackOnRetry: <span class="tk-kw">true</span>,            <span class="tk-cm">// undo each abandoned attempt's Engram writes</span>
+  },
+});
+
+<span class="tk-cm">// Or cancel a whole workflow yourself (and roll back its Engram writes):</span>
+<span class="tk-kw">await</span> orch.stopTrace(traceId, { rollback: <span class="tk-kw">true</span>, reason: <span class="tk-str">"superseded"</span> });`;
 
 const idsSnippet = `<span class="tk-kw">import</span> { newTraceId, newEventId, newEngramId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
@@ -652,7 +691,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           <code className="inline">@cosmonapse/sdk</code> is the 1:1 TypeScript port of the Python
           envelope protocol and runtime. The shapes are identical on the wire  -  only the surface is
           idiomatic: <code className="inline">camelCase</code> names, options-object constructors, and
-          classes you instantiate with <code className="inline">new</code>. As of 0.1.3 the TS SDK is at feature parity
+          classes you instantiate with <code className="inline">new</code>. As of 0.1.5 the TS SDK is at feature parity
           with Python  -  Pathway dispatch, capability routing and bidding, Engram, lifecycle hooks,
           and the full filtered handler surface are all ported; see{" "}
           <Link href="#ts-parity">Parity with Python</Link> for the details.
@@ -881,6 +920,20 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         </table>
         </div>
 
+        <h3 className="docs-h3">Resilience &amp; cancellation</h3>
+        <p className="docs-p">
+          Retry fits the request/reply shape only  -  the Dendrite owns the full dispatch → wait →
+          close arc and can transparently re-dispatch. The streaming shapes hand the live Pathway to
+          the caller, so retry there would orphan their subscriptions. A new-trace retry broadcasts{" "}
+          <code className="inline">STOP</code> on the abandoned trace first, so a stalled worker
+          can&rsquo;t outlive the retry. Full parity with the Python surface.
+        </p>
+        <ApiCard kind="async method" name="dendrite.runWithRetry(args & { retry: RetryStrategy, timeoutMs? }): Promise<Signal>" summary="Dispatch and wait, retrying per the RetryStrategy until a non-retryable outcome or attempts are exhausted. Resolves with the terminal Signal (FINAL / AGENT_OUTPUT / CLARIFICATION / PERMISSION, or a final ERROR); rejects with the last error when every attempt timed out." />
+        <ApiCard kind="async method" name="dendrite.dispatchAndWait(args & { retry?: RetryStrategy }): Promise<Signal>" summary="The request/reply sugar also accepts retry. When supplied it delegates to the same loop as runWithRetry; when omitted it is a single dispatch + wait." />
+        <ApiCard kind="async method" name="dendrite.emitStop({ traceId, rollback?, reason? }): Promise<Signal>" summary="Broadcast a STOP for a whole trace (orchestrator-gated). Best-effort and idempotent: a peer that never saw it simply isn't stopped. rollback replays each hosted Engram's per-trace saga journal in reverse. Resolves with the emitted STOP Signal." />
+        <ApiCard kind="async method" name="dendrite.stopTrace(traceId, { rollback?, reason?, collectAcks?, timeoutMs? }): Promise<Signal[]>" summary="Thin wrapper over emitStop. With collectAcks: true it opens a short-lived STOPPED subscription and resolves with the acks seen within timeoutMs (best effort)." />
+        <CodeBlock filename="retry.ts" html={retrySnippet} maxWidth={880} />
+
         <h3 className="docs-h3">Example</h3>
         <CodeBlock filename="worker.ts" html={dendriteUseSnippet} maxWidth={880} />
       </Section>
@@ -1026,6 +1079,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         <ApiCard kind="const + type" name="SignalType" summary="A frozen const object plus a union type. AXON_TYPES and SYNAPSE_TYPES are ReadonlySets controlling who may emit which type.">
           <CodeBlock filename="signal-type.ts" html={signalTypeSnippet} maxWidth={840} />
         </ApiCard>
+        <ApiCard kind="builders" name="stopSignal(...) / stoppedSignal(...)" summary="Envelope builders for the workflow-control pair. stopSignal({ traceId, rollback?, reason? }) builds a STOP; stoppedSignal({ traceId, parentId, rolledBack?, cancelled?, compensated?, node? }) builds the ack. You rarely call these directly  -  dendrite.emitStop / stopTrace build and publish them for you." />
       </Section>
 
       {/* ─── IDs ─── */}
@@ -1058,7 +1112,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
       {/* ─── Parity ─── */}
       <Section id="ts-parity" eyebrow="TS · 13" title="Parity with the Python SDK">
         <p className="docs-p">
-          As of 0.1.3 the port covers the full Python surface: the envelope and signal builders,
+          As of 0.1.5 the port covers the full Python surface: the envelope and signal builders,
           all four Synapse adapters with the URL factory, all three registry backends, Neuron
           source factories, Axon (with recognisers and Engram bindings), Dendrite (Pathway
           dispatch, offers and bidding, interactive cognition, Engram hosting), and the lifecycle

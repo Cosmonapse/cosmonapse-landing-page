@@ -18,7 +18,7 @@ const INSTALL_HTML: Record<Combo, string> = {
   "py-dev": `<span class="tk-cm"># SDK + the bundled cosmo CLE  -  the devsynapse needs no broker.</span>
 pip install cosmonapse`,
   "py-nats": `<span class="tk-cm"># SDK with the NATS extra.</span>
-pip install <span class="tk-str">"cosmonapse[nats]"</span>`,
+pip install <span class="tk-str">"cosmonapse"</span>`,
   "py-kafka": `<span class="tk-cm"># SDK + the Kafka driver (KafkaSynapse imports aiokafka lazily).</span>
 pip install cosmonapse
 pip install aiokafka`,

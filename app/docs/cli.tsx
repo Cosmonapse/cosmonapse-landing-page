@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 import { Section, type TocGroup } from "./shared";
 
@@ -417,6 +418,16 @@ export default function CliDocs({ section }: { section?: string }) {
           to FINAL (terminal-handler finalize).
         </p>
         <CodeBlock html={cliDispatchSnippet} maxWidth={820} />
+        <p className="docs-p" style={{ marginTop: 16, fontSize: 13, color: "var(--text-faint)" }}>
+          <strong>Retry &amp; cancellation</strong> are SDK-level, not CLI flags:{" "}
+          <code className="inline">cosmo dispatch</code> performs a single dispatch + wait. For
+          automatic retries with backoff and preemptive STOP of abandoned attempts, use{" "}
+          <code className="inline">Dendrite.run_with_retry(retry=…)</code> /{" "}
+          <code className="inline">dispatch_and_wait(retry=…)</code>; to cancel a whole trace use{" "}
+          <code className="inline">Dendrite.stop_trace(...)</code>. See the{" "}
+          <Link href="/docs/python/dendrite">Python</Link> and{" "}
+          <Link href="/docs/typescript/dendrite">TypeScript</Link> Dendrite references.
+        </p>
       </Section>
 
       <Section id="cli-registry" eyebrow="CLI · 08" title="cosmo registry">

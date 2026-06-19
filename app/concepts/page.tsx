@@ -616,6 +616,103 @@ export default function ConceptsPage() {
         </div>
       </section>
 
+      {/* Resolution & retry */}
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">Resolution &amp; retry</div>
+          <h2 className="sub-title">How a Pathway resolves  -  and retries.</h2>
+          <p className="prose">
+            Every dispatch opens a <strong>Pathway</strong>  -  a per-trace handle scoped to one{" "}
+            <code className="inline">trace_id</code>. In the request/reply shape, the Dendrite owns the
+            whole arc: it dispatches the TASK, waits for the first <strong>terminal</strong> Signal,
+            then closes the Pathway. A Pathway <em>resolves</em> the moment a terminal arrives  -  a{" "}
+            <code className="inline">FINAL</code> (success), an <code className="inline">ERROR</code>,
+            or an interactive <code className="inline">CLARIFICATION</code> /{" "}
+            <code className="inline">PERMISSION</code> the caller must answer. With{" "}
+            <code className="inline">{`scope: "terminal"`}</code> only those are delivered; with{" "}
+            <code className="inline">{`scope: "all"`}</code> the cognition stream (THOUGHT_DELTA, PLAN,
+            TOOL_CALL…) flows past first and the terminal still closes it.
+          </p>
+          <p className="prose">
+            A Pathway is considered <strong>stuck</strong> in three cases: no terminal arrives within{" "}
+            <code className="inline">timeout_s</code> (a timeout on the wait), the Pathway closes
+            before any terminal (a <code className="inline">PathwayClosedError</code>, e.g. the worker
+            died), or it resolves to an <code className="inline">ERROR</code> flagged{" "}
+            <code className="inline">recoverable</code>. A <code className="inline">FINAL</code>,
+            AGENT_OUTPUT, CLARIFICATION, or PERMISSION is never &ldquo;stuck&rdquo;  -  each is a result
+            or a decision the caller must handle, not something to retry behind their back.
+          </p>
+          <p className="prose">
+            <strong>Retry</strong> is a declarative policy  -  a{" "}
+            <code className="inline">RetryStrategy</code>  -  handed to{" "}
+            <code className="inline">dispatch_and_wait(retry=…)</code> or{" "}
+            <code className="inline">run_with_retry(…)</code>. It controls how many attempts to make,
+            the per-attempt timeout, the backoff between tries, and the predicate that decides whether a
+            given outcome is worth retrying. Because retry transparently re-dispatches, it only fits the
+            request/reply shape: the streaming shapes (<code className="inline">dispatch</code> /{" "}
+            <code className="inline">dispatch_and_subscribe</code>) hand the live Pathway back to the
+            caller, so retrying there would orphan their subscriptions  -  wrap those in a
+            resilient-pathway pattern instead.
+          </p>
+          <p className="prose">
+            The subtle part is what happens to the <em>abandoned</em> attempt. By default each retry
+            runs on a <strong>fresh trace</strong>, and before launching it the Dendrite broadcasts a{" "}
+            <strong>STOP</strong> on the old trace. STOP is cooperative cancellation: every Dendrite
+            hosting work on that trace cancels its in-flight Neuron call and Engram I/O, and  -  when{" "}
+            <code className="inline">rollback_on_retry</code> is set  -  replays that trace&rsquo;s
+            per-trace <strong>saga journal</strong> in reverse to undo half-finished Engram writes,
+            then acks with <strong>STOPPED</strong>. This is what stops a stalled worker from
+            continuing to run (and keep writing memory) behind a retry that has already moved on.
+            Rollback reverses Engram state only  -  a side effect a Neuron caused in the outside world
+            (a sent email, an external write) is reversed only if that Neuron registered its own
+            compensator.
+          </p>
+
+          <div className="layer-stack" style={{ marginTop: 40 }}>
+            <div className="layer">
+              <div className="layer-name">1 · Dispatch &amp; wait</div>
+              <div className="layer-desc">
+                Open a Pathway on a fresh trace, dispatch the TASK, and await the first terminal Signal
+                within <code className="inline">timeout_s</code>.
+              </div>
+            </div>
+            <div className="layer-arrow">↓</div>
+            <div className="layer highlight">
+              <div className="layer-name">2 · Evaluate the outcome</div>
+              <div className="layer-desc">
+                If the outcome is terminal-and-final (FINAL / AGENT_OUTPUT / CLARIFICATION /
+                PERMISSION), return it. If it is a timeout, an early close, or a{" "}
+                <code className="inline">recoverable</code> ERROR  -  and attempts remain  -  retry.
+              </div>
+            </div>
+            <div className="layer-arrow">↓</div>
+            <div className="layer">
+              <div className="layer-name">3 · Preempt the abandoned attempt</div>
+              <div className="layer-desc">
+                Broadcast STOP on the old trace. Hosts cancel in-flight work, optionally roll back
+                Engram writes via the saga journal, and ack with STOPPED.
+              </div>
+            </div>
+            <div className="layer-arrow">↓</div>
+            <div className="layer">
+              <div className="layer-name">4 · Back off &amp; re-dispatch</div>
+              <div className="layer-desc">
+                Sleep <code className="inline">backoff(attempt)</code>, fire the optional{" "}
+                <code className="inline">on_retry</code> hook, and loop with a new trace until a
+                non-retryable outcome or attempts are exhausted.
+              </div>
+            </div>
+          </div>
+
+          <p className="prose" style={{ marginTop: 32, fontSize: 13, color: "var(--text-faint)" }}>
+            See <strong>STOP</strong> / <strong>STOPPED</strong> in the{" "}
+            <a href="/protocol" style={{ color: "var(--accent)" }}>envelope spec</a>, and{" "}
+            <code className="inline">RetryStrategy</code> / <code className="inline">run_with_retry</code>{" "}
+            in the <a href="/docs/python/dendrite" style={{ color: "var(--accent)" }}>SDK reference</a>.
+          </p>
+        </div>
+      </section>
+
       {/* Glossary  -  grouped by product with status rows */}
       <section className="section-sm">
         <div className="container">

@@ -38,11 +38,6 @@ export const pythonToc: TocGroup = {
 const installSnippet = `<span class="tk-cm"># Python 3.11 or newer required.</span>
 <span class="tk-op">$</span> pip install cosmonapse
 
-<span class="tk-cm"># Optional extras (declared in pyproject):</span>
-<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[nats]"</span>      <span class="tk-cm"># NatsSynapse (nats-py)</span>
-<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[kafka]"</span>     <span class="tk-cm"># KafkaSynapse (aiokafka)</span>
-<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[postgres]"</span>  <span class="tk-cm"># PostgresRegistryStore + PostgresEngram (asyncpg)</span>
-
 <span class="tk-cm"># Provider-backed Neurons (Ollama / HuggingFace) need httpx:</span>
 <span class="tk-op">$</span> pip install httpx
 
@@ -640,9 +635,43 @@ const signalTypeSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">
     <span class="tk-cm"># Discovery</span>
     DISCOVER        <span class="tk-op">=</span> <span class="tk-str">"DISCOVER"</span>
 
+    <span class="tk-cm"># Workflow control  -  cooperative cancellation of a whole trace</span>
+    STOP            <span class="tk-op">=</span> <span class="tk-str">"STOP"</span>
+    STOPPED         <span class="tk-op">=</span> <span class="tk-str">"STOPPED"</span>
+
 <span class="tk-cm"># Frozensets defining who may emit what:</span>
 <span class="tk-fn">AXON_TYPES</span>     <span class="tk-cm"># AGENT_OUTPUT, CLARIFICATION, PERMISSION, ERROR, REGISTER, DEREGISTER, HEARTBEAT</span>
 <span class="tk-fn">SYNAPSE_TYPES</span>  <span class="tk-cm"># every type a Dendrite is allowed to emit (incl. ERROR)</span>`;
+
+const retrySnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> RetryStrategy, default_retry_on
+
+<span class="tk-cm"># Declarative retry policy for the request/reply shape.</span>
+<span class="tk-op">@</span>dataclass(frozen<span class="tk-op">=</span><span class="tk-kw">True</span>)
+<span class="tk-kw">class</span> <span class="tk-fn">RetryStrategy</span>:
+    max_attempts:      int   <span class="tk-op">=</span> <span class="tk-num">3</span>     <span class="tk-cm"># total tries, incl. the first (&gt;= 1)</span>
+    timeout_s:         float <span class="tk-op">=</span> <span class="tk-num">30.0</span>  <span class="tk-cm"># per-attempt terminal timeout</span>
+    backoff:           Callable[[int], float] <span class="tk-op">=</span> ...   <span class="tk-cm"># attempt -&gt; secs; default 0</span>
+    retry_on:          Callable[[object], bool] <span class="tk-op">=</span> default_retry_on
+    new_trace:         bool  <span class="tk-op">=</span> <span class="tk-kw">True</span>   <span class="tk-cm"># fresh trace + STOP the abandoned one</span>
+    rollback_on_retry: bool  <span class="tk-op">=</span> <span class="tk-kw">False</span>  <span class="tk-cm"># also roll back its Engram writes</span>
+    on_retry:          Callable[[int, object], None] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>
+    reason:            str   <span class="tk-op">=</span> <span class="tk-str">"retry"</span>
+
+<span class="tk-cm"># default_retry_on retries on a timeout, on a Pathway that closed before a</span>
+<span class="tk-cm"># terminal, or on an ERROR flagged recoverable. A FINAL / AGENT_OUTPUT /</span>
+<span class="tk-cm"># CLARIFICATION / PERMISSION is never retried.</span>
+
+sig <span class="tk-op">=</span> <span class="tk-kw">await</span> orch.<span class="tk-fn">run_with_retry</span>(
+    neuron<span class="tk-op">=</span><span class="tk-str">"flaky-worker"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"q"</span>: <span class="tk-str">"hi"</span>},
+    retry<span class="tk-op">=</span><span class="tk-fn">RetryStrategy</span>(
+        max_attempts<span class="tk-op">=</span><span class="tk-num">5</span>, timeout_s<span class="tk-op">=</span><span class="tk-num">10.0</span>,
+        backoff<span class="tk-op">=</span><span class="tk-kw">lambda</span> a: <span class="tk-num">2</span> <span class="tk-op">**</span> a,   <span class="tk-cm"># 1s, 2s, 4s, ...</span>
+        rollback_on_retry<span class="tk-op">=</span><span class="tk-kw">True</span>,        <span class="tk-cm"># undo each abandoned attempt's Engram writes</span>
+    ),
+)
+
+<span class="tk-cm"># Or cancel a whole workflow yourself (and roll back its Engram writes):</span>
+<span class="tk-kw">await</span> orch.<span class="tk-fn">stop_trace</span>(trace_id, rollback<span class="tk-op">=</span><span class="tk-kw">True</span>, reason<span class="tk-op">=</span><span class="tk-str">"superseded"</span>)`;
 
 const helpersSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> new_trace_id, new_event_id
 
@@ -977,6 +1006,21 @@ export default function PythonDocs({ section }: { section?: string }) {
         <ApiCard kind="async method" name="Dendrite.emit_error(*, trace_id, parent_id, code, message, recoverable=False, meta=None) -> Signal" summary="Publish a terminal ERROR envelope with a short machine code and a human-readable message. recoverable=True signals to the consumer that the task may be retried or re-routed." />
         <ApiCard kind="async method" name="Dendrite.emit(signal: Signal) -> None" summary="Low-level escape hatch. Raises DendriteProtocolError for any Signal whose type is not in SYNAPSE_TYPES (the allow-list defined in code, not just convention)." />
 
+        <h3 className="docs-h3">Resilience &amp; cancellation</h3>
+        <p className="docs-p">
+          Retry is a declarative policy for the request/reply shape only  -  the Dendrite owns the
+          full dispatch → wait → close arc and can transparently re-dispatch. The streaming shapes
+          (<code className="inline">dispatch</code> / <code className="inline">dispatch_and_subscribe</code>)
+          hand the live Pathway back to the caller, so retry there would orphan their subscriptions.
+          A new-trace retry broadcasts <code className="inline">STOP</code> on the abandoned trace
+          first, so a stalled worker (and its half-finished Engram writes) can&rsquo;t outlive the retry.
+        </p>
+        <ApiCard kind="async method" name="Dendrite.run_with_retry(*, retry: RetryStrategy, neuron=None, input, capabilities=None, timeout_s=30.0, scope='all', finalize=None, **kw) -> Signal" summary="Dispatch and wait, retrying per the RetryStrategy until a non-retryable outcome or attempts are exhausted. Returns the resolved Signal (FINAL / AGENT_OUTPUT / CLARIFICATION / PERMISSION, or a final ERROR); re-raises the last exception when every attempt timed out." />
+        <ApiCard kind="async method" name="Dendrite.dispatch_and_wait(..., retry: RetryStrategy | None = None) -> Signal" summary="The request/reply sugar also accepts retry=. When supplied it delegates to the same loop as run_with_retry; when omitted it is a single dispatch + wait." />
+        <ApiCard kind="async method" name="Dendrite.emit_stop(*, trace_id, rollback=False, reason=None) -> Signal" summary="Broadcast a STOP for a whole trace (orchestrator-gated). Best-effort and idempotent: STOP is fire-and-forget, so a peer that never saw it simply isn't stopped. rollback=True replays each hosted Engram's per-trace saga journal in reverse. Returns the emitted STOP Signal." />
+        <ApiCard kind="async method" name="Dendrite.stop_trace(trace_id, *, rollback=False, reason=None, collect_acks=False, timeout_s=1.0) -> list[Signal]" summary="Thin wrapper over emit_stop. With collect_acks=True it opens a short-lived STOPPED subscription and returns the acks (one per quiesced Dendrite) seen within timeout_s, best effort." />
+        <CodeBlock filename="retry.py" html={retrySnippet} maxWidth={880} />
+
         <h3 className="docs-h3">Inbound handlers</h3>
         <p className="docs-p">
           Every SignalType has a named <code className="inline">on_*</code> decorator you apply to a
@@ -1291,6 +1335,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         <ApiCard kind="enum" name="cosmonapse.SignalType" summary="String enum of every legal type. SYNAPSE_TYPES is a frozenset of the values a Dendrite is allowed to publish  -  anything else passed to dendrite.emit() raises DendriteProtocolError.">
           <CodeBlock filename="signal_type.pyi" html={signalTypeSnippet} maxWidth={840} />
         </ApiCard>
+        <ApiCard kind="builders" name="stop_signal(...) / stopped_signal(...)" summary="Envelope builders for the workflow-control pair. stop_signal(*, trace_id, rollback=False, reason=None) builds a STOP; stopped_signal(*, trace_id, parent_id, rolled_back=False, cancelled=0, compensated=0, node=None) builds the ack. You rarely call these directly  -  Dendrite.emit_stop / stop_trace build and publish them for you." />
       </Section>
 
       {/* ─── Helpers ─── */}

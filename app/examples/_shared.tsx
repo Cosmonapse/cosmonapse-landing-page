@@ -35,13 +35,13 @@ pip install httpx
 <span class="tk-op">$</span> export HF_TOKEN<span class="tk-op">=</span>hf_xxxxxxxxxxxxxxxxxxxxxxxx`,
 
   "py-nats": `<span class="tk-cm"># SDK with the NATS extra + httpx for the HF Neuron</span>
-pip install <span class="tk-str">"cosmonapse[nats]"</span>
+pip install <span class="tk-str">"cosmonapse"</span>
 pip install httpx
 
 <span class="tk-op">$</span> export HF_TOKEN<span class="tk-op">=</span>hf_xxxxxxxxxxxxxxxxxxxxxxxx`,
 
   "py-kafka": `<span class="tk-cm"># SDK with the Kafka extra + httpx for the HF Neuron</span>
-pip install <span class="tk-str">"cosmonapse[kafka]"</span>
+pip install <span class="tk-str">"cosmonapse"</span>
 pip install httpx
 
 <span class="tk-op">$</span> export HF_TOKEN<span class="tk-op">=</span>hf_xxxxxxxxxxxxxxxxxxxxxxxx`,

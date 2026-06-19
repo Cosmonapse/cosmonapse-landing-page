@@ -12,7 +12,7 @@ const installSnippet = `<span class="tk-cm"># Python 3.11+. The default InMemory
 <span class="tk-op">$</span> pip install cosmonapse
 
 <span class="tk-cm"># For durable storage:</span>
-<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse[postgres]"</span>   <span class="tk-cm"># PostgresEngram</span>
+<span class="tk-op">$</span> pip install <span class="tk-str">"cosmonapse"</span>   <span class="tk-cm"># PostgresEngram</span>
 <span class="tk-cm"># (SqliteEngram is in the stdlib  -  no extra needed.)</span>`;
 
 const neuronSnippet = `<span class="tk-cm"># The Neuron gains two keyword-only parameters: recall and imprint.</span>

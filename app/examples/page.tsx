@@ -122,6 +122,39 @@ const examples: Example[] = [
     difficulty: "Advanced",
     accentColor: "var(--accent-2)",
   },
+  {
+    slug: "rag",
+    number: "10",
+    tag: "Retrieval",
+    title: "Full RAG System",
+    description:
+      "Retrieval-augmented generation built entirely on Cosmonapse primitives  -  four Neurons across two workers, three Engrams across two hosts, run as a staged retrieve → rerank → generate pipeline on one trace. Hybrid semantic + lexical retrieval fused by reciprocal rank, plus an answer cache shared through one Engram binding.",
+    primitives: ["Neuron", "Axon", "Engram", "Pathway"],
+    difficulty: "Advanced",
+    accentColor: "var(--accent-2)",
+  },
+  {
+    slug: "rag-mcp",
+    number: "11",
+    tag: "Coding agent",
+    title: "RAG + MCP Coding Agent",
+    description:
+      "RAG-grounded code generation that lands on disk and runs. A coder Neuron recalls the team style guide from a VectorEngram, an MCP filesystem Neuron writes the file, and a runner Neuron executes it  -  retrieve → write → run, one trace. The model follows rules it was never trained on, supplied entirely by retrieval.",
+    primitives: ["Neuron", "Engram", "MCP", "Pathway"],
+    difficulty: "Advanced",
+    accentColor: "var(--accent-2)",
+  },
+  {
+    slug: "retry",
+    number: "12",
+    tag: "Resilience",
+    title: "Retry, STOP & Rollback",
+    description:
+      "Resilience patterns over the RAG primitives, fully offline. run_with_retry re-dispatches a stuck stage on a fresh trace after STOPping the abandoned one; stop_trace cooperatively cancels a whole workflow by trace_id; and stop_trace(rollback=True) replays each Engram's saga journal to undo a half-finished write.",
+    primitives: ["Dendrite", "RetryStrategy", "Engram", "Pathway"],
+    difficulty: "Advanced",
+    accentColor: "var(--accent-2)",
+  },
 ];
 
 const difficultyBg: Record<Example["difficulty"], string> = {

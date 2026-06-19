@@ -28,14 +28,14 @@ export default function RoadmapPage() {
         <div className="container container-narrow">
           <div className="timeline">
             <div className="timeline-item current">
-              <div className="timeline-version">0.1.x · current (0.1.3)  -  the start</div>
+              <div className="timeline-version">0.1.x · current (0.1.5)  -  the start</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>
                   The first public release. The developer reads the envelope spec, writes an Axon and
                   Dendrite using the SDK primitives, chooses a Synapse adapter, and wires their own
                   orchestration logic. Full control, full complexity, appropriate for early adopters. The
-                  Python SDK is the complete reference implementation; as of 0.1.3 the TypeScript SDK is at full parity.
+                  Python SDK is the complete reference implementation; as of 0.1.5 the TypeScript SDK is at full parity.
                 </p>
                 <p>What 0.1.0 ships:</p>
                 <ul>
@@ -91,7 +91,7 @@ export default function RoadmapPage() {
                     <code className="inline">dispatch_and_subscribe(...)</code>
                   </li>
                   <li>
-                    TypeScript SDK  -  full parity as of 0.1.3: envelope, builders, Axon,
+                    TypeScript SDK  -  full parity as of 0.1.5: envelope, builders, Axon,
                     Dendrite (Pathway dispatch, offers / bidding, interactive cognition), all
                     four Synapse adapters with{" "}
                     <code className="inline">connectSynapse(url)</code>, all three RegistryStore

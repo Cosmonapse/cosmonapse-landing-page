@@ -129,7 +129,7 @@ export default function HomePage() {
         <div className="container">
           <div className="badge">
             <span className="dot" />
-            v0.1.3 · Research preview
+            v0.1.5 · Research preview
           </div>
           <h1 className="hero-title">
             The Nervous System
@@ -432,7 +432,7 @@ export default function HomePage() {
           <div className="cta-card">
             <h2>Build the substrate for agent swarms.</h2>
             <p>
-              Cosmonapse Core 0.1.3 is in research preview  -  the protocol is drafted, the SDK ships
+              Cosmonapse Core 0.1.5 is in research preview  -  the protocol is drafted, the SDK ships
               with Engram, Pathway, capability-routed dispatch, competitive bidding, and first-class
               LLM provider Neurons. Doppler is next.
             </p>

@@ -22,11 +22,11 @@ pip install flask mcp        <span class="tk-cm"># flask = the web edge · mcp =
 <span class="tk-op">$</span> node <span class="tk-op">--</span>version    <span class="tk-cm"># any Node 18+ provides npx</span>`,
 
   "py-nats": `<span class="tk-cm"># SDK with the NATS extra + the source deps</span>
-pip install <span class="tk-str">"cosmonapse[nats]"</span>
+pip install <span class="tk-str">"cosmonapse"</span>
 pip install flask mcp`,
 
   "py-kafka": `<span class="tk-cm"># SDK with the Kafka extra + the source deps</span>
-pip install <span class="tk-str">"cosmonapse[kafka]"</span>
+pip install <span class="tk-str">"cosmonapse"</span>
 pip install flask mcp`,
 
   "ts-dev": `<span class="tk-cm"># SDK + express (the web edge) + the MCP SDK (the MCP worker)</span>
