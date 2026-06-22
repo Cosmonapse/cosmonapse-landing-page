@@ -169,7 +169,7 @@ export default function BiddingClient() {
           <h2 className="section-title">See the auction in Prism.</h2>
           <CodeBlock filename="terminal" html={watchSnippet} maxWidth={840} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="demo" src="/prism/bidding.gif" />
+            <PrismPreview namespace="demo" src="/prism/bidding.mp4" />
           </div>
         </div>
       </section>

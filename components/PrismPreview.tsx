@@ -6,6 +6,7 @@ type Props = {
   /**
    * Path to the recording, served from /public. Defaults to one shared
    * capture used across every example; pass a per-example path to override.
+   * Both animated GIFs and looping videos (.mp4 / .webm) are supported.
    */
   src?: string;
   /** Namespace shown in the frame's address bar, e.g. "rag". */
@@ -15,9 +16,11 @@ type Props = {
 };
 
 /**
- * A framed, lazy-loaded placeholder for an animated Prism recording (GIF or
- * looping video exported as .gif). Until the asset exists at `public{src}`,
- * the frame shows an inline placeholder telling you exactly where to drop it.
+ * A framed, lazy-loaded placeholder for an animated Prism recording. If `src`
+ * points at a video (.mp4 / .webm / .mov) it renders a muted, looping,
+ * autoplaying <video>; otherwise it renders an <img> (e.g. a GIF). Until the
+ * asset exists at `public{src}`, the frame shows an inline placeholder telling
+ * you exactly where to drop it.
  */
 export default function PrismPreview({
   src = "/prism/prism-demo.gif",
@@ -25,9 +28,13 @@ export default function PrismPreview({
   caption = "Prism renders every Signal on the bus as it fires — REGISTER, TASK, AGENT_OUTPUT, FINAL.",
 }: Props) {
   const [failed, setFailed] = React.useState(false);
+  const isVideo = /\.(mp4|webm|mov)$/i.test(src);
   const addr = namespace
     ? `http://127.0.0.1:7071  ·  -n ${namespace}`
     : "http://127.0.0.1:7071";
+  const alt = namespace
+    ? `Prism showing Signals animating in the ${namespace} namespace`
+    : "Prism showing Signals animating between Neurons";
 
   return (
     <figure className="prism-preview">
@@ -41,18 +48,28 @@ export default function PrismPreview({
       </div>
       <div className="prism-stage">
         {!failed ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={src}
-            alt={
-              namespace
-                ? `Prism showing Signals animating in the ${namespace} namespace`
-                : "Prism showing Signals animating between Neurons"
-            }
-            loading="lazy"
-            className="prism-img"
-            onError={() => setFailed(true)}
-          />
+          isVideo ? (
+            <video
+              src={src}
+              className="prism-img"
+              aria-label={alt}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              onError={() => setFailed(true)}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              className="prism-img"
+              onError={() => setFailed(true)}
+            />
+          )
         ) : (
           <div className="prism-placeholder">
             <div className="prism-badge">&#9654; PRISM PREVIEW</div>

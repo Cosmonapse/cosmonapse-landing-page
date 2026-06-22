@@ -691,7 +691,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           <code className="inline">@cosmonapse/sdk</code> is the 1:1 TypeScript port of the Python
           envelope protocol and runtime. The shapes are identical on the wire  -  only the surface is
           idiomatic: <code className="inline">camelCase</code> names, options-object constructors, and
-          classes you instantiate with <code className="inline">new</code>. As of 0.1.5 the TS SDK is at feature parity
+          classes you instantiate with <code className="inline">new</code>. As of 0.1.6 the TS SDK is at feature parity
           with Python  -  Pathway dispatch, capability routing and bidding, Engram, lifecycle hooks,
           and the full filtered handler surface are all ported; see{" "}
           <Link href="#ts-parity">Parity with Python</Link> for the details.
@@ -1112,7 +1112,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
       {/* ─── Parity ─── */}
       <Section id="ts-parity" eyebrow="TS · 13" title="Parity with the Python SDK">
         <p className="docs-p">
-          As of 0.1.5 the port covers the full Python surface: the envelope and signal builders,
+          As of 0.1.6 the port covers the full Python surface: the envelope and signal builders,
           all four Synapse adapters with the URL factory, all three registry backends, Neuron
           source factories, Axon (with recognisers and Engram bindings), Dendrite (Pathway
           dispatch, offers and bidding, interactive cognition, Engram hosting), and the lifecycle

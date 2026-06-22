@@ -218,7 +218,7 @@ export default function PathwayClient() {
           <h2 className="section-title">See every shape in Prism.</h2>
           <CodeBlock filename="terminal" html={watchSnippet} maxWidth={840} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="demo" src="/prism/pathway.gif" />
+            <PrismPreview namespace="demo" src="/prism/pathway.mp4" />
           </div>
         </div>
       </section>

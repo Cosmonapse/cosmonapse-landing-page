@@ -852,7 +852,7 @@ export default function OrchestratorApiClient() {
             every Signal on the bus as it fires. Run it against the dev synapse above to watch
             this workflow animate.
           </p>
-          <PrismPreview namespace="api-demo" src="/prism/orchestrator-api.gif" />
+          <PrismPreview namespace="api-demo" src="/prism/orchestrator-api.mp4" />
         </div>
       </section>
 

@@ -475,7 +475,7 @@ export default function NoOrchestratorClient() {
           </p>
           <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="quickstart" src="/prism/no-orchestrator.gif" />
+            <PrismPreview namespace="quickstart" src="/prism/no-orchestrator.mp4" />
           </div>
         </div>
       </section>

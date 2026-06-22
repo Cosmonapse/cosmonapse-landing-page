@@ -459,7 +459,7 @@ export default function RoundRobinClient() {
           </p>
           <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="quickstart" src="/prism/round-robin.gif" />
+            <PrismPreview namespace="quickstart" src="/prism/round-robin.mp4" />
           </div>
         </div>
       </section>

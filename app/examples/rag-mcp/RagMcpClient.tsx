@@ -351,7 +351,7 @@ export default function RagMcpClient() {
           </p>
           <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="rag-mcp" src="/prism/rag-mcp.gif" />
+            <PrismPreview namespace="rag-mcp" src="/prism/rag-mcp.mp4" />
           </div>
         </div>
       </section>

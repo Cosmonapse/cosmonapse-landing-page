@@ -298,7 +298,7 @@ export default function BuildingNeuronClient() {
           </p>
           <CodeBlock filename="terminal" html={prismSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="demo" src="/prism/building-a-neuron.gif" />
+            <PrismPreview namespace="demo" src="/prism/building-a-neuron.mp4" />
           </div>
         </div>
       </section>

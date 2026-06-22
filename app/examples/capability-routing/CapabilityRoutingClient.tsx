@@ -590,7 +590,7 @@ export default function CapabilityRoutingClient() {
           </p>
           <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="quickstart" src="/prism/capability-routing.gif" />
+            <PrismPreview namespace="quickstart" src="/prism/capability-routing.mp4" />
           </div>
         </div>
       </section>

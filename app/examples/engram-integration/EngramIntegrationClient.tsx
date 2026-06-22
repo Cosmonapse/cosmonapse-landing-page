@@ -263,7 +263,7 @@ export default function EngramIntegrationClient() {
           </p>
           <CodeBlock filename="terminal" html={prismSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="demo" src="/prism/engram-integration.gif" />
+            <PrismPreview namespace="demo" src="/prism/engram-integration.mp4" />
           </div>
         </div>
       </section>

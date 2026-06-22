@@ -480,7 +480,7 @@ export default function RealWorldNeuronsClient() {
           </p>
           <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="quickstart" src="/prism/real-world-neurons.gif" />
+            <PrismPreview namespace="quickstart" src="/prism/real-world-neurons.mp4" />
           </div>
         </div>
       </section>

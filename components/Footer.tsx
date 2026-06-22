@@ -90,7 +90,7 @@ export default function Footer() {
         </div>
         <div className="footer-bottom">
           <span>© 2026 Cosmonapse  -  Research preview</span>
-          <span>v0.1.5-alpha</span>
+          <span>v0.1.6-alpha</span>
         </div>
       </div>
     </footer>

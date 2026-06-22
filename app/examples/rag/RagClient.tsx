@@ -424,7 +424,7 @@ export default function RagClient() {
           </p>
           <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
-            <PrismPreview namespace="rag" src="/prism/rag.gif" />
+            <PrismPreview namespace="rag" src="/prism/rag.mp4" />
           </div>
         </div>
       </section>
