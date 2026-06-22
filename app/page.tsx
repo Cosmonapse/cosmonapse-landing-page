@@ -161,7 +161,7 @@ export default function HomePage() {
               marginBottom: 36,
             }}
           >
-            Open source · MIT licensed · Python + TypeScript SDK
+            Open source · Apache 2.0 licensed · Python + TypeScript SDK
           </p>
 
           {/* <div style={{ maxWidth: 780, margin: "0 auto", textAlign: "left" }}>

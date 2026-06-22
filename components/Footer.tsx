@@ -16,7 +16,7 @@ export default function Footer() {
             </Link>
             <p>
               Distributed cognition protocol for autonomous AI agents. One envelope. One channel. Replaceable
-              neurons. Open source under the MIT license.
+              neurons. Open source under the Apache 2.0 license.
             </p>
           </div>
           <div className="footer-col">
@@ -59,7 +59,7 @@ export default function Footer() {
               </li>
               <li>
                 <a href={`${GITHUB}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer">
-                  License  -  MIT
+                  License  -  Apache 2.0
                 </a>
               </li>
               <li>

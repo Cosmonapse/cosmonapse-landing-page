@@ -28,7 +28,7 @@ const michroma = Michroma({
 export const metadata: Metadata = {
   title: "Cosmonapse  -  Distributed cognition protocol for autonomous AI agents",
   description:
-    "Cosmonapse is an open protocol and SDK for building autonomous AI agent systems. One envelope. One channel. Replaceable neurons. MIT licensed.",
+    "Cosmonapse is an open protocol and SDK for building autonomous AI agent systems. One envelope. One channel. Replaceable neurons. Apache 2.0 licensed.",
   metadataBase: new URL("https://cosmonapse.dev"),
   keywords: [
     "AI agents",
