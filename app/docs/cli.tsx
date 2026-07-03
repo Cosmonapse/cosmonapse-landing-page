@@ -311,16 +311,22 @@ export default function CliDocs({ section }: { section?: string }) {
         <p className="docs-megasection-sub">
           <code className="inline">cosmo</code> is the operator&rsquo;s entry point: boot a dev
           synapse, tail traffic, dispatch and answer from the shell, inspect the registry, and
-          validate envelopes. It is a Click application installed alongside the Python SDK.
+          validate envelopes. It is a Click application with a single implementation, installable via pip (alongside the Python SDK) or npm (a launcher that auto-installs and delegates to it).
         </p>
       </div>
 
       <Section id="cli-overview" eyebrow="CLI · 01" title="Overview">
         <p className="docs-p">
-          <code className="inline">cosmo</code> is installed when you{" "}
-          <code className="inline">pip install cosmonapse</code>  -  the CLI ships inside that single
-          distribution (entry point <code className="inline">cosmo.main:cli</code>). Once installed,
-          the binary is on your <code className="inline">PATH</code>. It exposes{" "}
+          <code className="inline">cosmo</code> has a single implementation that ships inside the
+          Python distribution (entry point <code className="inline">cosmo.main:cli</code>), and two
+          installs that reach it: <code className="inline">pip install cosmonapse</code> puts the
+          binary on your <code className="inline">PATH</code> directly, and{" "}
+          <code className="inline">npm install -g @cosmonapse/sdk</code> installs a zero-dependency
+          launcher that delegates to <code className="inline">python -m cosmo</code>  -  on first run
+          it auto-installs the CLI into a private environment (
+          <code className="inline">~/.cosmonapse/cli-venv</code>, pinned to the npm package&rsquo;s
+          version) if no Python already has it. Either way there is exactly one CLI build, so pip
+          and npm users can never drift apart. Requires Python 3.11+. It exposes{" "}
           <code className="inline">init</code>, <code className="inline">synapse</code>,{" "}
           <code className="inline">dispatch</code>, <code className="inline">registry</code>,{" "}
           <code className="inline">answer</code>, <code className="inline">schema</code>,{" "}

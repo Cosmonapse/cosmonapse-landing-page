@@ -129,7 +129,7 @@ export default function HomePage() {
         <div className="container">
           <div className="badge">
             <span className="dot" />
-            v0.1.6 · Research preview
+            v0.1.7 · Research preview
           </div>
           <h1 className="hero-title">
             The Nervous System
@@ -368,7 +368,8 @@ export default function HomePage() {
               <p>
                 <code className="inline">cosmo synapse start memory</code> boots a local TCP broker.{" "}
                 <code className="inline">cosmo doppler</code> streams every Signal to stdout.{" "}
-                <code className="inline">cosmo validate</code> checks envelope conformance.
+                <code className="inline">cosmo validate</code> checks envelope conformance. One
+                implementation, installable from pip or npm.
               </p>
             </div>
           </div>
@@ -432,7 +433,7 @@ export default function HomePage() {
           <div className="cta-card">
             <h2>Build the substrate for agent swarms.</h2>
             <p>
-              Cosmonapse Core 0.1.6 is in research preview  -  the protocol is drafted, the SDK ships
+              Cosmonapse Core 0.1.7 is in research preview  -  the protocol is drafted, the SDK ships
               with Engram, Pathway, capability-routed dispatch, competitive bidding, and first-class
               LLM provider Neurons. Doppler is next.
             </p>

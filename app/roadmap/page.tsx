@@ -28,7 +28,7 @@ export default function RoadmapPage() {
         <div className="container container-narrow">
           <div className="timeline">
             <div className="timeline-item current">
-              <div className="timeline-version">0.1.x · current (0.1.6)  -  the start</div>
+              <div className="timeline-version">0.1.x · current (0.1.7)  -  the start</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>

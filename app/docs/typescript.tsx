@@ -44,6 +44,10 @@ $ npm i better-sqlite3              <span class="tk-cm"># SqliteRegistryStore + 
 $ npm i pg                          <span class="tk-cm"># PostgresRegistryStore + PostgresEngram</span>
 $ npm i @modelcontextprotocol/sdk   <span class="tk-cm"># mcpNeuron</span>
 
+<span class="tk-cm"># The cosmo CLI (global): a launcher that runs the single Python-implemented</span>
+<span class="tk-cm"># CLI, auto-installing it on first run. Requires Python 3.11+ on PATH.</span>
+$ npm i -g @cosmonapse/sdk &amp;&amp; cosmo --help
+
 <span class="tk-cm"># From source:</span>
 $ cd cosmonapse-core/packages/ts-sdk &amp;&amp; npm i &amp;&amp; npm run build`;
 
@@ -1133,6 +1137,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             <tr><td>async with dendrite</td><td>Use start() / stop() explicitly.</td></tr>
             <tr><td>Neuron memory helpers injected as keyword args (recall=, imprint=)</td><td>Helpers ride a context object as the NeuronFn&rsquo;s optional third argument.</td></tr>
             <tr><td>asyncio.TimeoutError on Pathway.wait timeout</td><td>A plain Error with a timeout message.</td></tr>
+            <tr><td>cosmo CLI: pip entry point</td><td>npm bin is a launcher delegating to the same Python CLI (auto-installs it; one CLI build, no port to drift).</td></tr>
           </tbody>
         </table>
         </div>

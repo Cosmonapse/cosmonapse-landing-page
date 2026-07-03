@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 const installPy = `<span class="tk-cm"># Python 3.11+</span>
 pip install cosmonapse httpx`;
 
-const installTs = `<span class="tk-cm">// Node 18+</span>
+const installTs = `<span class="tk-cm">// Node 18+. For the cosmo CLI too: npm i -g @cosmonapse/sdk</span>
+<span class="tk-cm">// (a launcher for the Python-implemented CLI; needs Python 3.11+)</span>
 npm install @cosmonapse/sdk`;
 
 // ── Synapse start (CLI  -  same for both) ────────────────────────────────────
