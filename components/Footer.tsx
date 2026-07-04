@@ -15,8 +15,8 @@ export default function Footer() {
               <span className="brand-word">Cosmonapse</span>
             </Link>
             <p>
-              Distributed cognition protocol for autonomous AI agents. One envelope. One channel. Replaceable
-              neurons. Open source under the Apache 2.0 license.
+              The open protocol for building distributed multi-agent/model harnesses. One envelope. One channel.
+              Replaceable neurons. Open source under the Apache 2.0 license.
             </p>
           </div>
           <div className="footer-col">

@@ -150,7 +150,7 @@ axon = Axon(
   {
     number: 4,
     title: "Lifecycle hooks",
-    surface: "on_connect · on_refresh · on_schedule · LifecycleHooks",
+    surface: "on_connect · on_refresh · on_schedule · AXON.host.on_*",
     tier: "core",
     note: (
       <>
@@ -170,6 +170,12 @@ axon = Axon(
 <span class="tk-op">@</span>axon.on_schedule(every_s=<span class="tk-num">30</span>)
 <span class="tk-kw">async def</span> <span class="tk-fn">flush_cache</span>(axon):
     cache.clear()
+
+<span class="tk-cm"># Host-side behaviour, declared ON the Axon - the deferred decorator is</span>
+<span class="tk-cm"># applied to the HOSTING Dendrite at announce (subscription ensured):</span>
+<span class="tk-op">@</span>axon.host.on_tool_call(neuron=<span class="tk-str">"websearch"</span>)
+<span class="tk-kw">async def</span> <span class="tk-fn">serve</span>(sig):
+    ...
 
 <span class="tk-cm"># Dendrite lifecycle  -  fires on every heartbeat tick</span>
 <span class="tk-op">@</span>dendrite.on_refresh
@@ -479,7 +485,7 @@ const cliCards: CliCard[] = [
     title: "cosmo init",
     commands: [{ html: "cosmo init" }],
     description:
-      "Scaffold a minimal Axon + Dendrite project. Creates worker.py, server.py, and a cosmo.toml in the current directory.",
+      "Scaffold a standard-skeleton project: config.py, neurons/, brain.py (wiring), demo.py, README. python demo.py runs a full round-trip in one process; SYNAPSE_URL swaps the transport.",
   },
   {
     title: "cosmo synapse start",

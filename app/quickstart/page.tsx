@@ -60,7 +60,7 @@ const workerPy = `<span class="tk-kw">import</span> asyncio, os
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, Neuron, connect_synapse
 
 <span class="tk-cm"># Build the Neuron, then wire it into an Axon (the two-step, lower-level form).</span>
-<span class="tk-cm"># role="worker": hosts Axons, replies to TASKs, cannot dispatch.</span>
+<span class="tk-cm"># role="worker": hosts Axons, replies to TASKs, cannot dispatch TASKs.</span>
 neuron <span class="tk-op">=</span> <span class="tk-fn">Neuron</span>(source<span class="tk-op">=</span><span class="tk-str">"huggingface"</span>,
     endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
     model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
@@ -79,7 +79,7 @@ asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 const workerTs = `<span class="tk-kw">import</span> { Axon, Dendrite, neuron, connectSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
 <span class="tk-cm">// Build the Neuron, then wire it into an Axon (the two-step, lower-level form).</span>
-<span class="tk-cm">// role: "worker"  -  hosts Axons, replies to TASKs, cannot dispatch.</span>
+<span class="tk-cm">// role: "worker"  -  hosts Axons, replies to TASKs, cannot dispatch TASKs.</span>
 <span class="tk-kw">const</span> llama <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"huggingface"</span>, {
   endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
   model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
@@ -275,7 +275,7 @@ export default function QuickstartPage() {
             <code className="inline">npm install express</code>.
           </p>
           <CodeSwitcher
-            python={{ html: serverPy, filename: "server.py" }}
+            python={{ html: serverPy, filename: "app.py" }}
             typescript={{ html: serverTs, filename: "server.ts" }}
             maxWidth={840}
           />

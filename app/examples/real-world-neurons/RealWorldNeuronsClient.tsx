@@ -142,7 +142,7 @@ const outputSnippet = `<span class="tk-op">$</span> curl <span class="tk-op">-s<
 <span class="tk-cm">{"summary": "API at the edge", "length": 15}</span>
 
 <span class="tk-op">$</span> curl <span class="tk-op">-s</span> <span class="tk-op">-X</span> POST localhost:5000/files
-<span class="tk-cm">{"response": "[FILE] worker.py\\n[FILE] server.py\\n[DIR]  data", ...}</span>`;
+<span class="tk-cm">{"response": "[FILE] app.py\\n[FILE] brain.py\\n[FILE] worker.py\\n[DIR]  data", ...}</span>`;
 
 // ===========================================================================
 // TypeScript  -  devsynapse (single in-process file)
@@ -259,7 +259,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   const broker = brokerStep(combo);
   const last = runStep(combo, [
     { label: "the worker", cmd: "python worker.py" },
-    { label: "the web edge", cmd: "python server.py" },
+    { label: "the web edge", cmd: "python app.py" },
   ]);
   last.afterProse = (
     <>The route dispatches a TASK and blocks on the matching AGENT_OUTPUT:</>

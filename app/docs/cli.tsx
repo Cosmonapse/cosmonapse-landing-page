@@ -49,7 +49,7 @@ Commands
   completion   Print a shell-completion script (bash / zsh / fish).
   dispatch     Dispatch a TASK and print the reply.
   doppler      Attach a read-only Doppler to a Synapse namespace.
-  init         Scaffold a minimal Axon + Dendrite project.
+  init         Scaffold a standard-skeleton Cosmonapse project.
   registry     Inspect the Neuron registry of a namespace.
   schema       Print the Signal envelope JSON Schema.
   synapse      Manage Cosmonapse synapse servers (start / view / stop).
@@ -58,15 +58,20 @@ Commands
 const cliInitSnippet = `<span class="tk-op">$</span> cosmo init my-app <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
 
 Scaffolded my-app in /path/to/my-app
-  <span class="tk-op">+</span> worker.py
-  <span class="tk-op">+</span> orchestrator.py
+  <span class="tk-op">+</span> config.py
+  <span class="tk-op">+</span> neurons/__init__.py
+  <span class="tk-op">+</span> neurons/hello.py
+  <span class="tk-op">+</span> brain.py
+  <span class="tk-op">+</span> demo.py
   <span class="tk-op">+</span> README.md
 
 Next steps:
   cd my-app
+  python demo.py     <span class="tk-cm"># one process, in-process bus - no setup</span>
+
+Same code over a real synapse:
   cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
-  python worker.py        <span class="tk-cm"># in a second terminal</span>
-  python orchestrator.py  <span class="tk-cm"># in a third terminal</span>`;
+  SYNAPSE_URL=cosmo://127.0.0.1:7070 python demo.py`;
 
 const cliCompletionSnippet = `<span class="tk-cm"># Load completions in the current shell:</span>
 <span class="tk-op">$</span> <span class="tk-kw">eval</span> <span class="tk-str">"$(cosmo completion bash)"</span>
@@ -338,14 +343,17 @@ export default function CliDocs({ section }: { section?: string }) {
 
       <Section id="cli-init" eyebrow="CLI · 02" title="cosmo init">
         <p className="docs-p">
-          Scaffold a minimal, runnable project  -  a worker{" "}
-          <code className="inline">Dendrite</code> hosting an <code className="inline">Axon</code>, and
-          an orchestrator that dispatches one task and prints the result. Three files
-          (<code className="inline">worker.py</code>, <code className="inline">orchestrator.py</code>,{" "}
-          <code className="inline">README.md</code>) are written into{" "}
-          <code className="inline">./NAME</code>; pass <code className="inline">--namespace</code> to
-          choose the namespace and <code className="inline">--force</code> to write into a non-empty
-          directory.
+          Scaffold a runnable project in the <strong>standard package skeleton</strong> every
+          cosmonapse-example follows: <code className="inline">config.py</code> (settings),{" "}
+          <code className="inline">neurons/</code> (Axon modules),{" "}
+          <code className="inline">brain.py</code> (the wiring), and{" "}
+          <code className="inline">demo.py</code>  -  an entry that hosts BOTH sides, so{" "}
+          <code className="inline">python demo.py</code> gives a full round-trip in one process
+          (<code className="inline">SYNAPSE_URL</code> just swaps the transport). The README
+          carries the 10-line <code className="inline">worker.py</code> to add when workers
+          should become their own processes. Pass <code className="inline">--namespace</code> to
+          choose the namespace and <code className="inline">--force</code> to write into a
+          non-empty directory.
         </p>
         <CodeBlock html={cliInitSnippet} maxWidth={820} />
       </Section>

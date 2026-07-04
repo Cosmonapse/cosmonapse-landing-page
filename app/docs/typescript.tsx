@@ -167,8 +167,16 @@ const axonClassSnippet = `<span class="tk-kw">interface</span> AxonOptions {
   detectsPermission(fn: Recogniser): Recogniser;
   detectsError(fn: Recogniser): Recogniser;
 
+  <span class="tk-cm">// Deferred HOST decorators (AxonHost) - queued at module scope, applied</span>
+  <span class="tk-cm">// to the HOSTING Dendrite when it announces this Axon (subscription</span>
+  <span class="tk-cm">// ensured). THE standard way to declare chain handlers / tool servers:</span>
+  host.onAgentOutput(fn, { neuron });   <span class="tk-cm">// chain handler</span>
+  host.onToolCall(fn, { neuron });      <span class="tk-cm">// tool server</span>
+  host.onSignal(type, fn, filter?);     <span class="tk-cm">// generic - any SignalType</span>
+
   <span class="tk-cm">// Inherited from LifecycleHooks:</span>
   onConnect(fn);                  <span class="tk-cm">// after the hosting Dendrite emits REGISTER</span>
+                                  <span class="tk-cm">// (and after host.on* have been applied)</span>
   onRefresh(fn);                  <span class="tk-cm">// each heartbeat tick</span>
   onSchedule(everyMs, fn);        <span class="tk-cm">// periodic background task</span>
 }
@@ -917,6 +925,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             <tr><td>dendrite.onRegister(fn) / onDeregister(fn) / onHeartbeat(fn)</td><td>REGISTER (incl. heartbeat re-registers) / DEREGISTER / HEARTBEAT.</td></tr>
             <tr><td>dendrite.onDiscover(fn)</td><td>Every DISCOVER  -  answer with your hosted Axons (cosmo registry list uses this).</td></tr>
             <tr><td>dendrite.onSignal(type, fn, filter?)</td><td>Any SignalType  -  the generic form with the same filters.</td></tr>
+            <tr><td>axon.host.on*(fn, filter?)</td><td>Deferred Dendrite decorators declared on the Axon  -  replayed onto the hosting Dendrite right after REGISTER (before onConnect hooks), subscriptions ensured. Full cognition/reply family plus the generic <code className="inline">host.onSignal</code>.</td></tr>
             <tr><td>dendrite.onTrace(traceId, ...types)(fn)</td><td>Every (or the selected) type on one trace.</td></tr>
             <tr><td>dendrite.onConnect(fn) / onRefresh(fn) / onSchedule(everyMs, fn)</td><td>Lifecycle hooks  -  not Signals: registration, registry refresh, timer.</td></tr>
             <tr><td>await dendrite.subscribe(type, fn)</td><td>Raw subscription. Returns a Subscription.</td></tr>

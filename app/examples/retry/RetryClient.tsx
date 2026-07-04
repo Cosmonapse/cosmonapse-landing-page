@@ -206,7 +206,7 @@ export default function RetryClient() {
             no API to call. The resilience behavior is identical; only the embedding quality is
             throwaway.
           </p>
-          <CodeBlock filename="resilient.py" html={offlineSnippet} maxWidth={880} />
+          <CodeBlock filename="neurons/ingester.py" html={offlineSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -219,7 +219,7 @@ export default function RetryClient() {
             <code className="inline">fail_after</code> knob makes it raise mid-stream, leaving the
             index in a half-written state  -  exactly the situation rollback exists to clean up.
           </p>
-          <CodeBlock filename="resilient.py" html={ingestSnippet} maxWidth={880} />
+          <CodeBlock filename="neurons/ingester.py" html={ingestSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -232,7 +232,7 @@ export default function RetryClient() {
             succeeds. Because every retry is a fresh dispatch, a process-wide call counter models a
             flaky upstream that recovers after a couple of tries.
           </p>
-          <CodeBlock filename="resilient.py" html={flakySnippet} maxWidth={880} />
+          <CodeBlock filename="neurons/generator.py" html={flakySnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -245,7 +245,7 @@ export default function RetryClient() {
             both Axons, one orchestrator. The <code className="inline">generator</code> is passed in
             so each scenario can supply a differently-flaky one.
           </p>
-          <CodeBlock filename="resilient.py" html={wireSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={wireSnippet} maxWidth={880} />
         </div>
       </section>
 

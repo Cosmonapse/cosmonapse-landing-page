@@ -188,8 +188,16 @@ const axonClassSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">A
     <span class="tk-op">@</span>axon.detects_permission       <span class="tk-cm"># -> {"action": ..., "scope": ..., "reason": ...}</span>
     <span class="tk-op">@</span>axon.detects_error            <span class="tk-cm"># -> {"code": ..., "message": ..., "recoverable": ...}</span>
 
+    <span class="tk-cm"># Deferred HOST decorators - queued at module level, applied to the</span>
+    <span class="tk-cm"># HOSTING Dendrite when it announces this Axon (subscription ensured).</span>
+    <span class="tk-cm"># THE standard way to declare chain handlers and tool servers:</span>
+    <span class="tk-op">@</span>axon.host.on_agent_output(neuron<span class="tk-op">=</span>...)   <span class="tk-cm"># chain handler</span>
+    <span class="tk-op">@</span>axon.host.on_tool_call(neuron<span class="tk-op">=</span>...)      <span class="tk-cm"># tool server</span>
+    <span class="tk-op">@</span>axon.host.on_&lt;any_signal&gt;(...)          <span class="tk-cm"># full Dendrite on_* family</span>
+
     <span class="tk-cm"># Inherited from LifecycleHooks:</span>
     <span class="tk-op">@</span>axon.on_connect          <span class="tk-cm"># after the hosting Dendrite emits REGISTER</span>
+                              <span class="tk-cm"># (and after @host.on_* have been applied)</span>
     <span class="tk-op">@</span>axon.on_refresh          <span class="tk-cm"># each heartbeat tick (reason="heartbeat")</span>
     <span class="tk-op">@</span>axon.on_schedule(every_s<span class="tk-op">=</span><span class="tk-num">N</span>)  <span class="tk-cm"># periodic background coroutine</span>`;
 
@@ -207,7 +215,13 @@ axon <span class="tk-op">=</span> Axon(
 
 <span class="tk-op">@</span>axon.<span class="tk-fn">on_connect</span>
 <span class="tk-kw">async def</span> <span class="tk-fn">warmup</span>(a):
-    <span class="tk-kw">await</span> <span class="tk-fn">preload_model_weights</span>()`;
+    <span class="tk-kw">await</span> <span class="tk-fn">preload_model_weights</span>()
+
+<span class="tk-cm"># Host-side behaviour, declared right here - applied to whichever</span>
+<span class="tk-cm"># Dendrite ends up hosting this Axon, subscription ensured:</span>
+<span class="tk-op">@</span>axon.host.<span class="tk-fn">on_agent_output</span>(neuron<span class="tk-op">=</span><span class="tk-str">"answerer"</span>)
+<span class="tk-kw">async def</span> <span class="tk-fn">chain</span>(sig):
+    ...   <span class="tk-cm"># e.g. dispatch the next TASK on sig.trace_id</span>`;
 
 const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Dendrite</span>(LifecycleHooks):
     <span class="tk-kw">def</span> __init__(
@@ -1184,6 +1198,10 @@ export default function PythonDocs({ section }: { section?: string }) {
             <tr>
               <td>on_connect(fn)</td>
               <td>Once, after this component finishes its own connect handshake. For an Axon, after the hosting Dendrite emits REGISTER; for a Dendrite, after synapse subscriptions are wired.</td>
+            </tr>
+            <tr>
+              <td>axon.host.on_&lt;signal&gt;(**filters)</td>
+              <td>Axon only  -  deferred Dendrite decorator. Queued at module level, replayed onto the <em>hosting</em> Dendrite right after REGISTER (before on_connect hooks) with the inbound subscription ensured. Any <code className="inline">Dendrite.on_*</code> signal decorator with the standard <code className="inline">(fn, *, neuron=, capability=, trace_id=)</code> shape; names validated at import time.</td>
             </tr>
             <tr>
               <td>on_refresh(fn)</td>

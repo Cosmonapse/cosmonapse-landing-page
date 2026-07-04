@@ -313,7 +313,7 @@ export default function RagClient() {
             is injected into the Neuron by the Axon&apos;s Engram bindings  -  the Neuron never
             holds a connection itself.
           </p>
-          <CodeBlock filename="rag_system.py" html={ingestSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={ingestSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -327,7 +327,7 @@ export default function RagClient() {
             query languages and fuses the two ranked lists with reciprocal-rank fusion, so a chunk
             that ranks well on either leg surfaces.
           </p>
-          <CodeBlock filename="rag_system.py" html={retrieveSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={retrieveSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -341,7 +341,7 @@ export default function RagClient() {
             Because it is just another stage on the bus, swapping it for a cross-encoder is a
             one-line change to the topology, not a rewrite.
           </p>
-          <CodeBlock filename="rag_system.py" html={rerankSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={rerankSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -356,7 +356,7 @@ export default function RagClient() {
             binding is the entire mechanism behind the step-03 short-circuit  -  no special cache
             API, just two Neurons pointed at one Engram.
           </p>
-          <CodeBlock filename="rag_system.py" html={generateSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={generateSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -371,7 +371,7 @@ export default function RagClient() {
             keep workers from emitting orchestration Signals; the lone{" "}
             <code className="inline">role=&quot;orchestrator&quot;</code> drives the pipeline.
           </p>
-          <CodeBlock filename="rag_system.py" html={wireSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={wireSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -386,7 +386,7 @@ export default function RagClient() {
             single lineage, so <code className="inline">cosmo doppler -n rag</code> renders it as
             one trace instead of three disconnected tasks.
           </p>
-          <CodeBlock filename="rag_system.py" html={pipelineSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={pipelineSnippet} maxWidth={880} />
         </div>
       </section>
 

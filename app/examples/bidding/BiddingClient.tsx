@@ -57,7 +57,7 @@ const workerSnippet = `<span class="tk-cm"># worker.py - hosts an Axon and bids 
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
-const producerSnippet = `<span class="tk-cm"># producer.py - emit TASK_OFFER, collect BIDs, pick a winner, await result.</span>
+const producerSnippet = `<span class="tk-cm"># demo.py - emit TASK_OFFER, collect BIDs, pick a winner, await result.</span>
 <span class="tk-kw">import</span> asyncio
 <span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Dendrite, connect_synapse
 
@@ -155,7 +155,7 @@ export default function BiddingClient() {
             returns a Pathway scoped to the awarded workflow. From the caller&apos;s
             perspective it&apos;s just <code className="inline">await pw.wait()</code>.
           </p>
-          <CodeBlock filename="producer.py" html={producerSnippet} maxWidth={840} />
+          <CodeBlock filename="demo.py" html={producerSnippet} maxWidth={840} />
         </div>
       </section>
 

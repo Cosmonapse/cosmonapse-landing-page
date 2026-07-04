@@ -6,7 +6,7 @@ import CodeBlock from "@/components/CodeBlock";
 import PrismPreview from "@/components/PrismPreview";
 
 // ---------------------------------------------------------------------------
-// Snippets  -  kept in sync with cosmonapse-core/examples/building_a_neuron/main.py
+// Snippets  -  kept in sync with cosmonapse-examples/02-building-a-neuron/
 // ---------------------------------------------------------------------------
 
 const installSnippet = `<span class="tk-cm"># Python 3.11+. httpx powers the HuggingFace Neuron source.</span>
@@ -121,7 +121,7 @@ greeter <span class="tk-op">=</span> Neuron(
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
-const outputSnippet = `<span class="tk-op">$</span> python main.py
+const outputSnippet = `<span class="tk-op">$</span> python demo.py
 [AGENT_OUTPUT] Hello, Cosmonapse! Welcome aboard  -  let's build something cool.`;
 
 const swapEndpointSnippet = `<span class="tk-cm"># The endpoint is the only HF-specific line. Point it elsewhere for any</span>
@@ -261,9 +261,9 @@ export default function BuildingNeuronClient() {
           <h2 className="sub-title">The whole program.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             About 25 lines of real code, including the LLM. Save as{" "}
-            <code className="inline">main.py</code> and run.
+            <code className="inline">demo.py</code> and run.
           </p>
-          <CodeBlock filename="main.py" html={fullSnippet} maxWidth={880} />
+          <CodeBlock filename="demo.py" html={fullSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
             <CodeBlock html={outputSnippet} maxWidth={880} />
           </div>

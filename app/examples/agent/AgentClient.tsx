@@ -18,8 +18,9 @@ const topologySnippet = `One dispatch, no loop  -  the Dendrites chain the run t
   research-node  <span class="tk-fn">@on_agent_output</span>(<span class="tk-str">"research"</span>)  -&gt; TASK <span class="tk-str">["planner"]</span> (next step)
   coding-node    <span class="tk-fn">@on_agent_output</span>(<span class="tk-str">"coding"</span>)    -&gt; TASK <span class="tk-str">["planner"]</span> (next step)
   engram host    <span class="tk-fn">@on_imprint_signal</span>            -&gt; mirror <span class="tk-str">"answer"</span> imprints to disk
+  tool nodes     <span class="tk-fn">@on_tool_call</span>(&lt;capability&gt;)   -&gt; run the MCP, reply TOOL_RESULT
 
-  tools (workers)  websearch | fetch | clock | files    agents own their tools:
+  tools (workers)  web-node (websearch + fetch Axons) | clock | files
   planner -&gt; <span class="tk-str">["time"]</span>   research -&gt; <span class="tk-str">["websearch"] ["fetch"]</span>   coding -&gt; <span class="tk-str">["filesystem"]</span>`;
 const installSnippet = `<span class="tk-cm"># Needs a real HF_TOKEN in cosmonapse-examples/.env. fetch/time run via</span>
 <span class="tk-cm"># uvx (install uv); filesystem runs via npx (Node 18+).</span>
@@ -75,42 +76,38 @@ AXON <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><spa
     decision <span class="tk-op">=</span> <span class="tk-fn">_first_json</span>(raw.<span class="tk-fn">get</span>(<span class="tk-str">"response"</span>)) <span class="tk-kw">or</span> {}
     ...
     <span class="tk-kw">return</span> {<span class="tk-str">"route"</span>: route, <span class="tk-str">"task"</span>: task, **chain}`;
-const chainSnippet = `<span class="tk-fn">@AXON.on_connect</span>
-<span class="tk-kw">async</span> <span class="tk-kw">def</span> <span class="tk-fn">wire_chain</span>(a):
-    <span class="tk-str">"""The chain registers ITSELF once the hosting Dendrite announces the
-    Axon (a.dendrite is set by then) - no wiring helpers."""</span>
-    node <span class="tk-op">=</span> a.dendrite
+const chainSnippet = `<span class="tk-fn">@AXON.host.on_agent_output</span>(neuron<span class="tk-op">=</span><span class="tk-str">"planner"</span>)
+<span class="tk-kw">async</span> <span class="tk-kw">def</span> <span class="tk-fn">chain</span>(sig):
+    <span class="tk-str">"""Declared at module level. The Axon applies it to the HOSTING
+    Dendrite when announced (subscription ensured) - no on_connect
+    boilerplate, no wiring helpers."""</span>
+    node <span class="tk-op">=</span> AXON.dendrite
+    d <span class="tk-op">=</span> sig.payload.<span class="tk-fn">get</span>(<span class="tk-str">"output"</span>, {})
+    route, goal, tag <span class="tk-op">=</span> d.<span class="tk-fn">get</span>(<span class="tk-str">"route"</span>), d.<span class="tk-fn">get</span>(<span class="tk-str">"goal"</span>), d.<span class="tk-fn">get</span>(<span class="tk-str">"tag"</span>)
 
-    <span class="tk-fn">@node.on_agent_output</span>(neuron<span class="tk-op">=</span><span class="tk-str">"planner"</span>)
-    <span class="tk-kw">async</span> <span class="tk-kw">def</span> <span class="tk-fn">chain</span>(sig):
-        d <span class="tk-op">=</span> sig.payload.<span class="tk-fn">get</span>(<span class="tk-str">"output"</span>, {})
-        route, goal, tag <span class="tk-op">=</span> d.<span class="tk-fn">get</span>(<span class="tk-str">"route"</span>), d.<span class="tk-fn">get</span>(<span class="tk-str">"goal"</span>), d.<span class="tk-fn">get</span>(<span class="tk-str">"tag"</span>)
-
-        <span class="tk-kw">if</span> route <span class="tk-kw">in</span> (<span class="tk-str">"research"</span>, <span class="tk-str">"coding"</span>):
-            <span class="tk-cm"># The Dendrite CREATES the next TASK - same trace, so the</span>
-            <span class="tk-cm"># chain's FINAL resolves the caller's Pathway.</span>
-            <span class="tk-kw">await</span> node.<span class="tk-fn">dispatch_task</span>(
-                capabilities<span class="tk-op">=</span>[route],
-                input<span class="tk-op">=</span>{<span class="tk-str">"task"</span>: d.<span class="tk-fn">get</span>(<span class="tk-str">"task"</span>, <span class="tk-str">""</span>), <span class="tk-str">"goal"</span>: goal, <span class="tk-str">"tag"</span>: tag, ...},
-                trace_id<span class="tk-op">=</span>sig.trace_id, parent_id<span class="tk-op">=</span>sig.id,
-            )
-            <span class="tk-kw">return</span>
-
-        <span class="tk-cm"># finish: assemble the report from this run's engram entries,</span>
-        <span class="tk-cm"># remember it under the goal, then conclude the trace.</span>
-        got <span class="tk-op">=</span> <span class="tk-kw">await</span> node.<span class="tk-fn">recall</span>(engram_id<span class="tk-op">=</span>ENGRAM_ID,
-                                query<span class="tk-op">=</span>{<span class="tk-str">"tag"</span>: tag, <span class="tk-str">"top_k"</span>: <span class="tk-num">50</span>}, ...)
-        <span class="tk-kw">await</span> node.<span class="tk-fn">imprint</span>(engram_id<span class="tk-op">=</span>ENGRAM_ID, op<span class="tk-op">=</span><span class="tk-str">"upsert"</span>,
-                           merge_key<span class="tk-op">=</span><span class="tk-str">f"answer:{goal}"</span>,
-                           entry<span class="tk-op">=</span>{<span class="tk-str">"content"</span>: report, <span class="tk-str">"tags"</span>: [<span class="tk-str">"answer"</span>]},
-                           meta<span class="tk-op">=</span>{<span class="tk-str">"path"</span>: report_path},
-                           await_ack<span class="tk-op">=</span><span class="tk-kw">True</span>, deadline_ms<span class="tk-op">=</span><span class="tk-num">2000</span>, ...)
-        <span class="tk-kw">await</span> node.<span class="tk-fn">emit_final</span>(
+    <span class="tk-kw">if</span> route <span class="tk-kw">in</span> (<span class="tk-str">"research"</span>, <span class="tk-str">"coding"</span>):
+        <span class="tk-cm"># The Dendrite CREATES the next TASK - same trace, so the</span>
+        <span class="tk-cm"># chain's FINAL resolves the caller's Pathway.</span>
+        <span class="tk-kw">await</span> node.<span class="tk-fn">dispatch_task</span>(
+            capabilities<span class="tk-op">=</span>[route],
+            input<span class="tk-op">=</span>{<span class="tk-str">"task"</span>: d.<span class="tk-fn">get</span>(<span class="tk-str">"task"</span>, <span class="tk-str">""</span>), <span class="tk-str">"goal"</span>: goal, <span class="tk-str">"tag"</span>: tag, ...},
             trace_id<span class="tk-op">=</span>sig.trace_id, parent_id<span class="tk-op">=</span>sig.id,
-            result<span class="tk-op">=</span>{<span class="tk-str">"report"</span>: report, <span class="tk-str">"source"</span>: <span class="tk-str">"web"</span>, ...},
         )
+        <span class="tk-kw">return</span>
 
-    <span class="tk-kw">await</span> node.<span class="tk-fn">ensure_subscribed</span>(SignalType.AGENT_OUTPUT)`;
+    <span class="tk-cm"># finish: assemble the report from this run's engram entries,</span>
+    <span class="tk-cm"># remember it under the goal, then conclude the trace.</span>
+    got <span class="tk-op">=</span> <span class="tk-kw">await</span> node.<span class="tk-fn">recall</span>(engram_id<span class="tk-op">=</span>ENGRAM_ID,
+                            query<span class="tk-op">=</span>{<span class="tk-str">"tag"</span>: tag, <span class="tk-str">"top_k"</span>: <span class="tk-num">50</span>}, ...)
+    <span class="tk-kw">await</span> node.<span class="tk-fn">imprint</span>(engram_id<span class="tk-op">=</span>ENGRAM_ID, op<span class="tk-op">=</span><span class="tk-str">"upsert"</span>,
+                       merge_key<span class="tk-op">=</span><span class="tk-str">f"answer:{goal}"</span>,
+                       entry<span class="tk-op">=</span>{<span class="tk-str">"content"</span>: report, <span class="tk-str">"tags"</span>: [<span class="tk-str">"answer"</span>]},
+                       meta<span class="tk-op">=</span>{<span class="tk-str">"path"</span>: report_path},
+                       await_ack<span class="tk-op">=</span><span class="tk-kw">True</span>, deadline_ms<span class="tk-op">=</span><span class="tk-num">2000</span>, ...)
+    <span class="tk-kw">await</span> node.<span class="tk-fn">emit_final</span>(
+        trace_id<span class="tk-op">=</span>sig.trace_id, parent_id<span class="tk-op">=</span>sig.id,
+        result<span class="tk-op">=</span>{<span class="tk-str">"report"</span>: report, <span class="tk-str">"source"</span>: <span class="tk-str">"web"</span>, ...},
+    )`;
 const researchSnippet = `<span class="tk-fn">@AXON.before_task</span>
 <span class="tk-kw">async</span> <span class="tk-kw">def</span> <span class="tk-fn">gather</span>(input):
     <span class="tk-str">"""Gather web context via MY tools, shaped into the prompt."""</span>
@@ -131,40 +128,49 @@ const researchSnippet = `<span class="tk-fn">@AXON.before_task</span>
     )
     <span class="tk-kw">return</span> {<span class="tk-str">"note"</span>: note, **chain_state}
 
-<span class="tk-cm"># @AXON.on_connect: @node.on_agent_output(neuron="research") hands back</span>
-<span class="tk-cm"># to the planner with step + 1 - same trace, same pattern as above.</span>`;
-const busSnippet = `<span class="tk-cm"># bus.py - thin capability-dispatch helpers (plain functions, no classes).</span>
-<span class="tk-kw">async</span> <span class="tk-kw">def</span> <span class="tk-fn">route</span>(dendrite, caps, payload, *, trace_id<span class="tk-op">=</span><span class="tk-kw">None</span>, timeout<span class="tk-op">=</span><span class="tk-num">90.0</span>):
-    <span class="tk-str">"""Dispatch by capability, await the reply, return the output payload."""</span>
-    r <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_and_wait</span>(
-        capabilities<span class="tk-op">=</span>caps, input<span class="tk-op">=</span>payload, trace_id<span class="tk-op">=</span>trace_id, timeout_s<span class="tk-op">=</span>timeout,
-    )
-    <span class="tk-kw">if</span> r.type.value <span class="tk-op">==</span> <span class="tk-str">"ERROR"</span>:
-        <span class="tk-kw">raise</span> RuntimeError(<span class="tk-str">f"{caps} failed: {r.payload.get('message')}"</span>)
-    <span class="tk-kw">return</span> r.payload[<span class="tk-str">"output"</span>]
-
+<span class="tk-cm"># @AXON.host.on_agent_output(neuron="research"): the chain handler hands</span>
+<span class="tk-cm"># back to the planner with step + 1 - same trace, same pattern as above.</span>`;
+const busSnippet = `<span class="tk-cm"># bus.py - MCP tools are NOT tasks. A tool invocation rides the cognition</span>
+<span class="tk-cm"># pair built for exactly this: TOOL_CALL out, TOOL_RESULT back.</span>
 <span class="tk-kw">async</span> <span class="tk-kw">def</span> <span class="tk-fn">mcp</span>(dendrite, caps, tool, arguments, *, timeout<span class="tk-op">=</span><span class="tk-num">60.0</span>):
-    <span class="tk-str">"""Call one MCP tool via the neuron advertising \`caps\`."""</span>
-    <span class="tk-kw">return</span> <span class="tk-kw">await</span> <span class="tk-fn">route</span>(dendrite, caps, {<span class="tk-str">"tool"</span>: tool, <span class="tk-str">"arguments"</span>: arguments},
-                       timeout<span class="tk-op">=</span>timeout)
+    <span class="tk-str">"""Call one MCP tool over the TOOL_CALL / TOOL_RESULT signal pair."""</span>
+    call_id <span class="tk-op">=</span> <span class="tk-fn">new_event_id</span>()
+    tid <span class="tk-op">=</span> <span class="tk-fn">new_trace_id</span>()            <span class="tk-cm"># own trace: never the agent chain's</span>
+    pw <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">observe_pathway</span>(tid)
+    <span class="tk-kw">async</span> <span class="tk-kw">with</span> pw:
+        <span class="tk-kw">await</span> dendrite.<span class="tk-fn">emit_tool_call</span>(
+            trace_id<span class="tk-op">=</span>tid, parent_id<span class="tk-op">=</span>call_id,
+            tool<span class="tk-op">=</span>tool, args<span class="tk-op">=</span>arguments, call_id<span class="tk-op">=</span>call_id,
+            neuron<span class="tk-op">=</span>caps[<span class="tk-num">0</span>],         <span class="tk-cm"># directed at the CAPABILITY</span>
+        )
+        <span class="tk-kw">while</span> <span class="tk-kw">True</span>:
+            sig <span class="tk-op">=</span> <span class="tk-kw">await</span> pw.<span class="tk-fn">wait_for</span>(SignalType.TOOL_RESULT, timeout_s<span class="tk-op">=</span>timeout)
+            <span class="tk-kw">if</span> sig.payload.<span class="tk-fn">get</span>(<span class="tk-str">"call_id"</span>) <span class="tk-op">!=</span> call_id:
+                <span class="tk-kw">continue</span>
+            <span class="tk-kw">if</span> sig.payload.<span class="tk-fn">get</span>(<span class="tk-str">"error"</span>) <span class="tk-kw">is</span> <span class="tk-kw">not</span> <span class="tk-kw">None</span>:
+                <span class="tk-kw">raise</span> RuntimeError(<span class="tk-str">f"{caps}.{tool} error: ..."</span>)
+            <span class="tk-kw">return</span> sig.payload[<span class="tk-str">"result"</span>]
 
-<span class="tk-cm"># Nested dispatches pass no trace_id -&gt; each tool TASK gets a FRESH trace,</span>
-<span class="tk-cm"># so a tool's output can never resolve the calling agent's pending Pathway.</span>`;
-const toolsSnippet = `<span class="tk-cm"># Plain MCP tool neurons - worker nodes; they never dispatch.</span>
-AXON <span class="tk-op">=</span> Axon(
-    neuron_id<span class="tk-op">=</span><span class="tk-str">"websearch"</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"websearch"</span>],
-    neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, command<span class="tk-op">=</span><span class="tk-str">"uvx"</span>, args<span class="tk-op">=</span>[<span class="tk-str">"duckduckgo-mcp-server"</span>]),
-)
+<span class="tk-cm"># Each exchange gets a FRESH trace, so a TOOL_RESULT can never resolve the</span>
+<span class="tk-cm"># calling agent's pending chain Pathway - and doppler shows tool traffic as</span>
+<span class="tk-cm"># TOOL_CALL -&gt; TOOL_RESULT, not nested TASKs. Tool calls are not role-gated</span>
+<span class="tk-cm"># (only TASK/STOP are): even worker-role nodes call their tools.</span>`;
+const toolsSnippet = `<span class="tk-cm"># A tool module: one stock MCP Neuron + ONE deferred host decorator.</span>
+TOOL <span class="tk-op">=</span> Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, command<span class="tk-op">=</span><span class="tk-str">"uvx"</span>, args<span class="tk-op">=</span>[<span class="tk-str">"duckduckgo-mcp-server"</span>])
+AXON <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"websearch"</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"websearch"</span>], neuron_fn<span class="tk-op">=</span>TOOL)
 
-AXON <span class="tk-op">=</span> Axon(
-    neuron_id<span class="tk-op">=</span><span class="tk-str">"files"</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"filesystem"</span>],
-    neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, server<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>, args<span class="tk-op">=</span>[<span class="tk-fn">str</span>(ROOT)]),
-)`;
+<span class="tk-fn">@AXON.host.on_tool_call</span>(neuron<span class="tk-op">=</span><span class="tk-str">"websearch"</span>)     <span class="tk-cm"># calls to MY capability</span>
+<span class="tk-kw">async</span> <span class="tk-kw">def</span> <span class="tk-fn">call</span>(sig):
+    <span class="tk-kw">await</span> bus.<span class="tk-fn">tool_reply</span>(AXON.dendrite, AXON.neuron_id, TOOL, sig)
+
+<span class="tk-cm"># web-node hosts BOTH the websearch and fetch Axons - one Dendrite, two</span>
+<span class="tk-cm"># tools; the directed-capability filters keep them discriminated locally.</span>`;
 const memorySnippet = `ENGRAM <span class="tk-op">=</span> InMemoryEngram(engram_id<span class="tk-op">=</span><span class="tk-str">"agent-memory"</span>, engram_kind<span class="tk-op">=</span><span class="tk-str">"context"</span>)
 
 host <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span>NAMESPACE,
                 dendrite_id<span class="tk-op">=</span><span class="tk-str">"agent-memory-host"</span>,
-                role<span class="tk-op">=</span><span class="tk-str">"orchestrator"</span>)   <span class="tk-cm"># it dispatches filesystem writes</span>
+                role<span class="tk-op">=</span><span class="tk-str">"worker"</span>)   <span class="tk-cm"># TOOL_CALLs aren't role-gated - no</span>
+                                  <span class="tk-cm"># orchestrator rights needed for tools</span>
 host.<span class="tk-fn">attach_engram</span>(ENGRAM)
 
 <span class="tk-fn">@host.on_imprint_signal</span>
@@ -241,8 +247,9 @@ export default function AgentClient() {
           <div className="sub-eyebrow">Topology</div>
           <h2 className="sub-title">Planner, two specialists, four tools, one memory.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            Three agent nodes (<code className="inline">role=&quot;orchestrator&quot;</code>: they
-            host their Axon and dispatch to their own tools), four plain tool workers, an engram
+            Three agent nodes (<code className="inline">role=&quot;orchestrator&quot;</code>  -  only
+            because their chain handlers dispatch TASKs; tool calls are not role-gated), three
+            worker tool nodes (web-node hosts the websearch AND fetch Axons), a worker engram
             host, and the caller. Chain state rides the TASK inputs; progress is recalled from the
             engram  -  no node holds run state.
           </p>
@@ -271,7 +278,7 @@ export default function AgentClient() {
             the chain  -  the run concludes when the planner node emits it. All chain TASKs share
             this trace, so that FINAL resolves this call.
           </p>
-          <CodeBlock filename="agent.py" html={runAgentSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={runAgentSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -294,10 +301,11 @@ export default function AgentClient() {
           <div className="sub-eyebrow">03 · The chain</div>
           <h2 className="sub-title">Dendrites create the TASKs.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            Each agent&apos;s chain handler registers itself from{" "}
-            <code className="inline">@AXON.on_connect</code> once its hosting Dendrite announces
-            it. The planner node routes to a specialist or  -  on finish  -  assembles the report
-            from the engram, imprints it, and emits FINAL.
+            Each agent&apos;s chain handler is ONE deferred host decorator  - {" "}
+            <code className="inline">@AXON.host.on_agent_output</code>  -  applied to the hosting
+            Dendrite when it announces the Axon, subscription ensured. The planner node routes to
+            a specialist or  -  on finish  -  assembles the report from the engram, imprints it,
+            and emits FINAL.
           </p>
           <CodeBlock filename="neurons/model/planner.py" html={chainSnippet} maxWidth={880} />
         </div>
@@ -321,12 +329,15 @@ export default function AgentClient() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">05 · Tool dispatch</div>
-          <h2 className="sub-title">Fresh traces for nested TASKs.</h2>
+          <div className="sub-eyebrow">05 · Tool calls</div>
+          <h2 className="sub-title">MCP = TOOL_CALL → TOOL_RESULT. Not a TASK.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            Two plain functions over <code className="inline">dispatch_and_wait</code>  -  no Bus
-            class, no wrappers. Nested tool dispatches mint fresh trace ids, so a tool&apos;s
-            output can never be mistaken for an agent&apos;s reply on the run&apos;s trace.
+            A tool invocation rides the cognition pair made for it: the caller emits a{" "}
+            <code className="inline">TOOL_CALL</code> directed at a <em>capability</em>, the tool
+            node&apos;s <code className="inline">@AXON.host.on_tool_call</code> handler runs the
+            MCP and answers with a <code className="inline">TOOL_RESULT</code> echoing the{" "}
+            <code className="inline">call_id</code>. Fresh trace per exchange  -  tool traffic
+            reads as tool traffic.
           </p>
           <CodeBlock filename="bus.py" html={busSnippet} maxWidth={880} />
           <div style={{ marginTop: 24 }}>
@@ -346,7 +357,7 @@ export default function AgentClient() {
             decorator-specified too: <code className="inline">@host.on_imprint_signal</code>{" "}
             mirrors answer imprints to <code className="inline">report/answer.md</code>.
           </p>
-          <CodeBlock filename="agent.py" html={memorySnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={memorySnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -374,7 +385,7 @@ export default function AgentClient() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">Watch it in Prism</div>
-          <h2 className="sub-title">TASK → AGENT_OUTPUT → IMPRINT → FINAL, live.</h2>
+          <h2 className="sub-title">TASK → TOOL_CALL → TOOL_RESULT → IMPRINT → FINAL, live.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             No observability is baked into the example  -  point{" "}
             <code className="inline">cosmo doppler</code> at the synapse and watch the chain hop

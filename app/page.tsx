@@ -137,7 +137,7 @@ export default function HomePage() {
             for <span className="gradient-text">Autonomous AI Agents</span>.
           </h1>
           <p className="hero-lead">
-            Cosmonapse is an open protocol and SDK for autonomous AI agents. Start with the Core
+            Cosmonapse is the open protocol for building distributed multi-agent/model harnesses. Start with the Core
             today  -  one envelope, one Synapse, replaceable Neurons backed by any LLM provider, and a
             CLI that boots a local broker in seconds.
           </p>

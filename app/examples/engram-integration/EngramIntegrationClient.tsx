@@ -6,7 +6,7 @@ import CodeBlock from "@/components/CodeBlock";
 import PrismPreview from "@/components/PrismPreview";
 
 // ---------------------------------------------------------------------------
-// Snippets  -  kept in sync with cosmonapse-core/examples/engram_integration/main.py
+// Snippets  -  kept in sync with cosmonapse-examples/06-engram-integration/.py
 // ---------------------------------------------------------------------------
 
 const installSnippet = `<span class="tk-cm"># Python 3.11+. The default InMemoryEngram needs no extras.</span>
@@ -95,7 +95,7 @@ const dispatchSnippet = `<span class="tk-cm"># Call twice with the same input. T
         out <span class="tk-op">=</span> reply.payload[<span class="tk-str">"output"</span>]
         <span class="tk-fn">print</span>(<span class="tk-fn">f</span><span class="tk-str">"[{label}] {out['source']:>8s}  →  {out['answer']}"</span>)`;
 
-const outputSnippet = `<span class="tk-op">$</span> python main.py
+const outputSnippet = `<span class="tk-op">$</span> python demo.py
 [first call ] computed  →  Answer to <span class="tk-str">'what is the meaning of life?'</span>: 42
 [second call]    cache  →  Answer to <span class="tk-str">'what is the meaning of life?'</span>: 42`;
 

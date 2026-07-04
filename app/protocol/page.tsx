@@ -466,8 +466,9 @@ export default function ProtocolPage() {
               <code className="inline">{`{ tool, args, call_id }`}</code>
             </Msg>
             <Msg name="TOOL_RESULT" by="Dendrite">
-              Tool response, parent_id pointing to the corresponding TOOL_CALL. Payload:{" "}
-              <code className="inline">{`{ call_id, ok, value?, error? }`}</code>
+              Tool response, parent_id pointing to the corresponding TOOL_CALL, call_id echoed.
+              Exactly one of result / error is set. Payload:{" "}
+              <code className="inline">{`{ tool, result?, error?, call_id? }`}</code>
             </Msg>
             <Msg name="ESCALATION" by="Dendrite">
               Agent cannot complete and is requesting re-dispatch to a more capable agent. Caller is excluded

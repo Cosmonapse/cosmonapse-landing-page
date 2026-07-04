@@ -228,14 +228,14 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
 
 <span class="tk-fn">main</span>();`;
 
-const outputSnippet = `<span class="tk-op">$</span> python producer.py
+const outputSnippet = `<span class="tk-op">$</span> python demo.py
 <span class="tk-cm"># …meanwhile, in the two worker terminals:</span>
 [worker-b] claims a3f2c1d8
 [worker-a] claims 7b1e0942
 [worker-a] claims 11ce88a4
 [worker-b] claims 92aa5b30
 
-<span class="tk-cm"># producer.py prints, in order:</span>
+<span class="tk-cm"># demo.py prints, in order:</span>
 worker-b answered: Golden disc ascends  -  silence breaks into light.
 worker-a answered: Pale lantern in the dark  -  tides remember her face.
 worker-a answered: Salt sighs against stone, an old song the wind forgot.
@@ -262,7 +262,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   const last = runStep(combo, [
     { label: "first worker", cmd: "python worker_a.py" },
     { label: "second worker", cmd: "python worker_b.py" },
-    { label: "the producer", cmd: "python producer.py" },
+    { label: "the producer", cmd: "python demo.py" },
   ]);
   last.afterProse = (
     <>
@@ -292,7 +292,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
             via <code className="inline">sig.directed.id</code>.
           </>
         ),
-        filename: "producer.py",
+        filename: "demo.py",
         html: pyProducer(url),
       },
       last,

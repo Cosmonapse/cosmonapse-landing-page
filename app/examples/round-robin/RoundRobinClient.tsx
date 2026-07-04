@@ -220,7 +220,7 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
 
 <span class="tk-fn">main</span>();`;
 
-const outputSnippet = `<span class="tk-op">$</span> python cortex.py
+const outputSnippet = `<span class="tk-op">$</span> python demo.py
 → dispatched to worker-a
    ← Golden disc ascends  -  silence breaks into light.
 → dispatched to worker-b
@@ -240,7 +240,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   const last = runStep(combo, [
     { label: "first worker", cmd: "python worker_a.py" },
     { label: "second worker", cmd: "python worker_b.py" },
-    { label: "the cortex", cmd: "python cortex.py" },
+    { label: "the cortex", cmd: "python demo.py" },
   ]);
   last.afterProse = (
     <>Watch the prompts alternate A, B, A, B in the cortex output:</>
@@ -277,7 +277,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
             <code className="inline">AGENT_OUTPUT</code> returns.
           </>
         ),
-        filename: "cortex.py",
+        filename: "demo.py",
         html: pyCortex(url),
       },
       last,

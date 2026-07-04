@@ -240,7 +240,7 @@ export default function RagMcpClient() {
             straight from <code className="inline">11-rag</code> on the path. The coding agent adds
             new Neurons on top of an unchanged retrieval backend  -  that reuse is the whole point.
           </p>
-          <CodeBlock filename="rag_codegen.py" html={reuseSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={reuseSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -254,7 +254,7 @@ export default function RagMcpClient() {
             are the rules the model will follow at generation time without ever being trained on
             them.
           </p>
-          <CodeBlock filename="rag_codegen.py" html={librarianSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={librarianSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -268,7 +268,7 @@ export default function RagMcpClient() {
             <code className="inline">extract_code()</code> pulls the block out of the reply. Swap
             the indexed docs and the generated code changes  -  no prompt edits.
           </p>
-          <CodeBlock filename="rag_codegen.py" html={coderSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={coderSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -282,7 +282,7 @@ export default function RagMcpClient() {
             <code className="inline">generated/&lt;name&gt;.py</code> through it  -  no custom
             tool-calling code, and any of the dozens of community MCP servers drops in the same way.
           </p>
-          <CodeBlock filename="rag_codegen.py" html={mcpSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={mcpSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -295,7 +295,7 @@ export default function RagMcpClient() {
             the exit code. It closes the loop  -  the agent doesn&apos;t just write code, it proves
             the code runs.
           </p>
-          <CodeBlock filename="rag_codegen.py" html={runnerSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={runnerSnippet} maxWidth={880} />
           <p className="prose" style={{ marginTop: 16, color: "var(--text-dim)", maxWidth: 760 }}>
             Note: the runner executes model-generated code on your machine. It is fine for this
             toy  -  review <code className="inline">generated/</code> before reusing the pattern.
@@ -313,7 +313,7 @@ export default function RagMcpClient() {
             hosts the MCP files Neuron and the runner. The orchestrator drives all three pipeline
             stages.
           </p>
-          <CodeBlock filename="rag_codegen.py" html={wireSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={wireSnippet} maxWidth={880} />
         </div>
       </section>
 
@@ -327,7 +327,7 @@ export default function RagMcpClient() {
             generate the code, persist it through the MCP server, then run it. One coherent trace
             from request to exit code.
           </p>
-          <CodeBlock filename="rag_codegen.py" html={pipelineSnippet} maxWidth={880} />
+          <CodeBlock filename="brain.py" html={pipelineSnippet} maxWidth={880} />
         </div>
       </section>
 

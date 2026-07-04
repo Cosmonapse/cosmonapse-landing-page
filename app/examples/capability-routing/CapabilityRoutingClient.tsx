@@ -307,7 +307,7 @@ const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse
 
 <span class="tk-fn">main</span>();`;
 
-const outputSnippet = `<span class="tk-op">$</span> python router.py
+const outputSnippet = `<span class="tk-op">$</span> python demo.py
 waiting for workers advertising {'summarize', 'translate'}…
 → summarize routed to summarizer
    ← summary: Cosmonapse is an A2A protocol that…
@@ -326,7 +326,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   const last = runStep(combo, [
     { label: "the summarizer", cmd: "python worker.py summarizer" },
     { label: "the translator", cmd: "python worker.py translator" },
-    { label: "the router", cmd: "python router.py" },
+    { label: "the router", cmd: "python demo.py" },
   ]);
   last.afterProse = (
     <>
@@ -365,7 +365,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
             naming a worker  -  workers can join or leave at runtime.
           </>
         ),
-        filename: "router.py",
+        filename: "demo.py",
         html: pyRouter(url),
       },
       last,
