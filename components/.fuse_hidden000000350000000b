@@ -25,7 +25,7 @@ type Props = {
 export default function PrismPreview({
   src = "/prism/prism-demo.gif",
   namespace,
-  caption = "Prism renders every Signal on the bus as it fires - REGISTER, TASK, AGENT_OUTPUT, FINAL.",
+  caption = "Prism renders every Signal on the bus as it fires — REGISTER, TASK, AGENT_OUTPUT, FINAL.",
 }: Props) {
   const [failed, setFailed] = React.useState(false);
   const isVideo = /\.(mp4|webm|mov)$/i.test(src);
