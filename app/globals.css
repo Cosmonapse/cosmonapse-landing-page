@@ -1127,6 +1127,15 @@ code.inline {
   max-width: 280px;
   line-height: 1.6;
 }
+.ph-badge {
+  display: inline-block;
+  margin-top: 18px;
+}
+.ph-badge img {
+  display: block;
+  height: 44px;
+  width: auto;
+}
 .footer-col h5 {
   font-family: var(--font-mono);
   font-size: 11px;

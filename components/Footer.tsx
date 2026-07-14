@@ -18,6 +18,19 @@ export default function Footer() {
               The open protocol for building distributed multi-agent/model harnesses. One envelope. One channel.
               Replaceable neurons. Open source under the Apache 2.0 license.
             </p>
+            <a
+              href="https://www.producthunt.com/products/cosmonapse?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-cosmonapse"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ph-badge"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1190534&theme=dark&t=1784041021323"
+                alt="Cosmonapse - An agent-to-agent protocol with no god-object orchestrator | Product Hunt"
+                width={250}
+                height={54}
+              />
+            </a>
           </div>
           <div className="footer-col">
             <h5>Protocol</h5>
