@@ -18,6 +18,17 @@ const installTs = `<span class="tk-cm">// Node 18+. For the cosmo CLI too: npm i
 <span class="tk-cm">// (a launcher for the Python-implemented CLI; needs Python 3.11+)</span>
 npm install @cosmonapse/sdk`;
 
+// ── Scaffold (CLI  -  same for both) ─────────────────────────────────────────
+
+const initSnippet = `<span class="tk-op">$</span> cosmo init my-app <span class="tk-op">-n</span> quickstart
+
+<span class="tk-cm">  Scaffolded my-app in ./my-app</span>
+<span class="tk-cm">    + config.py   + neurons/hello.py   + effector/tools.py</span>
+<span class="tk-cm">    + brain.py    + demo.py            + README.md</span>
+
+<span class="tk-op">$</span> cd my-app
+<span class="tk-op">$</span> python demo.py   <span class="tk-cm"># one process, in-process bus - no setup</span>`;
+
 // ── Synapse start (CLI  -  same for both) ────────────────────────────────────
 
 const synapseSnippet = `<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart
@@ -203,7 +214,26 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">02 · Start a Synapse</div>
+          <div className="sub-eyebrow">02 · Scaffold, then code</div>
+          <p className="prose" style={{ marginBottom: 16 }}>
+            Init, scaffold, then code. <code className="inline">cosmo init</code> writes the
+            standard package skeleton every example follows  -  {" "}
+            <code className="inline">config.py</code>, <code className="inline">neurons/</code>,{" "}
+            <code className="inline">effector/</code>, <code className="inline">brain.py</code>,{" "}
+            <code className="inline">demo.py</code>  -  with a working Axon + Dendrite round-trip
+            and one tool call. The steps below build the same thing by hand so you can see
+            every wire; when you code your own project, new Neuron modules go under{" "}
+            <code className="inline">neurons/</code>, tool families under{" "}
+            <code className="inline">effector/</code>, and the wiring stays in{" "}
+            <code className="inline">brain.py</code>.
+          </p>
+          <CodeBlock html={initSnippet} maxWidth={760} />
+        </div>
+      </section>
+
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">03 · Start a Synapse</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             <code className="inline">cosmo synapse start memory</code> boots a local TCP+NDJSON
             broker  -  no Docker, no NATS, no Postgres. Swap the URL for{" "}
@@ -216,7 +246,7 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">03 · Build an Axon</div>
+          <div className="sub-eyebrow">04 · Build an Axon</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             Two steps, the lower-level way:{" "}
             <code className="inline">Neuron(source=&quot;huggingface&quot;, ...)</code>{" "}
@@ -250,7 +280,7 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">04 · Wire a Dendrite</div>
+          <div className="sub-eyebrow">05 · Wire a Dendrite</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             The <strong>Dendrite</strong> is the only component that touches the Synapse  -  it hosts
             the Axon, emits REGISTER / HEARTBEAT / DEREGISTER, and routes inbound TASKs. Run this
@@ -266,7 +296,7 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">05 · Connect an HTTP interface</div>
+          <div className="sub-eyebrow">06 · Connect an HTTP interface</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             A <code className="inline">role=&quot;orchestrator&quot;</code> Dendrite has no Axon -
             its job is to dispatch tasks and collect results. Keep your web framework at the edge and
@@ -284,7 +314,7 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">06 · Watch the Signals flow</div>
+          <div className="sub-eyebrow">07 · Watch the Signals flow</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             Attach a Doppler to see every Signal as it crosses the Synapse. It is a passive
             read-only subscriber  -  it never competes with Dendrites for messages.
@@ -295,7 +325,7 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">07 · Test it</div>
+          <div className="sub-eyebrow">08 · Test it</div>
           <p className="prose" style={{ marginBottom: 16 }}>
             With the synapse, worker, and server all running, send a task:
           </p>
@@ -309,7 +339,7 @@ export default function QuickstartPage() {
 
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">08 · What to read next</div>
+          <div className="sub-eyebrow">09 · What to read next</div>
           <div className="grid-3">
             <Link href="/protocol" className="card">
               <div className="card-icon">→</div>

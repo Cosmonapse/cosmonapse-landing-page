@@ -9,7 +9,7 @@ import ComboExample, {
   type ComboData,
   type Step,
 } from "@/components/ComboExample";
-import { PY_URL, brokerStep, runStep } from "../_shared";
+import { PY_URL, isPython, scaffoldStep, brokerStep, runStep } from "../_shared";
 
 // ===========================================================================
 // Install  -  plain-function Neurons (no provider, so no HF_TOKEN / httpx).
@@ -339,6 +339,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   return {
     steps: [
       installStep(combo),
+      ...(isPython(combo) ? [scaffoldStep("capability-routing")] : []),
       ...(broker ? [broker] : []),
       {
         eyebrow: "Workers  -  two specialised Neurons",

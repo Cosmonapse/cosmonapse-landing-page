@@ -8,7 +8,7 @@ import ComboExample, {
   type Combo,
   type ComboData,
 } from "@/components/ComboExample";
-import { PY_URL, installStep, brokerStep, runStep } from "../_shared";
+import { PY_URL, installStep, isPython, scaffoldStep, brokerStep, runStep } from "../_shared";
 
 // ===========================================================================
 // Python  -  self-selecting worker + a routing-free producer.
@@ -274,6 +274,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   return {
     steps: [
       installStep(combo),
+      ...(isPython(combo) ? [scaffoldStep("no-orchestrator")] : []),
       ...(broker ? [broker] : []),
       {
         eyebrow: "Worker  -  it decides for itself",

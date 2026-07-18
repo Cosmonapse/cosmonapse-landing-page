@@ -117,6 +117,13 @@ const observeSnippet = `<span class="tk-cm"># observe_pathway - watch a trace an
         log.<span class="tk-fn">info</span>(<span class="tk-str">"observed"</span>, type<span class="tk-op">=</span>sig.type.value,
                  neuron<span class="tk-op">=</span>sig.directed.id <span class="tk-kw">if</span> sig.directed <span class="tk-kw">else</span> <span class="tk-kw">None</span>)`;
 
+
+const scaffoldSnippet = `<span class="tk-op">$</span> cosmo init pathway <span class="tk-op">-n</span> demo
+
+<span class="tk-cm">  Scaffolded pathway in ./pathway</span>
+<span class="tk-cm">    + config.py   + neurons/hello.py   + effector/tools.py</span>
+<span class="tk-cm">    + brain.py    + demo.py            + README.md</span>`;
+
 export default function PathwayClient() {
   return (
     <>
@@ -132,6 +139,21 @@ export default function PathwayClient() {
           </p>
         </div>
       </header>
+
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">Scaffold</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
+            Init, scaffold, then code. <code className="inline">cosmo init</code> writes the
+            standard skeleton every example follows  -  {" "}
+            <code className="inline">config.py</code>, <code className="inline">neurons/</code>,{" "}
+            <code className="inline">effector/</code>, <code className="inline">brain.py</code>,{" "}
+            <code className="inline">demo.py</code>  -  and the files on this page are what you
+            code on top of the generated stubs.
+          </p>
+          <CodeBlock html={scaffoldSnippet} maxWidth={760} />
+        </div>
+      </section>
 
       <section className="section-sm">
         <div className="container">

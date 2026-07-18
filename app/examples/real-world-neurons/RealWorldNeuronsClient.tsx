@@ -9,7 +9,7 @@ import ComboExample, {
   type ComboData,
   type Step,
 } from "@/components/ComboExample";
-import { PY_URL, brokerStep, runStep } from "../_shared";
+import { PY_URL, isPython, scaffoldStep, brokerStep, runStep } from "../_shared";
 
 // ===========================================================================
 // Install  -  the worker needs the MCP source; the web edge needs a framework.
@@ -268,6 +268,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   return {
     steps: [
       installStep(combo),
+      ...(isPython(combo) ? [scaffoldStep("real-world-neurons")] : []),
       ...(broker ? [broker] : []),
       {
         eyebrow: "Worker  -  real Neurons behind Axons",

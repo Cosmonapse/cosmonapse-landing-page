@@ -99,6 +99,34 @@ export function installStep(combo: Combo): Step {
 }
 
 // ---------------------------------------------------------------------------
+// Scaffold  (init -> scaffold -> code; Python combos only)
+// ---------------------------------------------------------------------------
+
+export function scaffoldStep(project: string, ns = "quickstart"): Step {
+  return {
+    eyebrow: "Scaffold",
+    prose: (
+      <>
+        Init, scaffold, then code. <code className="inline">cosmo init</code>{" "}
+        writes the standard skeleton every example follows  -  {" "}
+        <code className="inline">config.py</code>,{" "}
+        <code className="inline">neurons/</code>,{" "}
+        <code className="inline">effector/</code>,{" "}
+        <code className="inline">brain.py</code>,{" "}
+        <code className="inline">demo.py</code>  -  and the files in the steps
+        below are what you code on top of the generated stubs.
+      </>
+    ),
+    maxWidth: 760,
+    html: `<span class="tk-op">$</span> cosmo init ${project} <span class="tk-op">-n</span> ${ns}
+
+<span class="tk-cm">  Scaffolded ${project} in ./${project}</span>
+<span class="tk-cm">    + config.py   + neurons/hello.py   + effector/tools.py</span>
+<span class="tk-cm">    + brain.py    + demo.py            + README.md</span>`,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Start the broker  (skipped for in-process MemorySynapse)
 // ---------------------------------------------------------------------------
 

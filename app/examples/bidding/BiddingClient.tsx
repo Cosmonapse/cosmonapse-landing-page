@@ -105,6 +105,13 @@ const strategiesSnippet = `<span class="tk-cm"># select= picks the bid-evaluatio
 <span class="tk-cm">#                      largest self-assessment. Best for quality-critical work.</span>
 <span class="tk-kw">await</span> orch.<span class="tk-fn">dispatch_offer</span>(input<span class="tk-op">=</span>..., capabilities<span class="tk-op">=</span>..., select<span class="tk-op">=</span><span class="tk-str">"highest_confidence"</span>)`;
 
+
+const scaffoldSnippet = `<span class="tk-op">$</span> cosmo init bidding <span class="tk-op">-n</span> demo
+
+<span class="tk-cm">  Scaffolded bidding in ./bidding</span>
+<span class="tk-cm">    + config.py   + neurons/hello.py   + effector/tools.py</span>
+<span class="tk-cm">    + brain.py    + demo.py            + README.md</span>`;
+
 export default function BiddingClient() {
   return (
     <>
@@ -126,6 +133,21 @@ export default function BiddingClient() {
           <div className="sub-eyebrow">Why</div>
           <h2 className="sub-title">Capability routing covers the homogeneous case.<br/>Bidding covers the rest.</h2>
           <CodeBlock filename="why.md" html={whySnippet} maxWidth={840} />
+        </div>
+      </section>
+
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">Scaffold</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
+            Init, scaffold, then code. <code className="inline">cosmo init</code> writes the
+            standard skeleton every example follows  -  {" "}
+            <code className="inline">config.py</code>, <code className="inline">neurons/</code>,{" "}
+            <code className="inline">effector/</code>, <code className="inline">brain.py</code>,{" "}
+            <code className="inline">demo.py</code>  -  and the files on this page are what you
+            code on top of the generated stubs.
+          </p>
+          <CodeBlock html={scaffoldSnippet} maxWidth={760} />
         </div>
       </section>
 

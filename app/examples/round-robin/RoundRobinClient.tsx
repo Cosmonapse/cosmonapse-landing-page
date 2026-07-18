@@ -8,7 +8,7 @@ import ComboExample, {
   type Combo,
   type ComboData,
 } from "@/components/ComboExample";
-import { PY_URL, installStep, brokerStep, runStep } from "../_shared";
+import { PY_URL, installStep, isPython, scaffoldStep, brokerStep, runStep } from "../_shared";
 
 // ===========================================================================
 // Python  -  round-robin worker + cortex, parametrised by the Synapse URL.
@@ -249,6 +249,7 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   return {
     steps: [
       installStep(combo),
+      ...(isPython(combo) ? [scaffoldStep("round-robin")] : []),
       ...(broker ? [broker] : []),
       {
         eyebrow: "Worker  -  a Neuron behind an Axon",

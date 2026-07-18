@@ -714,6 +714,13 @@ const EXTEND: Record<Framework, React.ReactNode> = {
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
+
+const scaffoldSnippet = `<span class="tk-op">$</span> cosmo init orchestrator-api <span class="tk-op">-n</span> api-demo
+
+<span class="tk-cm">  Scaffolded orchestrator-api in ./orchestrator-api</span>
+<span class="tk-cm">    + config.py   + neurons/hello.py   + effector/tools.py</span>
+<span class="tk-cm">    + brain.py    + demo.py            + README.md</span>`;
+
 export default function OrchestratorApiClient() {
   const [fw, setFw] = useState<Framework>("flask");
   const steps = STEPS[fw];
@@ -771,6 +778,21 @@ export default function OrchestratorApiClient() {
       </section>
 
       {/* Shared worker */}
+      <section className="section-sm">
+        <div className="container">
+          <div className="sub-eyebrow">Scaffold</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
+            Init, scaffold, then code. <code className="inline">cosmo init</code> writes the
+            standard skeleton every example follows  -  {" "}
+            <code className="inline">config.py</code>, <code className="inline">neurons/</code>,{" "}
+            <code className="inline">effector/</code>, <code className="inline">brain.py</code>,{" "}
+            <code className="inline">demo.py</code>  -  and the files on this page are what you
+            code on top of the generated stubs.
+          </p>
+          <CodeBlock html={scaffoldSnippet} maxWidth={760} />
+        </div>
+      </section>
+
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">00 · Shared worker</div>
