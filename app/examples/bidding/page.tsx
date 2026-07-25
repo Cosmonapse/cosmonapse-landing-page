@@ -1,12 +1,33 @@
 import type { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { pageMetadata, KW_EVENT_DRIVEN, KW_REACTIVE } from "@/lib/seo";
 import BiddingClient from "./BiddingClient";
 
-export const metadata: Metadata = {
-  title: "Bidding  -  TASK_OFFER / BID / TASK_AWARDED  -  Examples  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Task Bidding - Offer, Bid, Award",
   description:
-    "Competitive bidding for capability-routed dispatch. Workers respond to TASK_OFFER with BIDs; the producer picks a winner by first_bid, lowest_cost, or highest_confidence and emits TASK_AWARDED. Atomic claim for heterogeneous deployments.",
-};
+    "Workers answer a TASK_OFFER with BIDs; the producer picks by first_bid, lowest_cost or highest_confidence and emits TASK_AWARDED. Atomic claim, mixed fleets.",
+  path: "/examples/bidding",
+  keywords: [
+    ...KW_EVENT_DRIVEN,
+    ...KW_REACTIVE,
+    "contract net protocol",
+    "agent task auction",
+    "agent bidding",
+    "cost-aware model routing",
+  ],
+});
 
 export default function BiddingPage() {
-  return <BiddingClient />;
+  return (
+    <>
+      <Breadcrumbs
+        trail={[
+          { name: "Examples", path: "/examples" },
+          { name: "Task Bidding", path: "/examples/bidding" },
+        ]}
+      />
+      <BiddingClient />
+    </>
+  );
 }

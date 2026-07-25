@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
+import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS, KW_REACTIVE } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Concepts & Terminology  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Event-Driven Agent Concepts",
   description:
-    "The biological vocabulary of Cosmonapse across the full product line: Core, Engram, Doppler, Immune, and Cloud.",
-};
+    "The vocabulary of a reactive agent harness - Synapse, Neuron, Axon, Dendrite, Pathway, Engram - and why event-driven choreography beats an orchestrator loop.",
+  path: "/concepts",
+  keywords: [
+    ...KW_EVENT_DRIVEN,
+    ...KW_REACTIVE,
+    ...KW_HARNESS,
+    "agent architecture glossary",
+    "what is an agent harness",
+    "orchestration vs choreography",
+    "multi-agent design patterns",
+  ],
+});
 
 type Status = "active" | "scoping" | "not-planned";
 

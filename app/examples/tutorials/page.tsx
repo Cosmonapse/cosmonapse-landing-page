@@ -1,12 +1,32 @@
 import type { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS } from "@/lib/seo";
 import TutorialsClient from "./TutorialsClient";
 
-export const metadata: Metadata = {
-  title: "Tutorials  -  Examples  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Tutorials - Agent Engineering",
   description:
-    "Eleven incremental tutorials for the Cosmonapse Python SDK, sorted by what you need next  -  from hello-world in twelve lines to the production switch from MemorySynapse to NATS or Kafka. Plus the full cosmo CLI reference.",
-};
+    "A guided track through building agent harnesses on Cosmonapse, from a single Neuron to a multi-agent RAG system. Every step is runnable and builds on the last.",
+  path: "/examples/tutorials",
+  keywords: [
+    ...KW_EVENT_DRIVEN,
+    ...KW_HARNESS,
+    "AI agent tutorial",
+    "learn multi-agent systems",
+    "agent engineering course",
+  ],
+});
 
 export default function TutorialsPage() {
-  return <TutorialsClient />;
+  return (
+    <>
+      <Breadcrumbs
+        trail={[
+          { name: "Examples", path: "/examples" },
+          { name: "Tutorials", path: "/examples/tutorials" },
+        ]}
+      />
+      <TutorialsClient />
+    </>
+  );
 }

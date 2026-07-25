@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
+import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS } from "@/lib/seo";
 import Link from "next/link";
 import CodeBlock from "@/components/CodeBlock";
 import CodeSwitcher from "@/components/CodeSwitcher";
 
-export const metadata: Metadata = {
-  title: "Quickstart  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Quickstart - Build an Event-Driven AI Agent",
   description:
-    "Install Cosmonapse, create a Hugging Face Neuron, wire an Axon and Dendrite, boot a local Synapse, watch Signals flow.",
-};
+    "Get an event-driven AI agent running in minutes: install the SDK, wrap a model as a Neuron, boot a local Synapse, watch Signals flow. Python & TypeScript.",
+  path: "/quickstart",
+  keywords: [
+    ...KW_EVENT_DRIVEN,
+    ...KW_HARNESS,
+    "AI agent quickstart",
+    "build an AI agent in Python",
+    "agent SDK tutorial",
+    "pip install cosmonapse",
+    "LLM agent getting started",
+  ],
+});
 
 // ── Install ────────────────────────────────────────────────────────────────
 

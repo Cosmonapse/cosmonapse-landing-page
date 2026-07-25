@@ -1,12 +1,34 @@
 import type { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS } from "@/lib/seo";
 import RagClient from "./RagClient";
 
-export const metadata: Metadata = {
-  title: "Full RAG System  -  Examples  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Full RAG System on an Event Bus",
   description:
-    "Retrieval-augmented generation built entirely on Cosmonapse primitives  -  four Neurons, three Engrams, hybrid semantic + lexical retrieval fused by reciprocal rank, an answer cache, and a staged retrieve / rerank / generate pipeline on one trace.",
-};
+    "RAG built entirely from Cosmonapse primitives: four Neurons, three Engrams, hybrid retrieval fused by reciprocal rank, an answer cache, one staged trace.",
+  path: "/examples/rag",
+  keywords: [
+    ...KW_EVENT_DRIVEN,
+    ...KW_HARNESS,
+    "RAG architecture",
+    "hybrid retrieval",
+    "reciprocal rank fusion",
+    "event-driven RAG pipeline",
+    "vector search agents",
+  ],
+});
 
 export default function RagPage() {
-  return <RagClient />;
+  return (
+    <>
+      <Breadcrumbs
+        trail={[
+          { name: "Examples", path: "/examples" },
+          { name: "Full RAG System", path: "/examples/rag" },
+        ]}
+      />
+      <RagClient />
+    </>
+  );
 }

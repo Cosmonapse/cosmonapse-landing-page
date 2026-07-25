@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import DocsShell from "../../DocsShell";
 import CliDocs from "../../cli";
 import { refByBase, sectionBySlug } from "../../docsNav";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { docsMetadata, KW_HARNESS } from "@/lib/seo";
 
 const BASE = "/docs/cli";
 
@@ -12,13 +14,15 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { section: string } }): Metadata {
   const sec = sectionBySlug(BASE, params.section);
-  return {
-    title: sec
-      ? `${sec.label}  -  cosmo CLI Reference  -  Cosmonapse`
-      : "cosmo CLI Reference  -  Cosmonapse",
-    description:
-      "Reference for the cosmo developer CLI  -  commands, flags, configuration, and exit codes.",
-  };
+  return docsMetadata({
+    sectionLabel: sec?.label,
+    blurb: sec?.blurb,
+    refLabel: "cosmo CLI",
+    refDescription:
+      "Reference for the cosmo developer CLI - commands, flags, configuration, and exit codes for running and inspecting agent harnesses.",
+    path: `${BASE}/${params.section}`,
+    keywords: [...KW_HARNESS, "cosmo CLI", "AI agent CLI", "agent developer tools"],
+  });
 }
 
 export default function CliSectionPage({ params }: { params: { section: string } }) {
@@ -26,6 +30,14 @@ export default function CliSectionPage({ params }: { params: { section: string }
   if (!sec) notFound();
 
   return (
+    <>
+      <Breadcrumbs
+        trail={[
+          { name: "Docs", path: "/docs/cli" },
+          { name: "cosmo CLI", path: "/docs/cli" },
+          { name: sec.label.replace(/\s+-\s+/g, " - "), path: `${BASE}/${sec.slug}` },
+        ]}
+      />
     <DocsShell
       title="cosmo CLI reference."
       sub={
@@ -37,5 +49,6 @@ export default function CliSectionPage({ params }: { params: { section: string }
     >
       <CliDocs section={sec.id} />
     </DocsShell>
+    </>
   );
 }

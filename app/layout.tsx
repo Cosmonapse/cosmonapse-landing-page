@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono, Michroma } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react";
+import { KEYWORDS_ALL, SITE_NAME, SITE_URL, TWITTER } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,34 +29,48 @@ const michroma = Michroma({
 });
 
 export const metadata: Metadata = {
-  title: "Cosmonapse  -  Distributed cognition protocol for autonomous AI agents",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Cosmonapse - Open Protocol for Event-Driven AI Agents",
+    // Every child page renders as "<page title> | Cosmonapse".
+    template: `%s | ${SITE_NAME}`,
+  },
   description:
-    "Cosmonapse is the open protocol for building distributed multi-agent/model harnesses. One envelope. One channel. Replaceable neurons. Apache 2.0 licensed.",
-  metadataBase: new URL("https://cosmonapse.dev"),
-  keywords: [
-    "AI agents",
-    "agent protocol",
-    "A2A",
-    "multi-agent",
-    "distributed cognition",
-    "agent SDK",
-    "Cosmonapse",
-  ],
+    "The open Apache 2.0 protocol for event-driven AI agents. Build reactive multi-agent harnesses on one signal envelope and one channel - no orchestrator loop.",
+  applicationName: SITE_NAME,
+  keywords: KEYWORDS_ALL,
+  authors: [{ name: "Cosmonapse", url: SITE_URL }],
+  creator: "Cosmonapse",
+  publisher: "Cosmonapse",
+  category: "technology",
+  alternates: { canonical: SITE_URL },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "Cosmonapse  -  The nervous system for autonomous AI agents",
+    title: "Cosmonapse - Event-Driven AI Agents",
     description:
-      "The open protocol for building distributed multi-agent/model harnesses. One envelope. One channel. Replaceable neurons.",
-    url: "https://cosmonapse.dev",
-    siteName: "Cosmonapse",
+      "The open protocol for event-driven AI agents and reactive multi-agent harnesses. One envelope. One channel. Replaceable neurons. Apache 2.0.",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cosmonapse  -  The nervous system for autonomous AI agents",
+    title: "Cosmonapse - Event-Driven AI Agents",
     description:
-      "The open protocol for building distributed multi-agent/model harnesses. One envelope. One channel. Replaceable neurons.",
-    site: "@Cosmonapse",
-    creator: "@Cosmonapse",
+      "The open protocol for event-driven AI agents and reactive multi-agent harnesses. One envelope. One channel. Replaceable neurons.",
+    site: TWITTER,
+    creator: TWITTER,
   },
 };
 
@@ -62,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${michroma.variable}`}>
       <body>
+        <JsonLd />
         <Nav />
         <main>{children}</main>
         <Footer />

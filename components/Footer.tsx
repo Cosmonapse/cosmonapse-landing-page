@@ -50,6 +50,9 @@ export default function Footer() {
                 <Link href="/quickstart">Quickstart</Link>
               </li>
               <li>
+                <Link href="/ycombinator">Interactive demo</Link>
+              </li>
+              <li>
                 <Link href="/docs">Docs</Link>
               </li>
               <li>

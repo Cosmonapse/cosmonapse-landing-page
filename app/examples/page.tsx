@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
+import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS, KW_REACTIVE } from "@/lib/seo";
 import Link from "next/link";
 import ExamplesCatalog from "./ExamplesCatalog";
 
-export const metadata: Metadata = {
-  title: "Examples  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Event-Driven Multi-Agent Examples",
   description:
-    "End-to-end example setups built on Cosmonapse primitives. Copy, run, and adapt each topology for your own agents.",
-};
+    "Runnable agent topologies: capability routing, task bidding, orchestrator-free choreography, RAG pipelines, MCP tool agents, retries and rollback.",
+  path: "/examples",
+  keywords: [
+    ...KW_EVENT_DRIVEN,
+    ...KW_REACTIVE,
+    ...KW_HARNESS,
+    "multi-agent examples",
+    "AI agent code examples",
+    "agent topology patterns",
+    "RAG example code",
+    "MCP agent example",
+  ],
+});
 
 export default function ExamplesPage() {
   return (

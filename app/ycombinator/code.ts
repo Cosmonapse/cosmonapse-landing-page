@@ -1,0 +1,298 @@
+// ---------------------------------------------------------------------------
+// neurons/rag.py, annotated. Each Part with a `tip` becomes a hoverable token.
+// Kept in sync by hand with cosmonapse-examples/16-rag-cli/neurons/rag.py.
+// ---------------------------------------------------------------------------
+
+export type Part = string | { t: string; cls?: string; tip?: string };
+export type Line = Part[];
+
+const K = (t: string, tip?: string): Part => ({ t, cls: "tk-kw", tip });
+const F = (t: string, tip?: string): Part => ({ t, cls: "tk-fn", tip });
+const S = (t: string, tip?: string): Part => ({ t, cls: "tk-str", tip });
+const C = (t: string): Part => ({ t, cls: "tk-cm" });
+const O = (t: string, tip?: string): Part => ({ t, cls: "tk-op", tip });
+
+export const NEURON_CODE: Line[] = [
+  [C("# THE NEURON. One async function, three declared capabilities.")],
+  [],
+  [
+    K("async def "),
+    F(
+      "answer_neuron",
+      "A Neuron is a plain async function. No base class, no framework object - this is the whole agent."
+    ),
+    "(input, context, ",
+    O("*"),
+    ", ",
+    O(
+      "recall",
+      "Ask for it by name in the signature and the Axon injects it. Becomes a RECALL Signal on the bus, answered by whichever Dendrite hosts the Engram."
+    ),
+    ", ",
+    O(
+      "imprint",
+      "Injected the same way. Becomes an IMPRINT Signal. Fired with await_ack=False below, so it does not wait for the receipt."
+    ),
+    ", ",
+    O(
+      "call_tool",
+      "Injected the same way. Becomes a TOOL_CALL Signal, serviced by whichever Dendrite hosts the Effector."
+    ),
+    "):",
+  ],
+  ["    question = input[", S('"question"'), "]"],
+  [],
+  [C("    # 1. What do we already know?")],
+  [
+    "    known = ",
+    K("await "),
+    F("recall"),
+    "(",
+    S(
+      '"web"',
+      'A binding name, not an address. The Axon resolves "web" to engram_id "web-memory" and writes that into directed.id. Move the Engram to another machine and this line does not change.'
+    ),
+    ", query={",
+    S('"text"'),
+    ": question})",
+  ],
+  ["    passages = ", F("_passages"), "(known.hits)"],
+  [],
+  [C("    # 2. Not enough -> go and learn.")],
+  [
+    "    ",
+    K("if not "),
+    F(
+      "_covers",
+      'The entire "do I already know this?" policy: enough passages, covering enough of the question\'s content words. Two numbers in config.py.'
+    ),
+    "(question, passages):",
+  ],
+  [
+    "        found = ",
+    K("await "),
+    F("call_tool"),
+    "(",
+    S('"web"'),
+    ", tool=",
+    S(
+      '"search"',
+      "The Axon's EffectorBinding lists exactly two reachable tool names: search and fetch. A third would be refused."
+    ),
+    ", args={...})",
+  ],
+  [
+    "        ",
+    K("for "),
+    "url ",
+    K("in "),
+    F("_urls"),
+    "(found.result[",
+    S('"response"'),
+    "]):",
+  ],
+  [
+    "            page = ",
+    K("await "),
+    F("call_tool"),
+    "(",
+    S('"web"'),
+    ", tool=",
+    S('"fetch"'),
+    ", args={",
+    S('"url"'),
+    ": url})",
+  ],
+  [
+    "            ",
+    K("for "),
+    "i, chunk ",
+    K("in "),
+    F("enumerate"),
+    "(",
+    F(
+      "_chunks",
+      "Fixed-width overlapping chunks. Deliberately dumb - a smarter splitter is a better splitter, not a different architecture."
+    ),
+    "(page)):",
+  ],
+  [
+    "                ",
+    K("await "),
+    F("imprint"),
+    "(",
+    S('"web"'),
+    ", op=",
+    S('"upsert"'),
+    ", merge_key=",
+    S(
+      'f"{url}#{i}"',
+      "Re-reading a page upserts its chunks instead of duplicating them. The index is idempotent under repeat runs."
+    ),
+    ",",
+  ],
+  [
+    "                              entry={...}, ",
+    O(
+      "await_ack=False",
+      "Emit and move on. Nothing downstream needs the receipt, so this IMPRINT never blocks the Neuron."
+    ),
+    ")",
+  ],
+  [],
+  [C("        # 3. The same recall as step 1. Both paths converge here.")],
+  [
+    "        passages = ",
+    F("_passages"),
+    "(",
+    K("await "),
+    F("recall"),
+    "(",
+    S('"web"'),
+    ", query={...}))",
+  ],
+  [],
+  [C("    # 4. Ask the model. It sees passages and a question, nothing else.")],
+  [
+    "    out = ",
+    K("await "),
+    F(
+      "LLM",
+      "The model is the last line. It has no tools, no memory, and no idea Cosmonapse exists. Swap it in config.py and nothing else changes."
+    ),
+    "(",
+    F("_prompt"),
+    "(question, passages), [])",
+  ],
+  [
+    "    ",
+    K("return "),
+    "{",
+    S('"answer"'),
+    ": out[",
+    S('"response"'),
+    "], ",
+    S('"sources"'),
+    ": [...]}",
+  ],
+];
+
+export const AXON_CODE: Line[] = [
+  [C("# THE DECLARATION. What this Neuron is allowed to touch.")],
+  [],
+  [
+    "AXON = ",
+    F(
+      "Axon",
+      "The Axon is the agent-side interface: it declares capabilities, validates output, and resolves bindings. The Neuron above never imports it."
+    ),
+    "(",
+  ],
+  [
+    "    neuron_id=",
+    S('"rag"'),
+    ", neuron_fn=",
+    F("answer_neuron"),
+    ", capabilities=[",
+    S(
+      '"rag"',
+      "What this Neuron advertises. The CLI dispatches to this capability, not to a node - so you can run three replicas and the Synapse load-balances them."
+    ),
+    "],",
+  ],
+  [
+    "    engrams=[",
+    F(
+      "EngramBinding",
+      'Declarative wiring. The Neuron says "web"; this says what "web" means on the wire. A name the Axon did not declare is refused at call time.'
+    ),
+    "(name=",
+    S('"web"'),
+    ", directed_id=",
+    S('"web-memory"'),
+    ")],",
+  ],
+  [
+    "    effectors=[",
+    F("EffectorBinding"),
+    "(name=",
+    S('"web"'),
+    ", directed_id=",
+    S('"web-effector"'),
+    ",",
+  ],
+  [
+    "                               tools=(",
+    S('"search"'),
+    ", ",
+    S('"fetch"'),
+    "))],",
+  ],
+  [
+    "    ",
+    O(
+      "tool_standard=",
+      "THE GATE: effectors= without a tool_standard fails at construction, not silently at runtime. The standard is how an Axon recognises a tool call in a model's raw output - bindings without one would be dead wiring."
+    ),
+    S('"codex"'),
+    ",",
+  ],
+  [")"],
+];
+
+export const BRAIN_CODE: Line[] = [
+  [C("# The wiring. Three Dendrites, one Synapse.")],
+  [],
+  [
+    "host = ",
+    F(
+      "Dendrite",
+      "A Dendrite is the synapse-side participant: it owns routing and exposes the aggregate capabilities of whatever is attached to it."
+    ),
+    "(synapse=synapse, dendrite_id=",
+    S('"engram-host"'),
+    ", role=",
+    S('"worker"'),
+    ")",
+  ],
+  [
+    "host.",
+    F(
+      "attach_engram",
+      "That is the entire registration step. No registry, no handler table, no manual subscription - the Dendrite now answers RECALL and IMPRINT for this Engram."
+    ),
+    "(web_memory.ENGRAM)",
+  ],
+  [],
+  [
+    "tools = ",
+    F("Dendrite"),
+    "(synapse=synapse, dendrite_id=",
+    S('"web-node"'),
+    ", role=",
+    S('"worker"'),
+    ")",
+  ],
+  [
+    "tools.",
+    F(
+      "attach_effector",
+      "Same idea for tools. The SDK services this Effector's TOOL_CALL / TOOL_RESULT from here on."
+    ),
+    "(web.EFFECTOR)",
+  ],
+  [],
+  [
+    "node = ",
+    F("Dendrite"),
+    "(synapse=synapse, dendrite_id=",
+    S('"rag-node"'),
+    ", role=",
+    S(
+      '"orchestrator"',
+      "Only an orchestrator may dispatch TASKs. Workers host Axons, Effectors and Engrams and never originate work."
+    ),
+    ")",
+  ],
+  ["node.", F("attach_axon"), "(rag.AXON)"],
+];

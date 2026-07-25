@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
+import { pageMetadata, KW_PRODUCT } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Roadmap  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Roadmap",
   description:
-    "0.1.8 is out - the first public release. 0.2.0 hardens the core primitives and freezes pathways and traces; 0.3.0 stress-tests the protocol with real agents; 1.0.0 is a strong protocol foundation with Doppler Prism observability, Brains and Brainwaves, and Cosmonapse Cloud.",
-};
+    "Where the Cosmonapse protocol is heading: 0.2.0 hardens the core primitives, 0.3.0 stress-tests with real agents, 1.0.0 lands Prism, Brainwaves and Cloud.",
+  path: "/roadmap",
+  keywords: [
+    ...KW_PRODUCT,
+    "Cosmonapse roadmap",
+    "agent protocol releases",
+    "open source AI agent roadmap",
+  ],
+});
 
 export default function RoadmapPage() {
   return (

@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
+import { pageMetadata, KW_EVENT_DRIVEN, KW_PRODUCT } from "@/lib/seo";
 import CodeBlock from "@/components/CodeBlock";
 import CodeSwitcher from "@/components/CodeSwitcher";
 
-export const metadata: Metadata = {
-  title: "Envelope Specification  -  Cosmonapse Protocol",
+export const metadata: Metadata = pageMetadata({
+  title: "Signal Envelope Spec",
   description:
-    "The envelope is the single shared contract of Cosmonapse. Every Signal on the channel is a valid envelope.",
-};
+    "The event contract every Cosmonapse agent speaks: one versioned JSON envelope - id, trace_id, parent_id, type, payload - readable by any Neuron, any language.",
+  path: "/protocol",
+  keywords: [
+    ...KW_EVENT_DRIVEN,
+    ...KW_PRODUCT,
+    "agent message format",
+    "AI agent event schema",
+    "signal envelope",
+    "agent interoperability protocol",
+    "trace propagation for agents",
+    "JSON event envelope",
+  ],
+});
 
 const envelopeSnippet = `{
   <span class="tk-fn">"v"</span>:         <span class="tk-str">"1"</span>,

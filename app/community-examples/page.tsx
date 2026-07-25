@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
+import { pageMetadata, KW_PRODUCT } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Community Examples  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Community Examples",
   description:
-    "Community-created examples and tutorials showcasing the creative brains other developers have built on Cosmonapse. Submit your own via the Cosmonapse subreddit or dev@cosmonapse.com.",
-};
+    "Agent harnesses built and shared by developers using Cosmonapse. Submit your own topology via the subreddit or dev@cosmonapse.com.",
+  path: "/community-examples",
+  keywords: [
+    ...KW_PRODUCT,
+    "community AI agent examples",
+    "open source agent showcase",
+  ],
+});
 
 export default function CommunityExamplesPage() {
   return (

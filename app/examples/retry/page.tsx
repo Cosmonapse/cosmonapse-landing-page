@@ -1,12 +1,34 @@
 import type { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { pageMetadata, KW_HARNESS, KW_REACTIVE } from "@/lib/seo";
 import RetryClient from "./RetryClient";
 
-export const metadata: Metadata = {
-  title: "Retry, STOP & Rollback  -  Examples  -  Cosmonapse",
+export const metadata: Metadata = pageMetadata({
+  title: "Retry, STOP and Rollback",
   description:
-    "Resilience patterns over the RAG primitives, fully offline. run_with_retry re-dispatches a stuck stage on a fresh trace, stop_trace cooperatively cancels a workflow, and stop_trace(rollback=True) replays each Engram's saga journal to undo a half-finished write.",
-};
+    "Fault tolerance on the event channel: bounded retries with backoff, cooperative STOP propagation down a trace, and compensating rollback when a step fails.",
+  path: "/examples/retry",
+  keywords: [
+    ...KW_HARNESS,
+    ...KW_REACTIVE,
+    "agent error handling",
+    "retry with backoff",
+    "cancelling an agent run",
+    "compensating transactions",
+    "resilient AI pipelines",
+  ],
+});
 
 export default function RetryPage() {
-  return <RetryClient />;
+  return (
+    <>
+      <Breadcrumbs
+        trail={[
+          { name: "Examples", path: "/examples" },
+          { name: "Retry, STOP & Rollback", path: "/examples/retry" },
+        ]}
+      />
+      <RetryClient />
+    </>
+  );
 }

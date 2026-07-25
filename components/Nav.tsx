@@ -26,6 +26,7 @@ const docsLinks = [
 ];
 
 const trailingLinks = [
+  { href: "/observability", label: "Observability" },
   { href: "/roadmap", label: "Roadmap" },
 ];
 
