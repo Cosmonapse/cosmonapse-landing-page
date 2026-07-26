@@ -13,50 +13,45 @@ const C = (t: string): Part => ({ t, cls: "tk-cm" });
 const O = (t: string, tip?: string): Part => ({ t, cls: "tk-op", tip });
 
 export const NEURON_CODE: Line[] = [
-  [C("# THE NEURON. One async function, three declared capabilities.")],
+  [C("# THE NEURON is a stock chat model. Three decorators make it a RAG.")],
   [],
   [
-    K("async def "),
+    "AXON = Axon(neuron_id=",
+    S('"rag"'),
+    ", neuron_fn=",
     F(
-      "answer_neuron",
-      "A Neuron is a plain async function. No base class, no framework object - this is the whole agent."
+      "llm()",
+      "A hosted chat model and nothing else - no retrieval code, no tool code, no protocol code. It never learns Cosmonapse exists. Swap it in config.py and no other file changes."
     ),
-    "(input, context, ",
-    O("*"),
-    ", ",
-    O(
-      "recall",
-      "Ask for it by name in the signature and the Axon injects it. Becomes a RECALL Signal on the bus, answered by whichever Dendrite hosts the Engram."
-    ),
-    ", ",
-    O(
-      "imprint",
-      "Injected the same way. Becomes an IMPRINT Signal. Fired with await_ack=False below, so it does not wait for the receipt."
-    ),
-    ", ",
-    O(
-      "call_tool",
-      "Injected the same way. Becomes a TOOL_CALL Signal, serviced by whichever Dendrite hosts the Effector."
-    ),
-    "):",
+    ", ...)",
   ],
-  ["    question = input[", S('"question"'), "]"],
+  [],
+  [
+    O(
+      "@AXON.before_task",
+      "Runs before the model does. The question comes in, a chat prompt goes out - and every Signal this example sends is emitted from in here."
+    ),
+  ],
+  [
+    K("async def "),
+    F("situate"),
+    "(input):",
+  ],
+  ["    d = ", F("AXON.dendrite", "The Dendrite hosting this Axon. Memory and tools are both reached through it - they are Signals on the bus, not library calls."), ""],
   [],
   [C("    # 1. What do we already know?")],
   [
     "    known = ",
     K("await "),
-    F("recall"),
-    "(",
-    S(
-      '"web"',
-      'A binding name, not an address. The Axon resolves "web" to engram_id "web-memory" and writes that into directed.id. Move the Engram to another machine and this line does not change.'
+    "d.",
+    F(
+      "recall",
+      "Emits RECALL, waits for RECALLED. Answered by whichever Dendrite hosts that Engram - which may be another machine."
     ),
-    ", query={",
-    S('"text"'),
-    ": question})",
+    "(engram_id=",
+    S('"web-memory"'),
+    ", query={...})",
   ],
-  ["    passages = ", F("_passages"), "(known.hits)"],
   [],
   [C("    # 2. Not enough -> go and learn.")],
   [
@@ -71,15 +66,13 @@ export const NEURON_CODE: Line[] = [
   [
     "        found = ",
     K("await "),
-    F("call_tool"),
-    "(",
-    S('"web"'),
+    "d.",
+    F("call_tool", "Emits TOOL_CALL, waits for TOOL_RESULT. Serviced by whichever Dendrite hosts that Effector."),
+    "(effector_id=",
+    S('"web-effector"'),
     ", tool=",
-    S(
-      '"search"',
-      "The Axon's EffectorBinding lists exactly two reachable tool names: search and fetch. A third would be refused."
-    ),
-    ", args={...})",
+    S('"search"'),
+    ", ...)",
   ],
   [
     "        ",
@@ -94,14 +87,11 @@ export const NEURON_CODE: Line[] = [
   [
     "            page = ",
     K("await "),
-    F("call_tool"),
-    "(",
-    S('"web"'),
+    "d.call_tool(effector_id=",
+    S('"web-effector"'),
     ", tool=",
     S('"fetch"'),
-    ", args={",
-    S('"url"'),
-    ": url})",
+    ", ...)",
   ],
   [
     "            ",
@@ -119,62 +109,61 @@ export const NEURON_CODE: Line[] = [
   [
     "                ",
     K("await "),
-    F("imprint"),
-    "(",
-    S('"web"'),
+    "d.",
+    F("imprint", "Emits IMPRINT. This one does not wait for the receipt."),
+    "(engram_id=",
+    S('"web-memory"'),
     ", op=",
     S('"upsert"'),
-    ", merge_key=",
+    ",",
+  ],
+  [
+    "                                merge_key=",
     S(
       'f"{url}#{i}"',
       "Re-reading a page upserts its chunks instead of duplicating them. The index is idempotent under repeat runs."
     ),
-    ",",
-  ],
-  [
-    "                              entry={...}, ",
+    ", ",
     O(
       "await_ack=False",
-      "Emit and move on. Nothing downstream needs the receipt, so this IMPRINT never blocks the Neuron."
+      "Emit and move on. Nothing downstream needs the receipt, so this IMPRINT never blocks."
     ),
     ")",
   ],
   [],
   [C("        # 3. The same recall as step 1. Both paths converge here.")],
-  [
-    "        passages = ",
-    F("_passages"),
-    "(",
-    K("await "),
-    F("recall"),
-    "(",
-    S('"web"'),
-    ", query={...}))",
-  ],
+  ["        passages = _passages((", K("await "), "d.recall(...)).hits)"],
   [],
-  [C("    # 4. Ask the model. It sees passages and a question, nothing else.")],
-  [
-    "    out = ",
-    K("await "),
-    F(
-      "LLM",
-      "The model is the last line. It has no tools, no memory, and no idea Cosmonapse exists. Swap it in config.py and nothing else changes."
-    ),
-    "(",
-    F("_prompt"),
-    "(question, passages), [])",
-  ],
   [
     "    ",
     K("return "),
     "{",
-    S('"answer"'),
-    ": out[",
-    S('"response"'),
-    "], ",
-    S('"sources"'),
-    ": [...]}",
+    S('"messages"'),
+    ": [",
+    F("system", "The model is handed finished passages and a question. It has no tools and no memory of its own."),
+    ", ",
+    F("user"),
+    "]}",
   ],
+  [],
+  [
+    O(
+      "@AXON.detects_output",
+      "Runs on the model's raw reply. Here the reply IS the answer, so this just re-attaches the sources it was allowed to cite."
+    ),
+  ],
+  [K("def "), F("answer"), "(raw): ..."],
+  [],
+  [
+    O(
+      "@AXON.host.on_agent_output",
+      "A DEFERRED HOST decorator. It queues at import time and is replayed onto whichever Dendrite hosts this Axon - so brain.py wires no handlers. Here the chain has one link; in 14-agent this same decorator hands work from the planner to the researcher."
+    ),
+    "(neuron=",
+    S('"rag"'),
+    ")",
+  ],
+  [K("async def "), F("conclude"), "(sig):  ", C("# THE CHAIN: emit FINAL")],
 ];
 
 export const AXON_CODE: Line[] = [
@@ -295,4 +284,121 @@ export const BRAIN_CODE: Line[] = [
     ")",
   ],
   ["node.", F("attach_axon"), "(rag.AXON)"],
+];
+
+export const ENGRAM_CODE: Line[] = [
+  [C("# THE ENGRAM. Two decorators - the memory side of the same idea.")],
+  [],
+  [
+    "ENGRAM = ",
+    F(
+      "Engram.serve",
+      "The memory-side twin of Effector.serve(). No ABC to implement and no reply to publish - the Engram is still attached under its own id, so it REGISTERs normally and an observer draws it as one engram node."
+    ),
+    "(engram_id=",
+    S('"web-memory"'),
+    ", engram_kind=",
+    S('"lexical"'),
+    ")",
+  ],
+  [],
+  [
+    O(
+      "@ENGRAM.serves",
+      "The can_serve gate. Return False and the hosting Dendrite skips responding - which is how a BM25 memory declines a vector query routed by kind rather than by id."
+    ),
+  ],
+  [K("def "), F("only_text"), "(query): ", K("return "), S('"text"'), " ", K("in "), "query"],
+  [],
+  [
+    O(
+      "@ENGRAM.on_recall",
+      "RECALL arrives, this runs, and what it RETURNS becomes the RECALLED hits. It executes INSIDE the Dendrite's handling pass - the same position @AXON.before_task occupies for a Neuron - so resolution and attribution keep working."
+    ),
+  ],
+  [
+    K("async def "),
+    F("search"),
+    "(query, ",
+    O("*"),
+    ", deadline_ms=",
+    K("None"),
+    ", min_confidence=",
+    K("None"),
+    "):",
+  ],
+  [
+    "    ",
+    K("return "),
+    "[",
+    F("Hit", "Return Hits, or plain {id, entry, score} dicts. Returning None falls through to the next handler, so a quota or ACL can sit in front of the real backend."),
+    "(id=eid, entry=e, score=bm25) ...]",
+  ],
+  [],
+  [
+    O(
+      "@ENGRAM.on_imprint",
+      "IMPRINT arrives, this runs, and what it returns becomes the IMPRINTED receipt. The index cap lives in here because this handler owns the write."
+    ),
+  ],
+  [
+    K("async def "),
+    F("write"),
+    "(op, entry, ",
+    O("*"),
+    ", merge_key=",
+    K("None"),
+    "):",
+  ],
+  ["    eid = _put(entry, merge_key); _cap()"],
+  ["    ", K("return "), "eid"],
+  [],
+  [
+    O(
+      "@ENGRAM.host.on_recalled",
+      "A pure OBSERVER - it fires AFTER the reply is on the wire, so it cannot filter or rewrite a query. Note which signal carries what: the request had the query, only the reply has the hits."
+    ),
+  ],
+  [
+    K("async def "),
+    F("mark_used"),
+    "(sig):  ",
+    C("# stamps last_used; never writes"),
+  ],
+];
+
+export const EFFECTOR_CODE: Line[] = [
+  [C("# THE EFFECTOR. Same shape again, on the action side.")],
+  [],
+  [
+    "EFFECTOR = ",
+    F("Effector.serve", "One protocol hook. A TOOL_CALL arrives, your handler runs, its return value is emitted as the TOOL_RESULT - no manual publish, no dispatch table in the SDK."),
+    "(effector_id=",
+    S('"web-effector"'),
+    ", effector_kind=",
+    S('"web"'),
+    ")",
+  ],
+  [],
+  [O("@EFFECTOR.on_tool_call", "The tool itself. A raise becomes `error` on the TOOL_RESULT, and a tool error never terminates the parent TASK.")],
+  [
+    K("async def "),
+    F("handle"),
+    "(tool, args, ",
+    O("*"),
+    ", ",
+    O("trace_id", "Injected only because it is declared - so are call_id and deadline_ms if a handler asks for them."),
+    "=",
+    K("None"),
+    "):",
+  ],
+  ["    ", C("# search | fetch, proxied onto one MCP server")],
+  [],
+  [
+    O(
+      "@EFFECTOR.host.on_final",
+      "The action-side observer. Drops this trace's fetch memo when the trace ends - without it the dict grows for the life of the process."
+    ),
+  ],
+  [K("async def "), F("forget"), "(sig): _SEEN.pop(sig.trace_id, ", K("None"), ")"],
 ];

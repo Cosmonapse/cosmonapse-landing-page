@@ -2,7 +2,15 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { COLD, NODES, SIG_TONE, WARM, type NodeId, type Run, type Sig } from "./trace";
-import { AXON_CODE, BRAIN_CODE, NEURON_CODE, type Line, type Part } from "./code";
+import {
+  AXON_CODE,
+  BRAIN_CODE,
+  EFFECTOR_CODE,
+  ENGRAM_CODE,
+  NEURON_CODE,
+  type Line,
+  type Part,
+} from "./code";
 import Paradigm from "./Paradigm";
 
 // ---------------------------------------------------------------------------
@@ -376,7 +384,7 @@ export default function YcClient() {
                   </>
                 ) : (
                   <span className="yc-detail-idle">
-                    The trace is 16 Signals cold, 4 warm. That difference is the whole
+                    The trace is 17 Signals cold, 5 warm. That difference is the whole
                     demo.
                   </span>
                 )}
@@ -457,22 +465,63 @@ export default function YcClient() {
       <section className="section-sm">
         <div className="container">
           <div className="section-eyebrow">// the code that did that</div>
-          <h2 className="section-title">Three files, and no loop in any of them.</h2>
+          <h2 className="section-title">
+            Every primitive is a decorated reaction to a Signal.
+          </h2>
           <p className="section-sub">
             Every underlined token is hoverable. This is the whole system - not an
             excerpt chosen to look small.
           </p>
 
+          <div className="yc-symmetry">
+            <div className="yc-sym-head">
+              <span>side</span>
+              <span>does the work</span>
+              <span>watches it happen</span>
+            </div>
+            <div className="yc-sym-row">
+              <span className="yc-sym-name">agent</span>
+              <code className="inline">@AXON.before_task</code>
+              <code className="inline">@AXON.host.on_agent_output</code>
+            </div>
+            <div className="yc-sym-row">
+              <span className="yc-sym-name">memory</span>
+              <code className="inline">@ENGRAM.on_recall</code>
+              <code className="inline">@ENGRAM.host.on_recalled</code>
+            </div>
+            <div className="yc-sym-row">
+              <span className="yc-sym-name">action</span>
+              <code className="inline">@EFFECTOR.on_tool_call</code>
+              <code className="inline">@EFFECTOR.host.on_final</code>
+            </div>
+            <p className="yc-sym-note">
+              The left column runs <em>inside</em> the request and its return
+              value becomes the reply. The right column fires after the reply is
+              already on the wire - it can observe, count and annotate, but it
+              cannot answer. Confusing the two is how you write to a store twice.
+            </p>
+          </div>
+
           <div className="yc-codegrid">
             <CodeBlock
               lines={NEURON_CODE}
               title="neurons/rag.py"
-              sub="the Neuron - one async function"
+              sub="the Neuron - a stock model + three decorators"
             />
             <CodeBlock
               lines={AXON_CODE}
               title="neurons/rag.py"
               sub="the declaration - what it may touch"
+            />
+            <CodeBlock
+              lines={ENGRAM_CODE}
+              title="engram/web_memory.py"
+              sub="the Engram - Engram.serve()"
+            />
+            <CodeBlock
+              lines={EFFECTOR_CODE}
+              title="effector/web.py"
+              sub="the Effector - Effector.serve()"
             />
             <CodeBlock
               lines={BRAIN_CODE}

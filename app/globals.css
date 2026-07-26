@@ -2241,3 +2241,32 @@ code.inline {
   margin-bottom: 12px; max-width: 760px;
 }
 .yc-pgroup-list { display: grid; gap: 10px; }
+
+/* --- /ycombinator : the three-primitive symmetry table ---------------- */
+.yc-symmetry {
+  margin: 22px 0 20px; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--bg-card); overflow: hidden;
+}
+.yc-sym-head, .yc-sym-row {
+  display: grid; grid-template-columns: 110px 1fr 1fr; gap: 16px;
+  padding: 11px 18px; align-items: center;
+}
+.yc-sym-head {
+  background: var(--bg-elev); border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono), ui-monospace, monospace; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint);
+}
+.yc-sym-row { border-bottom: 1px solid var(--border); font-size: 13px; }
+.yc-sym-name {
+  font-family: var(--font-mono), ui-monospace, monospace; font-size: 12px;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent);
+}
+.yc-sym-note {
+  padding: 14px 18px; margin: 0; font-size: 13px; line-height: 1.6;
+  color: var(--text-dim);
+}
+.yc-sym-note em { color: var(--text); font-style: normal; font-weight: 600; }
+@media (max-width: 900px) {
+  .yc-sym-head { display: none; }
+  .yc-sym-row { grid-template-columns: 1fr; gap: 6px; }
+}

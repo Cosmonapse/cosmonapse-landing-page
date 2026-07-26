@@ -178,6 +178,14 @@ export const COLD: Run = {
       detail:
         "The model ran once, on finished passages, and returned. It had no tools, no memory, and no idea any of this happened.",
     },
+    {
+      type: "FINAL",
+      from: "rag",
+      to: "cli",
+      label: "result: answer, source, sources[]",
+      detail:
+        "@AXON.host.on_agent_output - the chain handler, declared next to the Neuron rather than in the wiring. Here the chain has one link: conclude the trace. In 14-agent this same decorator is where a planner hands work to a researcher.",
+    },
   ],
   answer: [
     "Raft is a consensus algorithm for managing a replicated log, designed",
@@ -234,7 +242,15 @@ export const WARM: Run = {
       to: "cli",
       label: "answer + 5 sources",
       detail:
-        "Four Signals instead of sixteen. web-node was never touched - watch it stay dark.",
+        "Five Signals instead of seventeen. web-node was never touched - watch it stay dark.",
+    },
+    {
+      type: "FINAL",
+      from: "rag",
+      to: "cli",
+      label: "result: answer, source, sources[]",
+      detail:
+        "Same chain handler, same one link. The path through the system is identical - only the branch inside @AXON.before_task differed.",
     },
   ],
   answer: [
@@ -289,6 +305,7 @@ export const NODES: Record<
 export const SIG_TONE: Record<string, string> = {
   TASK: "task",
   AGENT_OUTPUT: "task",
+  FINAL: "task",
   RECALL: "mem",
   RECALLED: "mem",
   IMPRINT: "mem",
