@@ -473,13 +473,19 @@ export default function ProtocolPage() {
               Structured plan the agent has decided to follow. Supervisors may interrupt before execution.
               Payload: <code className="inline">{`{ steps, revision }`}</code>
             </Msg>
-            <Msg name="TOOL_CALL" by="Dendrite">
-              The agent is invoking a tool. A matching TOOL_RESULT is expected. Payload:{" "}
-              <code className="inline">{`{ tool, args, call_id }`}</code>
+            <Msg name="TOOL_CALL" by="Axon (via EffectorClient)">
+              The agent is invoking a tool. Addressed to an Effector by{" "}
+              <code className="inline">directed.id</code> (effector_id) or{" "}
+              <code className="inline">directed.type</code> (effector_kind); a matching TOOL_RESULT is
+              expected. Stays in <code className="inline">PATHWAY_TYPES</code>  -  the servicing branch
+              does not consume it, so trace observers still see every call. Payload:{" "}
+              <code className="inline">{`{ tool, args, call_id, deadline_ms? }`}</code>
             </Msg>
-            <Msg name="TOOL_RESULT" by="Dendrite">
+            <Msg name="TOOL_RESULT" by="Effector">
               Tool response, parent_id pointing to the corresponding TOOL_CALL, call_id echoed.
-              Exactly one of result / error is set. Payload:{" "}
+              Exactly one of result / error is set. A tool failure rides{" "}
+              <code className="inline">error</code> here rather than emitting a separate ERROR, so the
+              parent TASK survives and the Neuron can react. Payload:{" "}
               <code className="inline">{`{ tool, result?, error?, call_id? }`}</code>
             </Msg>
             <Msg name="ESCALATION" by="Dendrite">
@@ -619,7 +625,7 @@ export default function ProtocolPage() {
             <Msg name="RECALLED" by="Engram backend">
               Reply to a RECALL, parent_id pointing at the original request. Payload:{" "}
               <code className="inline">{`{ hits, partial? }`}</code> where each Hit carries{" "}
-              <code className="inline">{`{ id, content, score?, tags? }`}</code>.
+              <code className="inline">{`{ id, entry, score? }`}</code>.
             </Msg>
             <Msg name="IMPRINT" by="Axon (via EngramClient)">
               Commits a write to the bound Engram. Payload:{" "}
@@ -635,6 +641,58 @@ export default function ProtocolPage() {
         </div>
       </section>
 
+      {/* ── EFFECTOR participant ── */}
+      <section className="section-sm">
+        <div className="container">
+          <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Participants  -  Effector (tools &amp; side effects)</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 16 }}>
+            <strong style={{ color: "var(--text)" }}>Neurons think, Engrams remember, Effectors act.</strong>{" "}
+            An <strong>Effector</strong> is the third kind of synapse-side participant: it services{" "}
+            <code className="inline">TOOL_CALL</code> and publishes{" "}
+            <code className="inline">TOOL_RESULT</code>. Tools and MCP servers are Effectors, not
+            Neurons  -  a Neuron decides <em>which</em> tool to call and reacts to the outcome; the
+            Effector only performs the named call and reports what happened.
+          </p>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 16 }}>
+            The wiring mirrors Engram exactly. An Effector is mounted with{" "}
+            <code className="inline">attach_effector</code>, addressed by{" "}
+            <code className="inline">effector_id</code> or{" "}
+            <code className="inline">effector_kind</code>, and REGISTERs with{" "}
+            <code className="inline">role=&quot;effector&quot;</code> so observers classify it
+            correctly. <code className="inline">call_id</code> is caller-supplied and simply echoed
+            back on the reply; when the Axon dispatches a model&rsquo;s native tool call it applies a
+            30s default deadline, but a hand-written{" "}
+            <code className="inline">call_tool</code> with no deadline waits until the trace
+            terminates.
+          </p>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
+            On the agent side, an Axon declares <code className="inline">effectors</code> (a list of{" "}
+            <code className="inline">EffectorBinding</code>) together with{" "}
+            <code className="inline">tool_standard</code>  -  the native dialect its model emits (
+            <code className="inline">hermes</code>, <code className="inline">claude</code>, or{" "}
+            <code className="inline">codex</code>). The pair is gated: bindings without a standard
+            raise at construction. A standard on its own is pure translation  -  the recognised call is
+            surfaced on <code className="inline">AGENT_OUTPUT</code> as{" "}
+            <code className="inline">{`{ tool, args }`}</code> and the host chain executes it.
+          </p>
+          <div className="msg-grid">
+            <Msg name="TOOL_CALL" by="Axon (via EffectorClient)">
+              See the cognition surface above  -  TOOL_CALL and TOOL_RESULT are ordinary cognition
+              Signals. What the Effector adds is a <em>participant</em> that answers them, rather than
+              leaving the host chain to.
+            </Msg>
+            <Msg name="REGISTER" by="Effector (via Dendrite)">
+              Emitted per attached Effector with <code className="inline">role=&quot;effector&quot;</code>,
+              advertising <code className="inline">effector_id</code>,{" "}
+              <code className="inline">effector_kind</code>, and the tool names in{" "}
+              <code className="inline">capabilities</code> (empty means &ldquo;serves
+              everything&rdquo;).
+            </Msg>
+          </div>
+        </div>
+      </section>
+
       {/* ── DOPPLER + future ── */}
       <section className="section-sm">
         <div className="container">
@@ -642,7 +700,7 @@ export default function ProtocolPage() {
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Observability surface</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
             Doppler is a non-competing, read-only consumer of the Synapse. It does not define its own
-            Signal types  -  it taps every Signal emitted by Core and Engram. Pulse streams the raw
+            Signal types  -  it taps every Signal emitted by Core, Engram, and Effector. Pulse streams the raw
             telemetry; Prism renders it as dashboards and trace graphs.{" "}
             <code className="inline">cosmo doppler</code> in the CLI is the baseline implementation.
           </p>

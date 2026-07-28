@@ -52,7 +52,7 @@ const graph = {
       operatingSystem: "Linux, macOS, Windows",
       url: SITE_URL,
       downloadUrl: GITHUB,
-      softwareVersion: "0.1.8",
+      softwareVersion: "0.1.9",
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       programmingLanguage: ["Python", "TypeScript"],
       description:

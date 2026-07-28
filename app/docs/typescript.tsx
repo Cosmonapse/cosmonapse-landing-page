@@ -24,6 +24,7 @@ export const typescriptToc: TocGroup = {
     { href: "#ts-pathway", label: "Pathway" },
     { href: "#ts-synapse", label: "Synapse" },
     { href: "#ts-registry", label: "RegistryStore" },
+    { href: "#ts-effector", label: "Effector  -  tools" },
     { href: "#ts-engram", label: "Engram (shared memory)" },
     { href: "#ts-signal", label: "Signal & SignalType" },
     { href: "#ts-ids", label: "ID & trace helpers" },
@@ -91,6 +92,15 @@ const importsSnippet = `<span class="tk-kw">import</span> {
   anthropicNeuron,
   standardMcpServers,
 
+  <span class="tk-cm">// Effector  -  tools &amp; side effects (TOOL_CALL / TOOL_RESULT)</span>
+  Effector,
+  ServedEffector,
+  EffectorHost,
+  EffectorBinding,
+  EffectorClient,
+  ToolOutcome,
+  TOOL_STANDARDS,
+
   <span class="tk-cm">// Engram  -  shared memory (RECALL / IMPRINT)</span>
   Engram,
   EngramBinding,
@@ -118,6 +128,7 @@ const importsSnippet = `<span class="tk-kw">import</span> {
   <span class="tk-cm">// Errors</span>
   DendriteProtocolError,  <span class="tk-cm">// alias: CortexProtocolError</span>
   EngramError,            <span class="tk-cm">// + EngramTimeout / EngramCancelled / EngramNotBound / EngramOverloaded</span>
+  EffectorError,          <span class="tk-cm">// + EffectorTimeout / EffectorCancelled / EffectorNotBound / EffectorOverloaded</span>
 } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
 
 <span class="tk-kw">import</span> <span class="tk-kw">type</span> {
@@ -214,11 +225,10 @@ const neuronSourceSnippet = `<span class="tk-kw">import</span> { Axon, mcpNeuron
 <span class="tk-cm">// HTTP boundary and dispatch TASKs from its routes via an orchestrator</span>
 <span class="tk-cm">// Dendrite  -  see the real-world-neurons example.</span>
 
-<span class="tk-cm">// MCP server  -  wrap any stdio MCP server's tools as a Neuron</span>
-<span class="tk-kw">const</span> files <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({
-  neuronId: <span class="tk-str">"files"</span>,
-  neuronFn: <span class="tk-fn">mcpNeuron</span>({ server: <span class="tk-str">"filesystem"</span>, args: [<span class="tk-str">"/data"</span>], tool: <span class="tk-str">"read_file"</span> }),
-});
+<span class="tk-cm">// A tool is NOT a Neuron. mcpNeuron is the stdio transport  -  put the</span>
+<span class="tk-cm">// MCP server on the bus by wrapping it in an Effector instead.</span>
+<span class="tk-kw">const</span> mcpTransport <span class="tk-op">=</span> <span class="tk-fn">mcpNeuron</span>({ server: <span class="tk-str">"filesystem"</span>,
+                                args: [<span class="tk-str">"/data"</span>] });
 
 <span class="tk-cm">// Or use the unified factory  -  mirrors Python's Neuron(source=…)</span>
 <span class="tk-kw">const</span> sameFiles <span class="tk-op">=</span> <span class="tk-fn">neuron</span>(<span class="tk-str">"mcp"</span>, { server: <span class="tk-str">"filesystem"</span>, args: [<span class="tk-str">"/data"</span>] });`;
@@ -689,6 +699,68 @@ pw.on(SignalType.PLAN, <span class="tk-kw">async</span> (s) => console.log(s.pay
 <span class="tk-kw">const</span> watcher = <span class="tk-kw">await</span> orch.observePathway(<span class="tk-str">"trc_01J..."</span>);
 console.log(watcher.role);   <span class="tk-cm">// "observer"</span>`;
 
+const tsEffectorServeSnippet = `<span class="tk-kw">import</span> { Effector, EffectorBinding, Axon, Dendrite } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
+
+<span class="tk-cm">// ── The Effector side ────────────────────────────────────────────</span>
+<span class="tk-kw">const</span> FX <span class="tk-op">=</span> Effector.<span class="tk-fn">serve</span>({ effectorId: <span class="tk-str">"fs-effector"</span>,
+                          effectorKind: <span class="tk-str">"filesystem"</span> });
+
+FX.<span class="tk-fn">onToolCall</span>(<span class="tk-kw">async</span> (tool, args, ctx) <span class="tk-op">=></span> {
+  <span class="tk-cm">// Return value IS the TOOL_RESULT. ctx = { callId, deadlineMs, traceId }</span>
+  <span class="tk-kw">if</span> (tool <span class="tk-op">===</span> <span class="tk-str">"read"</span>) <span class="tk-kw">return</span> { content: <span class="tk-kw">await</span> <span class="tk-fn">readFile</span>(args.path) };
+  <span class="tk-kw">return</span> <span class="tk-kw">null</span>;            <span class="tk-cm">// fall through to the next handler</span>
+});
+
+<span class="tk-kw">const</span> worker <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, role: <span class="tk-str">"worker"</span> });
+<span class="tk-kw">await</span> worker.<span class="tk-fn">attachEffector</span>(FX);   <span class="tk-cm">// async  -  live-attach, like attachEngram</span>
+
+<span class="tk-cm">// ── The Neuron side ──────────────────────────────────────────────</span>
+<span class="tk-cm">// THE GATE: effectors without toolStandard throws at construction.</span>
+<span class="tk-kw">const</span> brain <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({
+  neuronId: <span class="tk-str">"brain"</span>,
+  neuronFn: <span class="tk-fn">openaiNeuron</span>({ model: <span class="tk-str">"gpt-4o"</span> }),
+  effectors: [<span class="tk-kw">new</span> <span class="tk-fn">EffectorBinding</span>({ name: <span class="tk-str">"fs"</span>,
+                                    directedId: <span class="tk-str">"fs-effector"</span> })],
+  toolStandard: <span class="tk-str">"codex"</span>,
+});
+
+<span class="tk-cm">// TS can't inspect signatures, so callTool is always on the helpers</span>
+<span class="tk-cm">// object  -  the NeuronFn's optional third argument.</span>
+<span class="tk-kw">async function</span> <span class="tk-fn">think</span>(input, context, helpers) {
+  <span class="tk-kw">const</span> out <span class="tk-op">=</span> <span class="tk-kw">await</span> helpers.<span class="tk-fn">callTool</span>(<span class="tk-str">"fs"</span>,
+    { tool: <span class="tk-str">"read"</span>, args: { path: <span class="tk-str">"/etc/hosts"</span> } });
+  <span class="tk-kw">return</span> { response: out.ok <span class="tk-op">?</span> out.result : out.error };
+}`;
+
+const tsEffectorClassSnippet = `<span class="tk-kw">abstract class</span> <span class="tk-fn">Effector</span> {
+  <span class="tk-kw">abstract</span> effectorId:   <span class="tk-kw">string</span>;
+  <span class="tk-kw">abstract</span> effectorKind: <span class="tk-kw">string</span>;
+  <span class="tk-kw">abstract</span> capabilities: <span class="tk-kw">string</span>[];   <span class="tk-cm">// [] means "serve everything"</span>
+  version: <span class="tk-kw">string</span> <span class="tk-op">|</span> <span class="tk-kw">null</span>;
+
+  <span class="tk-kw">abstract</span> <span class="tk-fn">connect</span>(): <span class="tk-fn">Promise</span>&lt;<span class="tk-kw">void</span>&gt;;
+  <span class="tk-kw">abstract</span> <span class="tk-fn">close</span>():   <span class="tk-fn">Promise</span>&lt;<span class="tk-kw">void</span>&gt;;
+  <span class="tk-fn">canServe</span>(tool: <span class="tk-kw">string</span>): <span class="tk-fn">Promise</span>&lt;<span class="tk-kw">boolean</span>&gt;;
+  <span class="tk-kw">abstract</span> <span class="tk-fn">invoke</span>(tool: <span class="tk-kw">string</span>, args: Json,
+                        opts: InvokeOptions): <span class="tk-fn">Promise</span>&lt;ToolOutcome&gt;;
+
+  <span class="tk-kw">get</span> <span class="tk-fn">host</span>(): EffectorHost;   <span class="tk-cm">// deferred Dendrite handlers</span>
+}
+
+<span class="tk-cm">// A class, not an interface: an onToolCall handler can return a</span>
+<span class="tk-cm">// ready-made outcome and the served Effector recognises it by</span>
+<span class="tk-cm">// instanceof  -  the TS counterpart of Python's isinstance passthrough.</span>
+<span class="tk-kw">class</span> <span class="tk-fn">ToolOutcome</span> {
+  <span class="tk-kw">readonly</span> tool:       <span class="tk-kw">string</span>;
+  <span class="tk-kw">readonly</span> result:     <span class="tk-kw">unknown</span>;
+  <span class="tk-kw">readonly</span> error:      <span class="tk-kw">string</span> <span class="tk-op">|</span> <span class="tk-kw">null</span>;
+  <span class="tk-kw">readonly</span> callId:     <span class="tk-kw">string</span> <span class="tk-op">|</span> <span class="tk-kw">null</span>;
+  <span class="tk-kw">readonly</span> tookMs:     <span class="tk-kw">number</span> <span class="tk-op">|</span> <span class="tk-kw">null</span>;
+  <span class="tk-kw">readonly</span> effectorId: <span class="tk-kw">string</span> <span class="tk-op">|</span> <span class="tk-kw">null</span>;
+  <span class="tk-kw">get</span> <span class="tk-fn">ok</span>(): <span class="tk-kw">boolean</span>;              <span class="tk-cm">// error === null</span>
+}`;
+
+
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
 
 export default function TypeScriptDocs({ section }: { section?: string }) {
@@ -805,9 +877,12 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         <p className="docs-p">
           A Neuron is a plain function  -  <code className="inline">NeuronFn</code>  -  wrapping{" "}
           <em>anything that interacts with the real world</em>. Write your own, or use a source
-          factory: <code className="inline">mcpNeuron(opts)</code> wraps any stdio MCP server, and the
-          unified <code className="inline">neuron(source, opts)</code> mirrors Python&rsquo;s{" "}
-          <code className="inline">Neuron(source=…)</code>. An HTTP API is <em>not</em> a Neuron  - 
+          factory: the unified <code className="inline">neuron(source, opts)</code> mirrors
+          Python&rsquo;s <code className="inline">Neuron(source=…)</code>. A tool is <em>not</em> a
+          Neuron  -  tools and MCP servers are{" "}
+          <Link href="/docs/typescript/effector" className="docs-link">Effectors</Link>, and{" "}
+          <code className="inline">mcpNeuron</code> is the stdio transport you wrap in one. An HTTP
+          API is <em>not</em> a Neuron either  - 
           keep Express/Fastify at the edge and dispatch TASKs from its routes via an orchestrator
           Dendrite. To ask for more information instead of producing a result, return{" "}
           <code className="inline">clarify()</code>; the Axon converts it into a CLARIFICATION signal.
@@ -816,7 +891,7 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         </p>
 
         <h3 className="docs-h3">Source factories</h3>
-        <ApiCard kind="function" name="mcpNeuron(opts): CloseableNeuronFn" summary="MCP source. Spawns any stdio MCP server (command+args or a server preset) via @modelcontextprotocol/sdk and exposes its tools. Input is {tool, arguments} or {__list_tools__:true}. Wrapper only  -  does not implement a server. The SDK is an optional peer dependency, imported lazily." />
+        <ApiCard kind="function" name="mcpNeuron(opts): CloseableNeuronFn" summary="MCP transport. Spawns any stdio MCP server (command+args or a server preset) via @modelcontextprotocol/sdk and exposes its tools. Input is {tool, arguments} or {__list_tools__:true}. Wrapper only  -  does not implement a server. Attach it behind an Effector rather than as a Neuron. The SDK is an optional peer dependency, imported lazily." />
         <ApiCard kind="function" name="neuron(source, opts): CloseableNeuronFn" summary='Unified dispatcher. source = "mcp" | "ollama" | "huggingface" | "hf". Mirrors Python&rsquo;s Neuron(source=…).' />
         <ApiCard kind="const" name="standardMcpServers" summary="Launch presets for well-known published MCP servers (filesystem, fetch, git, memory, everything, sequentialthinking, time). Pass server=&quot;filesystem&quot; and your args are appended to the preset." />
         <CodeBlock filename="neuron_sources.ts" html={neuronSourceSnippet} maxWidth={860} />
@@ -1034,6 +1109,57 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
         <CodeBlock filename="record.ts" html={neuronRecordSnippet} maxWidth={780} />
       </Section>
 
+      {/* ─── Effector ─── */}
+      <Section id="ts-effector" eyebrow="TS · 08b" title="Effector  -  tools &amp; side effects">
+        <p className="docs-p">
+          <strong>Neurons think, Engrams remember, Effectors act.</strong> An{" "}
+          <strong>Effector</strong> services <code className="inline">TOOL_CALL</code> and replies
+          with <code className="inline">TOOL_RESULT</code>. This is where tools and{" "}
+          <strong>MCP servers</strong> live  -  a tool is not a Neuron. The TypeScript port is at
+          parity with Python: <code className="inline">Effector.serve()</code>, the{" "}
+          <code className="inline">EffectorHost</code> proxy, all four{" "}
+          <code className="inline">TOOL_STANDARDS</code> dialects, and the{" "}
+          <code className="inline">EffectorClient</code>.
+        </p>
+
+        <ApiCard kind="static method" name="Effector.serve({ effectorId, effectorKind?, version? }) -> ServedEffector" summary="Build an Effector from one handler. fx.onToolCall((tool, args, ctx) => …) returns the TOOL_RESULT directly - no manual publish. Handlers run in registration order; the first non-null return answers, null/undefined falls through, a throw becomes error on the reply.">
+          <CodeBlock filename="effector.ts" html={tsEffectorServeSnippet} maxWidth={880} />
+        </ApiCard>
+
+        <ApiCard kind="abstract class" name="Effector" summary="The low-level path: extend it and implement connect / close / invoke when the backend owns real resources. ToolOutcome is a class here (not an interface) so a handler can return a ready-made outcome and be recognised by instanceof.">
+          <CodeBlock filename="effector.d.ts" html={tsEffectorClassSnippet} maxWidth={880} />
+        </ApiCard>
+
+        <h3 className="docs-h3">Hosting &amp; calling</h3>
+        <ApiCard kind="async method" name="dendrite.attachEffector(effector) -> Promise&lt;void&gt;" summary="Mounts an Effector. Async because it live-attaches like attachEngram: it subscribes to TOOL_CALL addressed to the effectorId or matching the effectorKind, registers with role &quot;effector&quot;, and publishes the TOOL_RESULT reply itself." />
+        <ApiCard kind="async method" name="dendrite.callTool({ effectorId?, effectorKind?, tool, args?, callId?, deadlineMs?, traceId?, parentId?, meta? }) -> Promise&lt;ToolOutcome&gt;" summary="Emit TOOL_CALL and await the correlated TOOL_RESULT. The TS EffectorClient follows the promise-correlation idiom of EngramClient rather than Python's op-Pathway design; TOOL_RESULT is always subscribed. With no deadlineMs the call waits until the trace terminates - the 30s default applies to Axon-dispatched native tool calls only." />
+        <ApiCard kind="helper" name="helpers.callTool(name, { tool, args?, callId?, deadlineMs?, meta? })" summary="Always present on the NeuronFn's helpers argument - TypeScript cannot inspect signatures, so unlike Python's opt-in call_tool= keyword the helper is unconditional. name is the local EffectorBinding name." />
+        <ApiCard kind="class" name="new EffectorBinding({ name, directedId?, directedType?, defaultDeadlineMs?, tools? })" summary="Declarative wiring on the Axon. At least one of directedId (the effectorId) or directedType (the effectorKind) must be set. Binding resolution: a binding whose tools lists the name, then a binding named after the tool, then the sole binding." />
+
+        <h3 className="docs-h3">Native dialects &amp; the gate</h3>
+        <p className="docs-p">
+          <code className="inline">toolStandard</code> names the dialect the Neuron&rsquo;s model emits  - {" "}
+          <code className="inline">&quot;hermes&quot;</code>,{" "}
+          <code className="inline">&quot;claude&quot;</code>, or{" "}
+          <code className="inline">&quot;codex&quot;</code>. Passing{" "}
+          <code className="inline">effectors</code> without it throws at construction. With{" "}
+          <code className="inline">toolStandard</code> alone the recognised call is surfaced on{" "}
+          <code className="inline">AGENT_OUTPUT</code> and your host chain executes it. The TS parsers
+          use a hand-rolled balanced-brace scanner in place of Python&rsquo;s{" "}
+          <code className="inline">raw_decode</code>, with the same anti-misfire rules  -  ordinary JSON
+          in a reply never registers as a call.
+        </p>
+        <p className="docs-p">
+          A tool failure rides <code className="inline">error</code> on the{" "}
+          <code className="inline">TOOL_RESULT</code> and never terminates the parent TASK.{" "}
+          <code className="inline">TOOL_CALL</code> stays in{" "}
+          <code className="inline">PATHWAY_TYPES</code>  -  <code className="inline">serveToolCall</code>{" "}
+          does not consume it, so trace observers still see every call. Note that{" "}
+          <code className="inline">AGENT_OUTPUT</code> nests its payload under{" "}
+          <code className="inline">payload.output</code>, not at the top level.
+        </p>
+      </Section>
+
       {/* ─── Engram ─── */}
       <Section id="ts-engram" eyebrow="TS · 09" title="Engram  -  shared memory">
         <p className="docs-p">
@@ -1128,8 +1254,8 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
           As of 0.1.6 the port covers the full Python surface: the envelope and signal builders,
           all four Synapse adapters with the URL factory, all three registry backends, Neuron
           source factories, Axon (with recognisers and Engram bindings), Dendrite (Pathway
-          dispatch, offers and bidding, interactive cognition, Engram hosting), and the lifecycle
-          hooks. The 92-test suite mirrors the Python one. Remaining differences are idiomatic,
+          dispatch, offers and bidding, interactive cognition, Engram hosting, Effector hosting), and
+          the lifecycle hooks. The 92-test suite mirrors the Python one. Remaining differences are idiomatic,
           not functional:
         </p>
         <div className="table-scroll">
@@ -1146,6 +1272,8 @@ export default function TypeScriptDocs({ section }: { section?: string }) {
             <tr><td>async with dendrite</td><td>Use start() / stop() explicitly.</td></tr>
             <tr><td>Neuron memory helpers injected as keyword args (recall=, imprint=)</td><td>Helpers ride a context object as the NeuronFn&rsquo;s optional third argument.</td></tr>
             <tr><td>asyncio.TimeoutError on Pathway.wait timeout</td><td>A plain Error with a timeout message.</td></tr>
+            <tr><td>Engram.serve() + @engram.host.on_&lt;signal&gt; decorators</td><td>Not yet ported. The TS Engram is the abstract class and the backends; build one by extending Engram. Effector.serve() and EffectorHost <em>are</em> at parity.</td></tr>
+            <tr><td>Neuron opts into call_tool= by declaring the parameter</td><td>helpers.callTool is always present  -  TypeScript cannot inspect signatures.</td></tr>
             <tr><td>cosmo CLI: pip entry point</td><td>npm bin is a launcher delegating to the same Python CLI (auto-installs it; one CLI build, no port to drift).</td></tr>
           </tbody>
         </table>

@@ -22,6 +22,7 @@ export const pythonToc: TocGroup = {
     { href: "#axon", label: "Axon" },
     { href: "#dendrite", label: "Dendrite" },
     { href: "#pathway", label: "Pathway" },
+    { href: "#effector", label: "Effector  -  tools" },
     { href: "#engram", label: "Engram (shared memory)" },
     { href: "#cortex", label: "Cortex (alias)" },
     { href: "#lifecycle", label: "Lifecycle hooks" },
@@ -71,6 +72,13 @@ const topImportSnippet = `<span class="tk-kw">from</span> cosmonapse <span class
     PathwayClosedError,
     PATHWAY_TYPES,
 
+    <span class="tk-cm"># Effector  -  tools &amp; side effects (TOOL_CALL / TOOL_RESULT)</span>
+    Effector,
+    EffectorBinding,
+    EffectorClient,
+    ToolOutcome,
+    TOOL_STANDARDS,
+
     <span class="tk-cm"># Engram  -  shared memory (RECALL / IMPRINT)</span>
     Engram,
     EngramBinding,
@@ -105,12 +113,17 @@ const topImportSnippet = `<span class="tk-kw">from</span> cosmonapse <span class
     EngramCancelled,
     EngramNotBound,
     EngramOverloaded,
+    EffectorError,
+    EffectorTimeout,
+    EffectorCancelled,
+    EffectorNotBound,
+    EffectorOverloaded,
 )`;
 
 const neuronSourceSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Neuron
 
-<span class="tk-cm"># A Neuron is anything that interacts with the real world. The same factory</span>
-<span class="tk-cm"># wraps an LLM or an MCP server  -  the Axon never knows which.</span>
+<span class="tk-cm"># A Neuron is the thinking layer, behind one signature. It decides; it does</span>
+<span class="tk-cm"># not act. Tools and MCP servers are Effectors  -  see the Effector section.</span>
 
 <span class="tk-cm"># 1 · LLM / agent  -  Ollama, HuggingFace, OpenAI, Anthropic, or any</span>
 <span class="tk-cm">#     OpenAI-compatible host (groq / openrouter / together / mistral).</span>
@@ -123,10 +136,11 @@ cloud <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><sp
 <span class="tk-cm">#     at the edge and dispatch TASKs from its routes via an orchestrator</span>
 <span class="tk-cm">#     Dendrite  -  see the quickstart and the real-world-neurons example.</span>
 
-<span class="tk-cm"># 3 · MCP server  -  wrap any stdio MCP server's tools as a Neuron</span>
-files <span class="tk-op">=</span> Axon(neuron_id<span class="tk-op">=</span><span class="tk-str">"files"</span>,
-             neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, server<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>,
-                              args<span class="tk-op">=</span>[<span class="tk-str">"/data"</span>], tool<span class="tk-op">=</span><span class="tk-str">"read_file"</span>))
+<span class="tk-cm"># 3 · A tool is NOT a Neuron. source="mcp" still exists as the low-level</span>
+<span class="tk-cm">#     stdio transport, but the way to put an MCP server on the bus is to</span>
+<span class="tk-cm">#     wrap it in an Effector and attach it  -  see the Effector section.</span>
+mcp_transport <span class="tk-op">=</span> Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, server<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>,
+                       args<span class="tk-op">=</span>[<span class="tk-str">"/data"</span>])
 
 <span class="tk-cm"># Shortcut: the source-paired factories  -  Axon.ollama() / .huggingface()</span>
 <span class="tk-cm"># / .openai() / .anthropic() / .mcp()  -  do both steps in one call AND</span>
@@ -143,8 +157,13 @@ const axonClassSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">A
         neuron_kind:     str <span class="tk-op">=</span> <span class="tk-str">"neuron"</span>,
         context_fetcher: Callable[[str], Awaitable[list]] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
         engrams:         list[EngramBinding] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        effectors:       list[EffectorBinding] <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        tool_standard:   str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,   <span class="tk-cm"># hermes | claude | codex</span>
         output_parser:   OutputParser <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
     ) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...
+    <span class="tk-cm"># THE GATE: effectors= requires tool_standard=, or ValueError at</span>
+    <span class="tk-cm"># construction. tool_standard alone is pure translation  -  the native</span>
+    <span class="tk-cm"># call is surfaced on AGENT_OUTPUT and the host chain executes it.</span>
 
     <span class="tk-cm"># ── Source-paired factories ─────────────────────────────────</span>
     <span class="tk-cm"># Create the Neuron AND the Axon in one call, wired with the</span>
@@ -744,6 +763,106 @@ files = Axon.<span class="tk-fn">mcp</span>(neuron_id<span class="tk-op">=</span
 <span class="tk-cm"># the model knows the convention. Opt out of both:</span>
 raw = Axon.<span class="tk-fn">openai</span>(neuron_id<span class="tk-op">=</span><span class="tk-str">"raw"</span>, model<span class="tk-op">=</span><span class="tk-str">"gpt-4o"</span>, recognize<span class="tk-op">=</span><span class="tk-kw">False</span>)`;
 
+const effectorServeSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Effector, EffectorBinding, Axon, Dendrite
+
+<span class="tk-cm"># ── The Effector side: what actually runs ──────────────────────────</span>
+FX <span class="tk-op">=</span> Effector.serve(effector_id<span class="tk-op">=</span><span class="tk-str">"fs-effector"</span>,
+                    effector_kind<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>)
+
+<span class="tk-op">@</span>FX.on_tool_call
+<span class="tk-kw">async def</span> <span class="tk-fn">handle</span>(tool, args):
+    <span class="tk-cm"># Return value IS the TOOL_RESULT  -  no manual publish.</span>
+    <span class="tk-kw">if</span> tool <span class="tk-op">==</span> <span class="tk-str">"read"</span>:
+        <span class="tk-kw">return</span> {<span class="tk-str">"content"</span>: open(args[<span class="tk-str">"path"</span>]).read()}
+    <span class="tk-kw">return</span> <span class="tk-kw">None</span>          <span class="tk-cm"># fall through to the next handler</span>
+
+worker <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, role<span class="tk-op">=</span><span class="tk-str">"worker"</span>)
+worker.attach_effector(FX)
+
+<span class="tk-cm"># ── The Neuron side: binding + native dialect ──────────────────────</span>
+<span class="tk-cm"># THE GATE: effectors= without tool_standard= raises ValueError.</span>
+brain <span class="tk-op">=</span> Axon(
+    neuron_id<span class="tk-op">=</span><span class="tk-str">"brain"</span>,
+    neuron_fn<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"openai"</span>, model<span class="tk-op">=</span><span class="tk-str">"gpt-4o"</span>),
+    effectors<span class="tk-op">=</span>[EffectorBinding(name<span class="tk-op">=</span><span class="tk-str">"fs"</span>,
+                              directed_id<span class="tk-op">=</span><span class="tk-str">"fs-effector"</span>)],
+    tool_standard<span class="tk-op">=</span><span class="tk-str">"codex"</span>,
+)
+
+<span class="tk-cm"># A Neuron that declares call_tool= gets the helper injected, already</span>
+<span class="tk-cm"># scoped to the running trace  -  the action-side twin of recall/imprint.</span>
+<span class="tk-kw">async def</span> <span class="tk-fn">think</span>(inp, ctx, <span class="tk-op">*</span>, call_tool):
+    out <span class="tk-op">=</span> <span class="tk-kw">await</span> call_tool(<span class="tk-str">"fs"</span>, tool<span class="tk-op">=</span><span class="tk-str">"read"</span>,
+                          args<span class="tk-op">=</span>{<span class="tk-str">"path"</span>: <span class="tk-str">"/etc/hosts"</span>})
+    <span class="tk-kw">return</span> {<span class="tk-str">"response"</span>: out.result <span class="tk-kw">if</span> out.error <span class="tk-kw">is</span> <span class="tk-kw">None</span> <span class="tk-kw">else</span> out.error}`;
+
+const effectorAbcSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">Effector</span>(ABC):
+    effector_id:   str
+    effector_kind: str
+    capabilities:  list[str]          <span class="tk-cm"># tool names; [] means "everything"</span>
+    version:       str <span class="tk-op">|</span> <span class="tk-kw">None</span>
+
+    <span class="tk-kw">async def</span> <span class="tk-fn">connect</span>(self) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...   <span class="tk-cm"># open subprocess / HTTP pool</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">close</span>(self) <span class="tk-op">-></span> <span class="tk-kw">None</span>: ...     <span class="tk-cm"># release them</span>
+
+    <span class="tk-kw">async def</span> <span class="tk-fn">can_serve</span>(self, tool: str) <span class="tk-op">-></span> bool: ...
+    <span class="tk-cm"># Default: tool in capabilities (empty list = serve everything).</span>
+
+    <span class="tk-kw">async def</span> <span class="tk-fn">invoke</span>(
+        self, tool: str, args: dict, *,
+        call_id: str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        deadline_ms: int <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+        trace_id: str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>,
+    ) <span class="tk-op">-></span> ToolOutcome: ...
+    <span class="tk-cm"># Tool-level failure (bad args, missing file, non-zero exit) is</span>
+    <span class="tk-cm"># ToolOutcome(error=...)  -  NOT a raise. Raise only for a backend</span>
+    <span class="tk-cm"># fault; the Dendrite maps it onto TOOL_RESULT error either way.</span>
+
+    <span class="tk-op">@</span>property
+    <span class="tk-kw">def</span> <span class="tk-fn">host</span>(self) <span class="tk-op">-></span> _EffectorHostProxy: ...
+    <span class="tk-cm"># @fx.host.on_&lt;signal&gt; queues a Dendrite decorator at module level,</span>
+    <span class="tk-cm"># replayed onto the HOSTING Dendrite once it connects this Effector.</span>
+
+<span class="tk-op">@</span>dataclass(frozen<span class="tk-op">=</span><span class="tk-kw">True</span>)
+<span class="tk-kw">class</span> <span class="tk-fn">ToolOutcome</span>:
+    tool:        str
+    result:      Any <span class="tk-op">=</span> <span class="tk-kw">None</span>
+    error:       str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>
+    call_id:     str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>
+    took_ms:     int <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>
+    effector_id: str <span class="tk-op">|</span> <span class="tk-kw">None</span> <span class="tk-op">=</span> <span class="tk-kw">None</span>`;
+
+const mcpEffectorSnippet = `<span class="tk-cm"># An MCP server is an Effector. Neuron(source="mcp") stays as the stdio</span>
+<span class="tk-cm"># transport underneath  -  the Effector is what goes on the bus.</span>
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Effector, Neuron, ToolOutcome
+
+<span class="tk-kw">class</span> <span class="tk-fn">MCPEffector</span>(Effector):
+    <span class="tk-kw">def</span> __init__(self, *, effector_id, effector_kind, mcp, shape<span class="tk-op">=</span><span class="tk-kw">None</span>):
+        self.effector_id <span class="tk-op">=</span> effector_id
+        self.effector_kind <span class="tk-op">=</span> effector_kind
+        self.capabilities <span class="tk-op">=</span> []      <span class="tk-cm"># empty = proxy whatever the server takes</span>
+        self._mcp, self._shape <span class="tk-op">=</span> mcp, shape
+
+    <span class="tk-kw">async def</span> <span class="tk-fn">connect</span>(self):    <span class="tk-kw">pass</span>   <span class="tk-cm"># the Neuron spawns lazily on first call</span>
+    <span class="tk-kw">async def</span> <span class="tk-fn">close</span>(self):      <span class="tk-kw">await</span> self._mcp.aclose()
+
+    <span class="tk-kw">async def</span> <span class="tk-fn">invoke</span>(self, tool, args, *, call_id<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw):
+        <span class="tk-cm"># shape() maps a model-facing tool name onto the server's own name</span>
+        name, payload <span class="tk-op">=</span> (self._shape(tool, args) <span class="tk-kw">if</span> self._shape
+                         <span class="tk-kw">else</span> (tool, args))
+        out <span class="tk-op">=</span> <span class="tk-kw">await</span> self._mcp({<span class="tk-str">"tool"</span>: name, <span class="tk-str">"arguments"</span>: payload}, [])
+        <span class="tk-kw">if</span> out.get(<span class="tk-str">"is_error"</span>):
+            <span class="tk-kw">return</span> ToolOutcome(tool<span class="tk-op">=</span>tool, call_id<span class="tk-op">=</span>call_id,
+                               error<span class="tk-op">=</span>str(out.get(<span class="tk-str">"response"</span>)))
+        <span class="tk-kw">return</span> ToolOutcome(tool<span class="tk-op">=</span>tool, call_id<span class="tk-op">=</span>call_id, result<span class="tk-op">=</span>out)
+
+files <span class="tk-op">=</span> MCPEffector(
+    effector_id<span class="tk-op">=</span><span class="tk-str">"files-effector"</span>, effector_kind<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>,
+    mcp<span class="tk-op">=</span>Neuron(source<span class="tk-op">=</span><span class="tk-str">"mcp"</span>, server<span class="tk-op">=</span><span class="tk-str">"filesystem"</span>, args<span class="tk-op">=</span>[<span class="tk-str">"/data"</span>]),
+)
+worker.attach_effector(files)`;
+
+
 /* ─────────────────────────────  COMPONENT  ───────────────────────────── */
 
 export default function PythonDocs({ section }: { section?: string }) {
@@ -1139,6 +1258,111 @@ export default function PythonDocs({ section }: { section?: string }) {
       </Section>
 
       {/* ─── Engram pointer ─── */}
+      {/* ─── Effector ─── */}
+      <Section id="effector" eyebrow="SDK · 06a" title="Effector  -  tools &amp; side effects">
+        <p className="docs-p">
+          <strong>Neurons think, Engrams remember, Effectors act.</strong> An{" "}
+          <strong>Effector</strong> is the synapse-side participant that services{" "}
+          <code className="inline">TOOL_CALL</code> and replies with{" "}
+          <code className="inline">TOOL_RESULT</code>. It is modelled on{" "}
+          <code className="inline">Engram</code> deliberately  -  same addressing (
+          <code className="inline">effector_id</code> or <code className="inline">effector_kind</code>),
+          same mounting (<code className="inline">attach_effector</code>), same rule that a failure
+          rides the reply instead of raising a separate <code className="inline">ERROR</code>.
+        </p>
+        <p className="docs-p">
+          This is where <strong>MCP servers</strong> and every other tool now live. A tool is not a
+          Neuron: a Neuron decides, an Effector does. Effectors do not think either  -  choosing{" "}
+          <em>which</em> tool to call, and reacting to the outcome, is Neuron-side work.
+        </p>
+        <p className="docs-p">
+          Cosmonapse does not build your tools. There is no <code className="inline">@tool</code>{" "}
+          registry and no per-tool routing: you get exactly the signal pair, and dispatch tables, MCP
+          sessions, subprocesses, and sandboxing stay in your code.
+        </p>
+
+        <ApiCard kind="classmethod" name="Effector.serve(*, effector_id, effector_kind='effector', version=None)" summary="Build an Effector from one decorator. @on_tool_call receives (tool, args) - plus call_id / deadline_ms / trace_id if declared as keyword parameters - and its return value IS the TOOL_RESULT. Handlers run in registration order; the first non-None answers, None falls through, a raise becomes error on the reply.">
+          <CodeBlock filename="effector_serve.py" html={effectorServeSnippet} maxWidth={860} />
+        </ApiCard>
+
+        <ApiCard kind="abstract base" name="cosmonapse.Effector" summary="The low-level path: subclass and implement connect / close / invoke when the backend owns real resources. A served Effector is just a concrete subclass with the handler wired for you.">
+          <CodeBlock filename="effector.pyi" html={effectorAbcSnippet} maxWidth={860} />
+        </ApiCard>
+
+        <h3 className="docs-h3">Wiring an MCP server</h3>
+        <p className="docs-p">
+          <code className="inline">Neuron(source=&quot;mcp&quot;)</code> is still the stdio transport  -  it
+          spawns the server subprocess and speaks the Model Context Protocol. What changed is where it
+          sits: instead of being attached as a Neuron, it is wrapped in an Effector and attached with{" "}
+          <code className="inline">attach_effector</code>, so the server answers TOOL_CALLs on the
+          trace rather than producing AGENT_OUTPUT of its own.
+        </p>
+        <CodeBlock filename="mcp_effector.py" html={mcpEffectorSnippet} maxWidth={860} />
+
+        <h3 className="docs-h3">Native tool-call dialects</h3>
+        <p className="docs-p">
+          Models emit tool calls in their own format. <code className="inline">tool_standard=</code>{" "}
+          tells the Axon which dialect to recognise in the raw output;{" "}
+          <code className="inline">TOOL_STANDARDS</code> holds the parsers. They are pure text parsers
+          with an anti-misfire rule  -  ordinary JSON in a reply never registers as a call, and the
+          first call found wins.
+        </p>
+        <div className="table-scroll">
+        <table className="spec-table">
+          <thead>
+            <tr>
+              <th>tool_standard=</th>
+              <th>Recognises</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>&quot;hermes&quot;</td>
+              <td>Nous/Hermes <code className="inline">&lt;tool_call&gt;{`{"name", "arguments"}`}&lt;/tool_call&gt;</code> tags.</td>
+            </tr>
+            <tr>
+              <td>&quot;claude&quot;</td>
+              <td>Anthropic <code className="inline">{`{"type": "tool_use", "name", "input"}`}</code> blocks.</td>
+            </tr>
+            <tr>
+              <td>&quot;codex&quot;</td>
+              <td>OpenAI function calling  -  a <code className="inline">tool_calls</code> array, legacy <code className="inline">function_call</code>, or a bare exact-keys <code className="inline">{`{"name", "arguments"}`}</code>. A top-level <code className="inline">{`"type": "function"`}</code> marker also licenses <code className="inline">parameters</code> as the args key, which is how Llama-class models actually reply.</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <p className="docs-p">
+          <strong>The gate:</strong> <code className="inline">effectors=</code> requires{" "}
+          <code className="inline">tool_standard=</code>, or the Axon raises{" "}
+          <code className="inline">ValueError</code> at construction  -  a misconfiguration fails at
+          import, not silently at runtime. <code className="inline">tool_standard=</code> on its own is
+          pure translation: the recognised call is surfaced on{" "}
+          <code className="inline">AGENT_OUTPUT</code> as <code className="inline">{`{tool, args}`}</code>{" "}
+          and your host chain executes it. A model&rsquo;s native call always takes precedence over the
+          Axon&rsquo;s own recognisers.
+        </p>
+
+        <h3 className="docs-h3">Calling a tool</h3>
+        <ApiCard kind="async method" name="dendrite.call_tool(*, effector_id=None, effector_kind=None, tool, args=None, call_id=None, deadline_ms=None, trace_id=None, parent_id=None, meta=None) -> ToolOutcome" summary="Emit TOOL_CALL and await the correlated TOOL_RESULT. Trace attribution resolves explicit ids first, then the ambient task context, then a fresh trace. With no deadline_ms - and none on the binding - the call waits until the trace terminates; pass a deadline if it must not hang." />
+        <ApiCard kind="injected helper" name="call_tool(name, *, tool, args=None, call_id=None, deadline_ms=None, meta=None) -> ToolOutcome" summary="A Neuron that declares a call_tool= keyword parameter gets this injected by its Axon, already scoped to the running trace. name is the local EffectorBinding name, not the deployment's effector_id - the action-side twin of the injected recall / imprint helpers. The 30s DEFAULT_TOOL_DEADLINE_MS applies to Axon-dispatched native tool calls, not to this helper." />
+        <ApiCard kind="class" name="cosmonapse.EffectorBinding(name, directed_id=None, directed_type=None, default_deadline_ms=None, tools=None)" summary="Declarative wiring stored on the Axon. name is what the Neuron addresses; directed_id (effector_id) or directed_type (effector_kind) determines routing on the wire. Binding resolution goes tools-list, then name match, then the sole binding." />
+        <ApiCard kind="property" name="dendrite.effector_client -> EffectorClient" summary="Caller-side correlation table, the action-side twin of engram_client. TOOL_RESULT is always subscribed, replies are correlated by parent_id and call_id." />
+
+        <p className="docs-p">
+          <strong>Errors never terminate the TASK.</strong> A tool-level failure comes back as{" "}
+          <code className="inline">error</code> on the <code className="inline">TOOL_RESULT</code>, so
+          the Neuron can read it and try something else. That is also why{" "}
+          <code className="inline">TOOL_CALL</code> stays in{" "}
+          <code className="inline">PATHWAY_TYPES</code>: the servicing branch does not consume it, so
+          trace observers and your own <code className="inline">on_tool_call</code> handlers still see
+          every call go past. The SDK-level exceptions (
+          <code className="inline">EffectorTimeout</code>,{" "}
+          <code className="inline">EffectorCancelled</code>,{" "}
+          <code className="inline">EffectorNotBound</code>,{" "}
+          <code className="inline">EffectorOverloaded</code>) are raised caller-side, not on the wire.
+        </p>
+      </Section>
+
       <Section id="engram" eyebrow="SDK · 06b" title="Engram  -  shared memory">
         <p className="docs-p">
           The Engram subsystem (the <code className="inline">cosmonapse.engram</code> package:{" "}
@@ -1150,7 +1374,10 @@ export default function PythonDocs({ section }: { section?: string }) {
           reference. It covers how a Neuron addresses memory through{" "}
           <code className="inline">recall(...)</code> and <code className="inline">imprint(...)</code>,
           how Engrams are mounted on a Dendrite with{" "}
-          <code className="inline">attach_engram(...)</code>, the{" "}
+          <code className="inline">attach_engram(...)</code>, the two ways to write a backend  -  subclass
+          the ABC, or build one from decorators with{" "}
+          <code className="inline">Engram.serve()</code> + <code className="inline">@on_recall</code> /{" "}
+          <code className="inline">@on_imprint</code>  -  the{" "}
           <code className="inline">RECALL</code> / <code className="inline">IMPRINT</code> signals on
           the wire, and the full backend API.
         </p>

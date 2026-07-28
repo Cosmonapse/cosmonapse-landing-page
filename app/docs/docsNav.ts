@@ -41,6 +41,9 @@ export const DOC_REFS: DocRef[] = [
       { slug: "pathway", id: "pathway", label: "Pathway",
         blurb:
           "Pathway gives one trace three consumption shapes - await for request/reply, handlers for reactive callbacks, and async iteration for streaming." },
+      { slug: "effector", id: "effector", label: "Effector  -  tools",
+        blurb:
+          "Effector is the action layer - tools and MCP servers serviced over TOOL_CALL and TOOL_RESULT. Build one from a single decorator with Effector.serve()." },
       { slug: "engram", id: "engram", label: "Engram (shared memory)",
         blurb:
           "Engram is shared memory for Neurons, serviced over RECALL and IMPRINT signals. In-memory, SQLite, Postgres, and vector backends behind one API." },
@@ -95,6 +98,9 @@ export const DOC_REFS: DocRef[] = [
       { slug: "registry", id: "ts-registry", label: "RegistryStore",
         blurb:
           "RegistryStore tracks which Neurons are live and what capabilities they advertise - the discovery layer behind capability-based routing." },
+      { slug: "effector", id: "ts-effector", label: "Effector  -  tools",
+        blurb:
+          "Effector is the action layer in TypeScript - tools and MCP servers serviced over TOOL_CALL and TOOL_RESULT, at full parity with the Python SDK." },
       { slug: "engram", id: "ts-engram", label: "Engram (shared memory)",
         blurb:
           "Engram is shared memory for Neurons, serviced over RECALL and IMPRINT signals, with the same API surface as the Python SDK." },

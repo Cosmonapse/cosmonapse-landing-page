@@ -11,6 +11,7 @@ export const engramToc: TocGroup = {
     { href: "#eg-binding", label: "EngramBinding" },
     { href: "#eg-helpers", label: "recall() & imprint()" },
     { href: "#eg-abc", label: "Engram (ABC)" },
+    { href: "#eg-serve", label: "Engram.serve() & host hooks" },
     { href: "#eg-results", label: "Hit · RecallResult · Receipt" },
     { href: "#eg-backends", label: "Backends" },
     { href: "#eg-mount", label: "Mounting on a Dendrite" },
@@ -22,6 +23,54 @@ export const engramToc: TocGroup = {
 };
 
 /* ─────────────────────────────  CODE SNIPPETS  ───────────────────────────── */
+const serveSnippet = `<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Engram, Hit, ImprintReceipt
+
+<span class="tk-cm"># The memory-side twin of Effector.serve(). Two protocol hooks, no</span>
+<span class="tk-cm"># subclass  -  the handler RUNS the operation and its return value is</span>
+<span class="tk-cm"># what gets published as RECALLED / IMPRINTED.</span>
+ENGRAM <span class="tk-op">=</span> Engram.serve(engram_id<span class="tk-op">=</span><span class="tk-str">"notes"</span>, engram_kind<span class="tk-op">=</span><span class="tk-str">"context"</span>)
+
+<span class="tk-op">@</span>ENGRAM.on_recall
+<span class="tk-kw">async def</span> <span class="tk-fn">search</span>(query, <span class="tk-op">*</span>, deadline_ms<span class="tk-op">=</span><span class="tk-kw">None</span>):
+    <span class="tk-cm"># Return Hits, or plain {"id", "entry", "score"} dicts, or None to</span>
+    <span class="tk-cm"># fall through to the next handler. A miss is [] , not an error.</span>
+    <span class="tk-kw">return</span> [Hit(id<span class="tk-op">=</span>k, entry<span class="tk-op">=</span>v) <span class="tk-kw">for</span> k, v <span class="tk-kw">in</span> match(query)]
+
+<span class="tk-op">@</span>ENGRAM.on_imprint
+<span class="tk-kw">async def</span> <span class="tk-fn">write</span>(op, entry, <span class="tk-op">*</span>, merge_key<span class="tk-op">=</span><span class="tk-kw">None</span>, imprint_id<span class="tk-op">=</span><span class="tk-kw">None</span>):
+    <span class="tk-cm"># Return an ImprintReceipt, or just the new entry id as a str.</span>
+    <span class="tk-kw">return</span> ImprintReceipt(engram_id<span class="tk-op">=</span><span class="tk-str">"notes"</span>, op<span class="tk-op">=</span>op,
+                          id<span class="tk-op">=</span>store(op, entry, merge_key))
+
+<span class="tk-op">@</span>ENGRAM.serves          <span class="tk-cm"># optional can_serve(query) -> bool gate</span>
+<span class="tk-kw">def</span> <span class="tk-fn">gate</span>(query):
+    <span class="tk-kw">return</span> <span class="tk-str">"vector"</span> <span class="tk-kw">not in</span> query
+
+worker.attach_engram(ENGRAM)   <span class="tk-cm"># REGISTERs under its own engram_id</span>`;
+
+const engramHostSnippet = `<span class="tk-cm"># @engram.host.&lt;on_signal&gt; OBSERVES the protocol. By the time it runs,</span>
+<span class="tk-cm"># the Dendrite has already serviced the request and replied  -  this is</span>
+<span class="tk-cm"># NOT where you service it. Registering one does not disable the</span>
+<span class="tk-cm"># built-in path, so writing from here would emit a second IMPRINTED</span>
+<span class="tk-cm"># and, for a non-idempotent op, write twice.</span>
+ENGRAM <span class="tk-op">=</span> InMemoryEngram(engram_id<span class="tk-op">=</span><span class="tk-str">"session-memory"</span>,
+                        engram_kind<span class="tk-op">=</span><span class="tk-str">"context"</span>)
+
+<span class="tk-op">@</span>ENGRAM.host.on_imprint_signal
+<span class="tk-kw">async def</span> <span class="tk-fn">audit</span>(sig):
+    log.info(<span class="tk-str">"write on trace %s"</span>, sig.trace_id)
+
+host <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, role<span class="tk-op">=</span><span class="tk-str">"worker"</span>)
+host.attach_engram(ENGRAM)
+<span class="tk-kw">await</span> host.start()      <span class="tk-cm"># audit() is now live on the host, subscription ensured</span>
+
+<span class="tk-cm"># Lifecycle is the shared LifecycleHooks trio, owner passed first:</span>
+<span class="tk-op">@</span>ENGRAM.on_connect
+<span class="tk-kw">async def</span> <span class="tk-fn">warm</span>(engram): <span class="tk-kw">await</span> engram.connect_pool()
+
+<span class="tk-op">@</span>ENGRAM.on_schedule(every_s<span class="tk-op">=</span><span class="tk-num">60</span>)
+<span class="tk-kw">async def</span> <span class="tk-fn">compact</span>(engram): <span class="tk-kw">await</span> engram.vacuum()`;
+
 
 const installSnippet = `<span class="tk-cm"># Engram ships inside the base cosmonapse package  -  InMemoryEngram,</span>
 <span class="tk-cm"># SqliteEngram and PostgresEngram all included.</span>
@@ -599,6 +648,11 @@ export default function EngramDocs() {
           <code className="inline">capabilities</code> on construction. All read/write methods are
           async; backends wrapping sync libraries (sqlite3) dispatch to a threadpool.
         </p>
+        <p className="docs-p">
+          This is one of two ways to write an Engram. If your backend does not need to own resources,{" "}
+          <code className="inline">Engram.serve()</code> builds the same thing from two decorators  - {" "}
+          see <Link href="#eg-serve" className="docs-link">Engram.serve() below</Link>.
+        </p>
         <ApiCard
           kind="abstract base class"
           name="cosmonapse.engram.Engram"
@@ -629,6 +683,87 @@ export default function EngramDocs() {
 
         <h3 className="docs-h3">Implementing a custom backend</h3>
         <CodeBlock filename="redis_engram.py" html={customEngramSnippet} maxWidth={840} />
+      </Section>
+
+      {/* ─── Engram.serve ─── */}
+      <Section id="eg-serve" eyebrow="ENGRAM · 06b" title="Engram.serve()  -  the decorator-native form">
+        <p className="docs-p">
+          There are two ways to write an Engram. Subclass the ABC above  -  what every bundled backend
+          does  -  or build one from decorators with <code className="inline">Engram.serve()</code>, the
+          memory-side twin of <code className="inline">Effector.serve()</code>. A{" "}
+          <code className="inline">RECALL</code> arrives, <code className="inline">@on_recall</code>{" "}
+          runs, and its return value is published as the <code className="inline">RECALLED</code> hits;
+          an <code className="inline">IMPRINT</code> arrives,{" "}
+          <code className="inline">@on_imprint</code> runs, and its return value becomes the{" "}
+          <code className="inline">IMPRINTED</code> receipt.
+        </p>
+        <p className="docs-p">
+          Either way the result is a plain Engram: it REGISTERs under its own{" "}
+          <code className="inline">engram_id</code>, the hosting Dendrite resolves and services it
+          exactly as it does a subclass, and the reply carries the Engram&rsquo;s own attribution. The
+          decorators change where the body lives, nothing else.
+        </p>
+
+        <ApiCard
+          kind="classmethod"
+          name="Engram.serve(*, engram_id, engram_kind='context', capabilities=None, version=None)"
+          summary="Returns a concrete Engram driven by @on_recall / @on_imprint handlers. Both are sync-or-async, run in registration order, and returning None falls through to the next one."
+        >
+          <CodeBlock filename="served_engram.py" html={serveSnippet} maxWidth={840} />
+        </ApiCard>
+
+        <h3 className="docs-h3">Handler contracts</h3>
+        <div className="table-scroll">
+        <table className="spec-table">
+          <thead>
+            <tr><th>Decorator</th><th>Receives</th><th>Returns</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>@on_recall</td>
+              <td><code className="inline">query</code>, plus <code className="inline">filters</code> / <code className="inline">context_ref</code> / <code className="inline">deadline_ms</code> / <code className="inline">min_confidence</code> if declared as keyword parameters (a <code className="inline">**kwargs</code> catch-all receives all four).</td>
+              <td>A list of <code className="inline">Hit</code> or of <code className="inline">{`{"id", "entry", "score"}`}</code> dicts  -  becomes the RECALLED hits. <code className="inline">None</code> falls through; if every handler falls through the result is an empty list, which is a miss, not an error.</td>
+            </tr>
+            <tr>
+              <td>@on_imprint</td>
+              <td><code className="inline">op</code> and <code className="inline">entry</code>, plus <code className="inline">merge_key</code> / <code className="inline">imprint_id</code> / <code className="inline">trace_id</code> if declared.</td>
+              <td>An <code className="inline">ImprintReceipt</code>, or the new entry id as a <code className="inline">str</code>  -  becomes the IMPRINTED receipt. <code className="inline">None</code> falls through.</td>
+            </tr>
+            <tr>
+              <td>@serves</td>
+              <td><code className="inline">query</code>.</td>
+              <td>The <code className="inline">can_serve</code> gate. Optional  -  the default answers every query once a recall handler exists.</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3 className="docs-h3">Servicing vs observing  -  the distinction that bites</h3>
+        <p className="docs-p">
+          <code className="inline">@on_recall</code> / <code className="inline">@on_imprint</code>{" "}
+          <strong>are</strong> the servicing. <code className="inline">@engram.host.on_&lt;signal&gt;</code>{" "}
+          only <strong>observes</strong> it: those are deferred{" "}
+          <code className="inline">Dendrite</code> decorators, queued at module level and replayed onto
+          the <em>hosting</em> Dendrite once it connects this Engram, with the inbound subscription
+          ensured. By the time one runs, the Dendrite has already serviced the request and published
+          the reply. Registering a host observer does not disable the built-in path  -  so servicing
+          from one would emit a second RECALLED / IMPRINTED and, for a non-idempotent op, write twice.
+        </p>
+        <p className="docs-p">
+          The name is validated eagerly, so a typo fails at import time rather than at connect time.{" "}
+          <code className="inline">on_discover</code> and <code className="inline">on_trace</code> have
+          non-standard registration shapes and are not accepted. This mirrors{" "}
+          <code className="inline">Axon.host</code> exactly.
+        </p>
+        <CodeBlock filename="engram_host.py" html={engramHostSnippet} maxWidth={840} />
+
+        <p className="docs-p">
+          <strong>TypeScript note:</strong> <code className="inline">Engram.serve()</code> and the host
+          proxy are Python-only today. In the TypeScript SDK, extend the abstract{" "}
+          <code className="inline">Engram</code> class instead  -  see the{" "}
+          <Link href="/docs/typescript/engram" className="docs-link">TS Engram section</Link>. The
+          Effector equivalents <em>are</em> at parity in both SDKs.
+        </p>
       </Section>
 
       {/* ─── Result types ─── */}

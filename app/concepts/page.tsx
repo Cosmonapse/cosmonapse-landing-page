@@ -64,13 +64,18 @@ const productLine: {
       },
       {
         name: "Neuron",
-        map: "Agent · LLM provider · MCP server · function",
-        desc: "Anything that interacts with the real world, exposed behind a pure-function interface  -  receives (input, context), returns output, zero protocol knowledge. The Neuron(source=...) factory wraps LLM providers (OpenAI, Anthropic, HuggingFace, Groq, Mistral, Together, OpenRouter, Ollama), MCP servers, or a plain async function behind the same callable. An HTTP API is not a Neuron  -  keep your web framework at the edge and dispatch TASKs from route handlers via an orchestrator Dendrite. Replaceable without touching infrastructure.",
+        map: "Agent · LLM provider · async function",
+        desc: "The thinking layer, exposed behind a pure-function interface  -  receives (input, context), returns output, zero protocol knowledge. The Neuron(source=...) factory wraps LLM providers (OpenAI, Anthropic, HuggingFace, Groq, Mistral, Together, OpenRouter, Ollama) or a plain async function behind the same callable. A tool is not a Neuron  -  tools and MCP servers are Effectors. An HTTP API is not a Neuron either  -  keep your web framework at the edge and dispatch TASKs from route handlers via an orchestrator Dendrite. Replaceable without touching infrastructure.",
       },
       {
         name: "Axon",
         map: "Agent-side tool",
-        desc: "The only piece of Cosmonapse that lives inside the Neuron's process. Wraps the Neuron function, validates its output into a Signal (AGENT_OUTPUT, CLARIFICATION, PERMISSION, or ERROR), and hands it to the Dendrite. The Neuron itself never touches the protocol.",
+        desc: "The only piece of Cosmonapse that lives inside the Neuron's process. Wraps the Neuron function, validates its output into a Signal (AGENT_OUTPUT, CLARIFICATION, PERMISSION, or ERROR), and hands it to the Dendrite. The Neuron itself never touches the protocol. Axon(effectors=[...], tool_standard='hermes'|'claude'|'codex') is also where a model's native tool-call dialect is recognised and turned into a TOOL_CALL.",
+      },
+      {
+        name: "Effector",
+        map: "Tool · MCP server · side effect",
+        desc: "The action layer. A synapse-side participant that services TOOL_CALL and replies with TOOL_RESULT  -  modelled exactly on Engram, mounted with dendrite.attach_effector(fx), addressed by effector_id or effector_kind. Effector.serve(effector_id=...) builds one from a single @on_tool_call handler whose return value IS the TOOL_RESULT; subclassing the Effector ABC is the low-level path. A tool failure rides error on TOOL_RESULT rather than a separate ERROR signal, so a failing tool never terminates the parent TASK. Cosmonapse does not build your tools  -  dispatch tables, MCP sessions, subprocesses, and sandboxing stay your code.",
       },
         {
         name: "Dendrite",
@@ -103,12 +108,12 @@ const productLine: {
       {
         name: "Recall",
         map: "Read path · RECALL signal",
-        desc: "Reads bound memory before a Neuron acts. The Axon emits a RECALL signal; the Engram replies with RECALLED carrying Hits. EngramClient.recall() is the in-Neuron API. Ships in 0.1.0 with InMemory, SQLite, and Postgres backends. Vector-backed semantic search is on the Echo roadmap.",
+        desc: "Reads bound memory before a Neuron acts. The Axon emits a RECALL signal; the Engram replies with RECALLED carrying Hits. EngramClient.recall() is the in-Neuron API, and a Neuron that declares a recall= parameter gets the helper injected by its Axon. Backends either subclass Engram or are built from decorators with Engram.serve(engram_id=...) + @on_recall, whose return value becomes the RECALLED hits. Ships with InMemory, SQLite, and Postgres backends. Vector-backed semantic search is on the Echo roadmap.",
       },
       {
         name: "Imprint",
         map: "Write path · IMPRINT signal",
-        desc: "Durable writes to bound memory. The Axon emits an IMPRINT signal; the Engram replies with IMPRINTED carrying a receipt. EngramClient.imprint() is the in-Neuron API. Operations: add, append, merge, upsert, delete. Ships in 0.1.0.",
+        desc: "Durable writes to bound memory. The Axon emits an IMPRINT signal; the Engram replies with IMPRINTED carrying a receipt. EngramClient.imprint() is the in-Neuron API, injected into any Neuron that declares an imprint= parameter. Operations: add, append, merge, upsert, delete. With Engram.serve(), @on_imprint runs the write and its return value becomes the IMPRINTED receipt  -  distinct from @engram.host.on_imprint_signal, which only observes writes the Dendrite has already serviced.",
       },
       {
         name: "Echo",
@@ -551,6 +556,19 @@ export default function ConceptsPage() {
             primitives for whoever needs them.
           </p>
           <p className="prose">
+            Three kinds of participant hang off that Synapse, and the division of labour is the whole
+            design: <strong>Neurons think, Engrams remember, Effectors act.</strong> A Neuron is a pure
+            function that decides; it never opens a file, calls an API, or spawns a subprocess. When it
+            decides to act, it emits a <code className="inline">TOOL_CALL</code> and an{" "}
+            <strong>Effector</strong> answers with a <code className="inline">TOOL_RESULT</code>. That
+            is where tools and <strong>MCP servers</strong> live  -  an MCP server is an Effector, not a
+            Neuron. Effector is modelled on Engram deliberately: same addressing (
+            <code className="inline">effector_id</code> or <code className="inline">effector_kind</code>),
+            same mounting (<code className="inline">attach_effector</code>), same rule that a backend
+            failure rides the reply rather than raising a separate{" "}
+            <code className="inline">ERROR</code> and killing the TASK.
+          </p>
+          <p className="prose">
             Persistent state lives in <strong>Engram</strong>  -  written via <strong>Imprint</strong>,
             retrieved via <strong>Recall</strong>, and replayed or snapshotted via{" "}
             <strong>Echo</strong>. Observability comes from <strong>Doppler</strong>:{" "}
@@ -588,12 +606,23 @@ export default function ConceptsPage() {
             </div>
             <div className="layer-arrow">↓</div>
             <div className="layer">
-              <div className="layer-name">Neuron   -   LLM provider · MCP server · async function</div>
+              <div className="layer-name">Neuron   -   LLM provider · async function</div>
               <div className="layer-desc">
                 Receives (input, context). Returns a plain dict. The Neuron factory wraps any
-                provider  -  OpenAI, Anthropic, HuggingFace, Groq, Ollama, an MCP server, or a
-                plain async function  -  knowing nothing about the Synapse, envelopes, or trace IDs.
-                An HTTP API is not a Neuron: it sits at the edge, in front of an orchestrator Dendrite.
+                provider  -  OpenAI, Anthropic, HuggingFace, Groq, Ollama  -  or a plain async
+                function, knowing nothing about the Synapse, envelopes, or trace IDs. An HTTP API is
+                not a Neuron: it sits at the edge, in front of an orchestrator Dendrite. Neither is a
+                tool  -  that is the Effector below.
+              </div>
+            </div>
+            <div className="layer-arrow">↓</div>
+            <div className="layer">
+              <div className="layer-name">Effector  -  tools · MCP servers · side effects</div>
+              <div className="layer-desc">
+                Services TOOL_CALL, replies TOOL_RESULT. When a Neuron decides to act, its Axon
+                recognises the model&rsquo;s native tool-call dialect and the call is dispatched to the
+                bound Effector, whose result is fed back on the same trace. Tool errors ride the
+                TOOL_RESULT, so a failing tool never terminates the TASK.
               </div>
             </div>
             <div className="layer-arrow">↓</div>

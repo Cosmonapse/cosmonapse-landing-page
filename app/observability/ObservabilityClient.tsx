@@ -8,7 +8,7 @@ type ViewId = "brain" | "constellation" | "tree" | "list" | "metrics";
 type ViewDef = {
   id: ViewId;
   label: string;
-  version: "0.1.8" | "0.1.9";
+  version: "0.1.9";
   tagline: string;
   /** Sub-line shown in the accordion when expanded. */
   blurb: string;
@@ -24,7 +24,7 @@ const VIEWS: ViewDef[] = [
   {
     id: "brain",
     label: "Brain View",
-    version: "0.1.8",
+    version: "0.1.9",
     tagline: "The live neural graph",
     blurb: "Watch a running Synapse think in real time.",
     what: [
@@ -169,7 +169,7 @@ export default function ObservabilityClient() {
                       onClick={() => setActive(v.id)}
                     >
                       <span className="obs-viewbtn-label">{v.label}</span>
-                      <span className={`obs-badge obs-badge-${v.version === "0.1.8" ? "now" : "next"}`}>
+                      <span className="obs-badge obs-badge-now">
                         {v.version}
                       </span>
                     </button>
@@ -184,8 +184,8 @@ export default function ObservabilityClient() {
       {/* ─── Main content: the selected view explained ─── */}
       <main className="obs-content">
         <div className="obs-view-eyebrow">
-          <span className={`obs-badge obs-badge-${view.version === "0.1.8" ? "now" : "next"}`}>
-            {view.version === "0.1.8" ? "Available in 0.1.8" : "Ships in 0.1.9"}
+          <span className="obs-badge obs-badge-now">
+            Available in {view.version}
           </span>
         </div>
         <h2 className="obs-view-title">{view.label}</h2>

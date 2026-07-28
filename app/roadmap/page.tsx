@@ -22,8 +22,9 @@ export default function RoadmapPage() {
           <div className="page-eyebrow">// Roadmap</div>
           <h1 className="page-title">From 0.1.0 to a Stable 1.0.0.</h1>
           <p className="page-sub">
-            0.1.8 is out  -  the first public release: the protocol and SDK shapes are in place. The 0.x line takes the
-            five core primitives  -  Synapse, Dendrite, Neuron, Axon, Engram  -  from shapes to
+            0.1.9 is out  -  the protocol and SDK shapes are in place, and Effector joins them as the
+            action layer. The 0.x line takes the six core primitives  -  Synapse, Dendrite, Neuron,
+            Axon, Engram, Effector  -  from shapes to
             solid, freezes pathways and traces, and then stress-tests the protocol with real agents.
             1.0.0 is a strong protocol foundation you can build complex RAG and agent systems on,
             observed through Doppler Prism, captured and replayed as Brainwaves, and deployed as
@@ -36,11 +37,11 @@ export default function RoadmapPage() {
         <div className="container container-narrow">
           <div className="timeline">
             <div className="timeline-item current">
-              <div className="timeline-version">0.1.x · shipped (0.1.8)  -  the start</div>
+              <div className="timeline-version">0.1.x · shipped (0.1.9)  -  the start</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>
-                  Out now as 0.1.8  -  the first public release. The developer reads the envelope spec, writes an Axon and
+                  Out now as 0.1.9. The developer reads the envelope spec, writes an Axon and
                   Dendrite using the SDK primitives, chooses a Synapse adapter, and wires their own
                   orchestration logic. Full control, full complexity, appropriate for early adopters. The
                   Python SDK is the complete reference implementation; the TypeScript SDK is at full parity.
@@ -127,7 +128,7 @@ export default function RoadmapPage() {
 
             <div className="timeline-item">
               <div className="timeline-version">0.2.0 · next  -  solid barebones</div>
-              <h2 className="timeline-title">The five primitives, working end to end.</h2>
+              <h2 className="timeline-title">The six primitives, working end to end.</h2>
               <div className="timeline-body">
                 <p>
                   Take every core primitive from shipped to dependable: barebones functionality that
@@ -213,9 +214,9 @@ export default function RoadmapPage() {
 
       <section className="section-sm">
         <div className="container container-narrow">
-          <div className="sub-eyebrow">Known limitations  -  0.1.8</div>
+          <div className="sub-eyebrow">Known limitations  -  0.1.9</div>
           <p className="prose">
-            0.1.8 is a 0.1: the protocol and SDK shapes are in place, and 0.2.0 hardens them
+            0.1.9 is a 0.1: the protocol and SDK shapes are in place, and 0.2.0 hardens them
             before anything is frozen. These are the edges we know about  -  each one points at
             the milestone that closes it.
           </p>
@@ -249,8 +250,8 @@ export default function RoadmapPage() {
           <div className="sub-eyebrow">Priority order  -  0.1.0 → 1.0.0</div>
           <p className="prose">The order matters. Each milestone lands on the baseline the last one established.</p>
           <ol className="prose" style={{ paddingLeft: 24 }}>
-            <li>0.1.x  -  shipped (0.1.8): protocol drafted, both SDKs and the CLI released, every primitive present</li>
-            <li>0.2.0  -  the five primitives solid with basic LLMs; the Axon output repair contract; Doppler multi-tab + filters; pathways and traces set in stone; heavy testing against NATS / Kafka</li>
+            <li>0.1.x  -  shipped (0.1.9): protocol drafted, both SDKs and the CLI released, every primitive present</li>
+            <li>0.2.0  -  the six primitives solid with basic LLMs; the Axon output repair contract; Doppler multi-tab + filters; pathways and traces set in stone; heavy testing against NATS / Kafka</li>
             <li>0.3.0  -  agents from Claude and OpenAI stress-testing the protocol; fixing and development in tandem</li>
             <li>1.0.0  -  strong foundation: Doppler Prism observability, Brains and Brainwaves, infra integration, complex RAG / agent systems built consistently, Cosmonapse Cloud</li>
           </ol>

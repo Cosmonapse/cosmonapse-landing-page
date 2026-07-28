@@ -40,9 +40,9 @@ export default function ObservabilityPage() {
         <div className="obs-disclaimer" role="note">
           <span className="obs-disclaimer-badge">Heads up</span>
           <p>
-            <strong>Brain View</strong> ships today in <strong>0.1.8</strong>. Constellation, Signal
-            Tree, Signal List, and Metrics arrive in <strong>0.1.9</strong>. Screenshots and
-            recordings below are placeholders until each view lands.
+            All five views  -  <strong>Brain View</strong>, Constellation, Signal Tree, Signal List,
+            and Metrics  -  ship today in <strong>0.1.9</strong>. Screenshots and recordings below are
+            placeholders until we capture real ones.
           </p>
         </div>
 
