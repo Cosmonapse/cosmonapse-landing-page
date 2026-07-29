@@ -544,8 +544,8 @@ export default function CapabilityRoutingClient() {
               marginTop: 28,
               padding: "18px 22px",
               borderRadius: 10,
-              border: "1px solid rgba(34, 211, 238, 0.28)",
-              background: "rgba(34, 211, 238, 0.06)",
+              border: "1px solid rgba(var(--accent2-rgb), 0.28)",
+              background: "rgba(var(--accent2-rgb), 0.06)",
             }}
           >
             <div
@@ -632,7 +632,7 @@ export default function CapabilityRoutingClient() {
           font-size: 13px; font-family: var(--font-mono, ui-monospace, monospace);
         }
         .breadcrumb-back { color: var(--accent); transition: color 0.15s; }
-        .breadcrumb-back:hover { color: #c4b5fd; }
+        .breadcrumb-back:hover { color: var(--accent-text); }
         .breadcrumb-sep { color: var(--text-faint); }
         .breadcrumb-current { color: var(--text-dim); }
       `}</style>

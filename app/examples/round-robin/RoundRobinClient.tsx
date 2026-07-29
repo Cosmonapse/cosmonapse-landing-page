@@ -498,7 +498,7 @@ export default function RoundRobinClient() {
           font-size: 13px; font-family: var(--font-mono, ui-monospace, monospace);
         }
         .breadcrumb-back { color: var(--accent); transition: color 0.15s; }
-        .breadcrumb-back:hover { color: #c4b5fd; }
+        .breadcrumb-back:hover { color: var(--accent-text); }
         .breadcrumb-sep { color: var(--text-faint); }
         .breadcrumb-current { color: var(--text-dim); }
       `}</style>

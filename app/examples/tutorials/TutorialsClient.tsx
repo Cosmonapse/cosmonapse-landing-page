@@ -756,7 +756,7 @@ export default function TutorialsClient() {
           transition: background 0.15s;
         }
         .ex-tut-head:hover {
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(var(--fg-rgb), 0.02);
         }
         .ex-num {
           width: 28px;
@@ -771,20 +771,20 @@ export default function TutorialsClient() {
           flex-shrink: 0;
         }
         .ex-num-start {
-          background: rgba(34, 211, 238, 0.14);
-          color: #67e8f9;
+          background: rgba(var(--accent2-rgb), 0.14);
+          color: var(--accent2-soft);
         }
         .ex-num-core {
-          background: rgba(139, 92, 246, 0.14);
-          color: #c4b5fd;
+          background: rgba(var(--accent-rgb), 0.14);
+          color: var(--accent-text);
         }
         .ex-num-advanced {
-          background: rgba(251, 191, 36, 0.14);
-          color: #fcd34d;
+          background: rgba(var(--warn-rgb), 0.14);
+          color: var(--warn-soft);
         }
         .ex-num-production {
-          background: rgba(244, 114, 182, 0.14);
-          color: #f9a8d4;
+          background: rgba(var(--tag-advanced-rgb), 0.14);
+          color: var(--tag-advanced);
         }
         .ex-tut-meta {
           display: flex;
@@ -817,24 +817,24 @@ export default function TutorialsClient() {
           white-space: nowrap;
         }
         .ex-badge-start {
-          background: rgba(34, 211, 238, 0.12);
-          color: #67e8f9;
-          border: 1px solid rgba(34, 211, 238, 0.3);
+          background: rgba(var(--accent2-rgb), 0.12);
+          color: var(--accent2-soft);
+          border: 1px solid rgba(var(--accent2-rgb), 0.3);
         }
         .ex-badge-core {
-          background: rgba(139, 92, 246, 0.12);
-          color: #c4b5fd;
-          border: 1px solid rgba(139, 92, 246, 0.3);
+          background: rgba(var(--accent-rgb), 0.12);
+          color: var(--accent-text);
+          border: 1px solid rgba(var(--accent-rgb), 0.3);
         }
         .ex-badge-advanced {
-          background: rgba(251, 191, 36, 0.12);
-          color: #fcd34d;
-          border: 1px solid rgba(251, 191, 36, 0.3);
+          background: rgba(var(--warn-rgb), 0.12);
+          color: var(--warn-soft);
+          border: 1px solid rgba(var(--warn-rgb), 0.3);
         }
         .ex-badge-production {
-          background: rgba(244, 114, 182, 0.12);
-          color: #f9a8d4;
-          border: 1px solid rgba(244, 114, 182, 0.3);
+          background: rgba(var(--tag-advanced-rgb), 0.12);
+          color: var(--tag-advanced);
+          border: 1px solid rgba(var(--tag-advanced-rgb), 0.3);
         }
         .ex-chevron {
           color: var(--text-faint);
@@ -856,7 +856,7 @@ export default function TutorialsClient() {
           margin: 0 0 16px;
         }
         .ex-code {
-          background: var(--bg, #07080c);
+          background: var(--bg);
           border: 1px solid var(--border);
           border-radius: 8px;
           padding: 14px 16px;
@@ -911,7 +911,7 @@ export default function TutorialsClient() {
           display: block;
           font-family: var(--font-mono, ui-monospace, monospace);
           font-size: 12px;
-          background: var(--bg, #07080c);
+          background: var(--bg);
           border: 1px solid var(--border);
           border-radius: 6px;
           padding: 6px 10px;

@@ -56,14 +56,14 @@ const STATUS_LABEL: Record<Status, string> = {
   "not-planned": "Planned",
 };
 const STATUS_COLOR: Record<Status, string> = {
-  active: "#4ade80",
-  scoping: "#fbbf24",
-  "not-planned": "#6b7280",
+  active: "var(--ok-strong)",
+  scoping: "var(--warn)",
+  "not-planned": "var(--status-none)",
 };
 const STATUS_BG: Record<Status, string> = {
-  active: "rgba(74,222,128,0.07)",
-  scoping: "rgba(251,191,36,0.07)",
-  "not-planned": "rgba(107,114,128,0.05)",
+  active: "rgba(var(--ok-rgb), 0.07)",
+  scoping: "rgba(var(--warn-rgb), 0.07)",
+  "not-planned": "rgba(var(--status-none-rgb), 0.05)",
 };
 
 const products: {
@@ -88,7 +88,7 @@ const products: {
     name: "Cosmonapse Engram",
     short: "Engram",
     tagline: "Context, memory & persistence",
-    color: "#a78bfa",
+    color: "var(--p-engram)",
     status: "active",
     concepts: ["Recall", "Echo", "Imprint"],
     desc: "Shared memory for agent systems. Recall and Imprint primitives ship in 0.1.0 with InMemory, SQLite, and Postgres backends. Vector search and snapshot replay (Echo) are next.",
@@ -97,7 +97,7 @@ const products: {
     name: "Cosmonapse Doppler",
     short: "Doppler",
     tagline: "Observability, telemetry & cognition analytics",
-    color: "#22d3ee",
+    color: "var(--p-doppler)",
     status: "active",
     concepts: ["Pulse", "Prism", "Resonance"],
     desc: "Live telemetry and visualization over the Signal stream, reading the wave without disturbing the source. Pulse streams metrics, Prism turns them into dashboards, and Resonance adds cognition analytics  -  how Neurons influence each other and how Signals propagate through a Brain.",
@@ -106,7 +106,7 @@ const products: {
     name: "Cosmonapse Immune",
     short: "Immune",
     tagline: "Identity, security & threat response",
-    color: "#f87171",
+    color: "var(--p-immune)",
     status: "not-planned",
     concepts: ["Genome", "Myelin", "Reflex", "AntiBody"],
     desc: "Identity management, encryption, anomaly detection, and automated threat response for production agent infrastructure.",
@@ -115,7 +115,7 @@ const products: {
     name: "Cosmonapse Cloud",
     short: "Cloud",
     tagline: "Managed cognition platform",
-    color: "#fb923c",
+    color: "var(--p-cloud)",
     status: "not-planned",
     concepts: ["Membrane"],
     desc: "The fully managed runtime  -  Brains in isolated Membranes, quota-enforced, credential-scoped at the infrastructure level.",

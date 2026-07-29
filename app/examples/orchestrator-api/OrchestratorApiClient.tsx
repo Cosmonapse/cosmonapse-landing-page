@@ -908,7 +908,7 @@ export default function OrchestratorApiClient() {
           font-size: 13px; font-family: var(--font-mono, ui-monospace, monospace);
         }
         .breadcrumb-back { color: var(--accent); transition: color 0.15s; }
-        .breadcrumb-back:hover { color: #c4b5fd; }
+        .breadcrumb-back:hover { color: var(--accent-text); }
         .breadcrumb-sep { color: var(--text-faint); }
         .breadcrumb-current { color: var(--text-dim); }
 
@@ -933,14 +933,14 @@ export default function OrchestratorApiClient() {
           white-space: nowrap;
         }
         .arch-box--highlight {
-          border-color: rgba(34, 211, 238, 0.4);
-          color: #67e8f9;
-          background: rgba(34, 211, 238, 0.06);
+          border-color: rgba(var(--accent2-rgb), 0.4);
+          color: var(--accent2-soft);
+          background: rgba(var(--accent2-rgb), 0.06);
         }
         .arch-box--accent {
-          border-color: rgba(139, 92, 246, 0.4);
-          color: #c4b5fd;
-          background: rgba(139, 92, 246, 0.08);
+          border-color: rgba(var(--accent-rgb), 0.4);
+          color: var(--accent-text);
+          background: rgba(var(--accent-rgb), 0.08);
         }
         .arch-arrow {
           color: var(--text-faint);
@@ -975,14 +975,14 @@ export default function OrchestratorApiClient() {
           transform: translateY(-1px);
         }
         .fw-tab.active {
-          color: #fff;
-          border-color: rgba(34, 211, 238, 0.5);
+          color: var(--accent-text);
+          border-color: rgba(var(--accent2-rgb), 0.5);
           background: linear-gradient(
             180deg,
-            rgba(34, 211, 238, 0.12),
-            rgba(139, 92, 246, 0.06)
+            rgba(var(--accent2-rgb), 0.12),
+            rgba(var(--accent-rgb), 0.06)
           );
-          box-shadow: 0 8px 26px -14px rgba(34, 211, 238, 0.5);
+          box-shadow: 0 8px 26px -14px rgba(var(--accent2-rgb), 0.5);
         }
         .fw-name { font-weight: 600; letter-spacing: -0.01em; }
         .fw-dot  { color: var(--text-faint); }

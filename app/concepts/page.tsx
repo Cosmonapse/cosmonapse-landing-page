@@ -26,15 +26,15 @@ const STATUS_LABEL: Record<Status, string> = {
 };
 
 const STATUS_COLOR: Record<Status, string> = {
-  "active":      "#4ade80",
-  "scoping":     "#fbbf24",
-  "not-planned": "#6b7280",
+  "active":      "var(--ok-strong)",
+  "scoping":     "var(--warn)",
+  "not-planned": "var(--status-none)",
 };
 
 const STATUS_BG: Record<Status, string> = {
-  "active":      "rgba(74,222,128,0.08)",
-  "scoping":     "rgba(251,191,36,0.08)",
-  "not-planned": "rgba(107,114,128,0.06)",
+  "active":      "rgba(var(--ok-rgb), 0.08)",
+  "scoping":     "rgba(var(--warn-rgb), 0.08)",
+  "not-planned": "rgba(var(--status-none-rgb), 0.06)",
 };
 
 const productLine: {
@@ -102,7 +102,7 @@ const productLine: {
   {
     product: "Cosmonapse Engram",
     tagline: "Context, memory & persistence",
-    color: "#a78bfa",
+    color: "var(--p-engram)",
     status: "active",
     concepts: [
       {
@@ -125,7 +125,7 @@ const productLine: {
   {
     product: "Cosmonapse Doppler",
     tagline: "Observability & telemetry",
-    color: "#22d3ee",
+    color: "var(--p-doppler)",
     status: "active",
     concepts: [
       {
@@ -142,7 +142,7 @@ const productLine: {
     subProject: {
       product: "Cosmonapse Resonance",
       tagline: "Cognition analytics",
-      color: "#818cf8",
+      color: "var(--p-pathway)",
       status: "scoping",
       concepts: [
         {
@@ -176,7 +176,7 @@ const productLine: {
   {
     product: "Cosmonapse Immune",
     tagline: "Identity, security & threat response",
-    color: "#f87171",
+    color: "var(--p-immune)",
     status: "not-planned",
     concepts: [
       {
@@ -204,7 +204,7 @@ const productLine: {
   {
     product: "Cosmonapse Cloud",
     tagline: "Managed cognition platform",
-    color: "#fb923c",
+    color: "var(--p-cloud)",
     status: "not-planned",
     concepts: [
       {

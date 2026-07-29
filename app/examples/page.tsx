@@ -76,10 +76,10 @@ export default function ExamplesPage() {
           gap: 24px;
           background: linear-gradient(
             180deg,
-            rgba(139, 92, 246, 0.12),
-            rgba(34, 211, 238, 0.04)
+            rgba(var(--accent-rgb), 0.12),
+            rgba(var(--accent2-rgb), 0.04)
           );
-          border: 1px solid rgba(139, 92, 246, 0.35);
+          border: 1px solid rgba(var(--accent-rgb), 0.35);
           border-radius: 12px;
           padding: 24px 28px;
           color: var(--text);
@@ -88,7 +88,7 @@ export default function ExamplesPage() {
         }
         .ex-cat-cta:hover {
           transform: translateY(-2px);
-          border-color: rgba(139, 92, 246, 0.55);
+          border-color: rgba(var(--accent-rgb), 0.55);
         }
         .ex-cat-cta-eyebrow {
           font-family: var(--font-mono, ui-monospace, monospace);

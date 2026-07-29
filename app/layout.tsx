@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import { KEYWORDS_ALL, SITE_NAME, SITE_URL, TWITTER } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
+import ThemeScript from "@/components/ThemeScript";
 import "./globals.css";
 
 const inter = Inter({
@@ -76,7 +77,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${michroma.variable}`}>
+    <html
+      lang="en"
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} ${michroma.variable}`}
+    >
+      <head>
+        <ThemeScript />
+      </head>
       <body>
         <JsonLd />
         <Nav />

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
-import mark from "@/app/assets/mark.png";
+import BrandMark from "@/components/BrandMark";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
@@ -11,7 +10,7 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-brand">
             <Link href="/" className="logo">
-              <Image src={mark} alt="" width={34} height={34} className="logo-mark-img" />
+              <BrandMark />
               <span className="brand-word">Cosmonapse</span>
             </Link>
             <p>
@@ -29,6 +28,14 @@ export default function Footer() {
                 alt="Cosmonapse - An agent-to-agent protocol with no god-object orchestrator | Product Hunt"
                 width={250}
                 height={54}
+                className="ph-badge-dark"
+              />
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1190534&theme=light&t=1784041021323"
+                alt="Cosmonapse - An agent-to-agent protocol with no god-object orchestrator | Product Hunt"
+                width={250}
+                height={54}
+                className="ph-badge-light"
               />
             </a>
           </div>

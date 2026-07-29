@@ -165,19 +165,19 @@ const examples: Example[] = [
 ];
 
 const difficultyBg: Record<Example["difficulty"], string> = {
-  Beginner: "rgba(34, 211, 238, 0.12)",
-  Intermediate: "rgba(139, 92, 246, 0.12)",
-  Advanced: "rgba(244, 114, 182, 0.12)",
+  Beginner: "rgba(var(--accent2-rgb), 0.12)",
+  Intermediate: "rgba(var(--accent-rgb), 0.12)",
+  Advanced: "rgba(var(--tag-advanced-rgb), 0.12)",
 };
 const difficultyText: Record<Example["difficulty"], string> = {
-  Beginner: "#67e8f9",
-  Intermediate: "#c4b5fd",
-  Advanced: "#f9a8d4",
+  Beginner: "var(--accent2-soft)",
+  Intermediate: "var(--accent-text)",
+  Advanced: "var(--tag-advanced)",
 };
 const difficultyBorder: Record<Example["difficulty"], string> = {
-  Beginner: "rgba(34, 211, 238, 0.3)",
-  Intermediate: "rgba(139, 92, 246, 0.3)",
-  Advanced: "rgba(244, 114, 182, 0.3)",
+  Beginner: "rgba(var(--accent2-rgb), 0.3)",
+  Intermediate: "rgba(var(--accent-rgb), 0.3)",
+  Advanced: "rgba(var(--tag-advanced-rgb), 0.3)",
 };
 
 const PER_PAGE = 9;
@@ -343,7 +343,7 @@ export default function ExamplesCatalog() {
         }
         .ex-cat-card:hover {
           transform: translateY(-2px);
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(var(--fg-rgb), 0.02);
         }
         .ex-cat-head {
           display: flex;
@@ -399,7 +399,7 @@ export default function ExamplesCatalog() {
           font-size: 11px;
           padding: 3px 9px;
           border-radius: 6px;
-          background: var(--bg, #07080c);
+          background: var(--bg);
           border: 1px solid var(--border);
           color: var(--text-dim);
         }
@@ -441,7 +441,7 @@ export default function ExamplesCatalog() {
         .ex-cat-page-btn.is-active {
           color: var(--accent-2);
           border-color: var(--accent-2);
-          background: rgba(139, 92, 246, 0.12);
+          background: rgba(var(--accent-rgb), 0.12);
           cursor: default;
         }
         .ex-cat-page-btn:disabled {

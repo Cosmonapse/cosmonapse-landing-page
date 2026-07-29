@@ -164,9 +164,9 @@ export default function ProtocolPage() {
             </span>
             {[
               { label: "Core", color: "var(--accent)", desc: "Lifecycle · Cognition · Agent management" },
-              { label: "Engram", color: "#a78bfa", desc: "Memory · Context" },
-              { label: "Doppler", color: "#22d3ee", desc: "Observability surface" },
-              { label: "Immune", color: "#f87171", desc: "Identity · Security (planned)" },
+              { label: "Engram", color: "var(--p-engram)", desc: "Memory · Context" },
+              { label: "Doppler", color: "var(--p-doppler)", desc: "Observability surface" },
+              { label: "Immune", color: "var(--p-immune)", desc: "Identity · Security (planned)" },
             ].map((p) => (
               <span
                 key={p.label}
@@ -415,7 +415,7 @@ export default function ProtocolPage() {
       <section className="section-sm">
         <div className="container">
 
-          <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+          <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="var(--ok-strong)" />
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Lifecycle</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
             The mandatory types. Any compliant implementation must handle all of them.
@@ -457,7 +457,7 @@ export default function ProtocolPage() {
           </div>
 
           <div style={{ marginTop: 56 }}>
-            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="var(--ok-strong)" />
           </div>
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Cognition</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
@@ -527,7 +527,7 @@ export default function ProtocolPage() {
           </div>
 
           <div style={{ marginTop: 56 }}>
-            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="var(--ok-strong)" />
           </div>
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Agent management</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
@@ -551,7 +551,7 @@ export default function ProtocolPage() {
           </div>
 
           <div style={{ marginTop: 56 }}>
-            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+            <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="var(--ok-strong)" />
           </div>
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Workflow control</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
@@ -587,7 +587,7 @@ export default function ProtocolPage() {
       {/* ── ENGRAM message types ── */}
       <section className="section-sm">
         <div className="container">
-          <ProductTag label="Cosmonapse Engram" color="#a78bfa" status="Active Development" statusColor="#4ade80" />
+          <ProductTag label="Cosmonapse Engram" color="var(--p-engram)" status="Active Development" statusColor="var(--ok-strong)" />
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Engram (shared memory)</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 16 }}>
             The Engram surface is request/reply: an Axon asks for context with{" "}
@@ -604,9 +604,9 @@ export default function ProtocolPage() {
               alignItems: "center",
               gap: 6,
               fontSize: 12,
-              color: "#a78bfa",
-              background: "#a78bfa14",
-              border: "1px solid #a78bfa36",
+              color: "var(--p-engram)",
+              background: "var(--p-engram)14",
+              border: "1px solid var(--p-engram)36",
               padding: "6px 14px",
               borderRadius: 8,
               marginBottom: 32,
@@ -644,7 +644,7 @@ export default function ProtocolPage() {
       {/* ── EFFECTOR participant ── */}
       <section className="section-sm">
         <div className="container">
-          <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="#4ade80" />
+          <ProductTag label="Cosmonapse Core" color="var(--accent)" status="Active Development" statusColor="var(--ok-strong)" />
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Participants  -  Effector (tools &amp; side effects)</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 16 }}>
             <strong style={{ color: "var(--text)" }}>Neurons think, Engrams remember, Effectors act.</strong>{" "}
@@ -696,7 +696,7 @@ export default function ProtocolPage() {
       {/* ── DOPPLER + future ── */}
       <section className="section-sm">
         <div className="container">
-          <ProductTag label="Cosmonapse Doppler" color="#22d3ee" status="Active Development" statusColor="#4ade80" />
+          <ProductTag label="Cosmonapse Doppler" color="var(--p-doppler)" status="Active Development" statusColor="var(--ok-strong)" />
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Observability surface</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
             Doppler is a non-competing, read-only consumer of the Synapse. It does not define its own
@@ -708,23 +708,23 @@ export default function ProtocolPage() {
             style={{
               padding: "16px 20px",
               borderRadius: 10,
-              border: "1px solid #22d3ee36",
-              background: "#22d3ee08",
+              border: "1px solid var(--p-doppler)36",
+              background: "var(--p-doppler)08",
               color: "var(--text-dim)",
               fontSize: 13,
               lineHeight: 1.65,
             }}
           >
-            <strong style={{ color: "#22d3ee" }}>Pulse</strong>  -  real-time Signal metrics: latency,
+            <strong style={{ color: "var(--p-doppler)" }}>Pulse</strong>  -  real-time Signal metrics: latency,
             throughput, error rates, cost per Neuron.{" "}
-            <strong style={{ color: "#22d3ee" }}>Prism</strong>  -  the visualization layer: trace graphs,
+            <strong style={{ color: "var(--p-doppler)" }}>Prism</strong>  -  the visualization layer: trace graphs,
             audit logs, dashboard views. Both build on the existing Synapse subscription model  -  no new
             envelope types required.
           </div>
 
           {/* Future / planned */}
           <div style={{ marginTop: 56 }}>
-            <ProductTag label="Cosmonapse Immune" color="#f87171" status="Not Planned" statusColor="#6b7280" />
+            <ProductTag label="Cosmonapse Immune" color="var(--p-immune)" status="Not Planned" statusColor="var(--status-none)" />
           </div>
           <div className="sub-eyebrow" style={{ marginTop: 0 }}>Future signal extensions</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
@@ -744,7 +744,7 @@ export default function ProtocolPage() {
             }}
           >
             <div style={{ marginBottom: 12 }}>
-              <strong style={{ color: "#f87171", fontFamily: "var(--font-mono)" }}>Immune</strong>{" "}
+              <strong style={{ color: "var(--p-immune)", fontFamily: "var(--font-mono)" }}>Immune</strong>{" "}
                 -  Genome · Myelin · Reflex · AntiBody
             </div>
             <div>
@@ -756,7 +756,7 @@ export default function ProtocolPage() {
               with v1 consumers.
             </div>
             <div style={{ marginTop: 16 }}>
-              <strong style={{ color: "#fb923c", fontFamily: "var(--font-mono)" }}>Cloud</strong>{" "}
+              <strong style={{ color: "var(--p-cloud)", fontFamily: "var(--font-mono)" }}>Cloud</strong>{" "}
                 -  Membrane
             </div>
             <div style={{ marginTop: 4 }}>

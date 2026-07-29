@@ -150,14 +150,14 @@ export default function ComboExample({
           transform: translateY(-1px);
         }
         .combo-tab.active {
-          color: #fff;
-          border-color: rgba(139, 92, 246, 0.55);
+          color: var(--accent-text);
+          border-color: rgba(var(--accent-rgb), 0.55);
           background: linear-gradient(
             180deg,
-            rgba(139, 92, 246, 0.16),
-            rgba(34, 211, 238, 0.06)
+            rgba(var(--accent-rgb), 0.16),
+            rgba(var(--accent2-rgb), 0.06)
           );
-          box-shadow: 0 8px 26px -14px rgba(139, 92, 246, 0.7);
+          box-shadow: 0 8px 26px -14px rgba(var(--accent-rgb), 0.7);
         }
         .combo-lang {
           font-weight: 600;
