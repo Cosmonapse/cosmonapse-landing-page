@@ -1,5 +1,5 @@
 import Image from "next/image";
-import mark from "@/app/assets/mark.png";
+import mark from "@/app/assets/logowork.png";
 import markLight from "@/app/assets/logowork-light.png";
 
 /**
