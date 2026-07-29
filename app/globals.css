@@ -276,7 +276,7 @@ a { color: inherit; text-decoration: none; }
   background: var(--bg);
 }
 .logo-mark-img {
-  width: 34px;
+  width: 44px;
   height: 34px;
   object-fit: contain;
   filter: drop-shadow(0 0 10px var(--glow));
@@ -2477,8 +2477,6 @@ code.inline {
 [data-theme="light"] .logo-mark-dark { display: none; }
 [data-theme="light"] .logo-mark-light {
   display: block;
-  width: 42px;
-  height: 34px;
   object-fit: contain;
   filter: none;
   flex-shrink: 0;

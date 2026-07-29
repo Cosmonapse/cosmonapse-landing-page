@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS, KW_REACTIVE } from "@/lib/seo";
-import Link from "next/link";
 import ExamplesCatalog from "./ExamplesCatalog";
 
 export const metadata: Metadata = pageMetadata({
@@ -20,29 +19,27 @@ export const metadata: Metadata = pageMetadata({
   ],
 });
 
+// NOTE: The examples catalog and CTA are intentionally hidden while the
+// Cosmonapse primitives/SDK undergo a rework. The underlying example pages
+// and code (ExamplesCatalog, subpage routes, client components) are left
+// untouched so this can be reverted by restoring the catalog + CTA sections
+// below once examples are redone.
 export default function ExamplesPage() {
   return (
     <>
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Examples</div>
-          <h1 className="page-title">End-to-End Topologies.</h1>
+          <h1 className="page-title">Examples Are Being Reworked.</h1>
           <p className="page-sub">
-            Runnable example setups built on Cosmonapse primitives. Copy any of
-            them, swap the Synapse URL, and adapt for your own agents. Sorted
-            by difficulty  -  start with{" "}
-            <Link href="/examples/building-a-neuron" className="inline-link">
-              Building a Neuron
-            </Link>{" "}
-            and work down. If you want a guided ten-step track instead, head to{" "}
-            <Link href="/examples/tutorials" className="inline-link">
-              Tutorials
-            </Link>
-            .
+            The Cosmonapse primitives and SDK are currently going through a
+            rework. The examples on this page are out of date and are being
+            redone to match the new APIs. Check back soon.
           </p>
         </div>
       </header>
 
+      {/* Hidden while primitives/SDK rework is in progress:
       <section className="section-sm">
         <div className="container">
           <ExamplesCatalog />
@@ -67,6 +64,7 @@ export default function ExamplesPage() {
           </Link>
         </div>
       </section>
+      */}
 
       <style>{`
         .ex-cat-cta {
