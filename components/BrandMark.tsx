@@ -12,7 +12,7 @@ export default function BrandMark({ priority = false }: { priority?: boolean }) 
       <Image
         src={mark}
         alt=""
-        width={34}
+        width={42}
         height={34}
         className="logo-mark-img logo-mark-dark"
         priority={priority}
