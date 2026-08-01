@@ -10,7 +10,7 @@ export type DocsShellProps = {
 
 /**
  * Standalone documentation page frame. The left rail is an accordion of the
- * three SDK references (Python, TypeScript, CLI); each expands to that
+ * two SDK references (Python, CLI); each expands to that
  * page's sections, and every section is its own route.
  */
 export default function DocsShell({ title, sub, children }: DocsShellProps) {
@@ -46,10 +46,10 @@ export default function DocsShell({ title, sub, children }: DocsShellProps) {
                 debated in <code className="inline">DECISIONS.md</code> first.
               </p>
               <div className="hero-ctas" style={{ marginBottom: 0 }}>
-                <Link href="/quickstart" className="btn btn-primary">
+                <Link href="/core/quickstart" className="btn btn-primary">
                   Run the quickstart <span className="arrow">→</span>
                 </Link>
-                <Link href="/protocol" className="btn btn-ghost">
+                <Link href="/core/protocol" className="btn btn-ghost">
                   Re-read the envelope spec
                 </Link>
               </div>

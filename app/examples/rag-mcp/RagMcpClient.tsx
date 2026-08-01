@@ -172,7 +172,7 @@ wrote generated/fib.py  (grounded on: house-style#0, review-checklist#1)
 exit code: 0
 
 <span class="tk-cm"># Watch the retrieve -&gt; write -&gt; run trace animate in the browser.</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">-n</span> rag-mcp`;
+<span class="tk-op">$</span> cosmo prism --tail <span class="tk-op">-n</span> rag-mcp`;
 
 const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a MemorySynapse, which Prism can't attach to.</span>
 <span class="tk-cm"># To watch it live, start a dev synapse and point the code at it:</span>
@@ -181,7 +181,7 @@ const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a 
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=rag-mcp
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> rag-mcp
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> rag-mcp
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -204,7 +204,7 @@ export default function RagMcpClient() {
           <p className="page-sub">
             RAG-grounded code generation, combining the retrieval of{" "}
             <Link href="/examples/rag" className="inline-link">Example 10</Link> with an{" "}
-            MCP-server <Link href="/concepts" className="inline-link">Neuron</Link>. A coder
+            MCP-server <Link href="/core/concepts" className="inline-link">Neuron</Link>. A coder
             recalls the team style guide from a VectorEngram, the standard MCP filesystem server
             (wrapped as a Neuron) writes the file, and a runner executes it  -  retrieve → write
             → run, on one trace. We build it stage by stage; every snippet is the real code from{" "}
@@ -366,7 +366,7 @@ export default function RagMcpClient() {
           <div className="sub-eyebrow">Watch it in Prism</div>
           <h2 className="sub-title">See the Signals fire in the browser.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            <code className="inline">cosmo prism</code> opens a live, read-only view of
             every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT, FINAL  -  as the workflow
             runs. The demo runs in-process on a <code className="inline">MemorySynapse</code>,
             which Prism can&apos;t attach to, so start a dev synapse and point the code at it.

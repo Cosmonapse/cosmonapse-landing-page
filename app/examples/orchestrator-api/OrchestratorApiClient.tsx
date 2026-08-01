@@ -8,12 +8,11 @@ import PrismPreview from "@/components/PrismPreview";
 // ---------------------------------------------------------------------------
 // Framework tab type
 // ---------------------------------------------------------------------------
-type Framework = "flask" | "fastapi" | "express" | "wsgi";
+type Framework = "flask" | "fastapi" | "wsgi";
 
 const FRAMEWORKS: { id: Framework; label: string; lang: string }[] = [
   { id: "flask",   label: "Flask",   lang: "Python" },
   { id: "fastapi", label: "FastAPI", lang: "Python" },
-  { id: "express", label: "Express", lang: "TypeScript" },
   { id: "wsgi",    label: "WSGI",    lang: "Python" },
 ];
 
@@ -60,7 +59,7 @@ const flaskWorker = `<span class="tk-cm"># terminal 1  -  the bus</span>
 <span class="tk-op">$</span> python worker.py
 
 <span class="tk-cm"># optional  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
 
 <span class="tk-cm"># terminal 3  -  Flask</span>
 <span class="tk-op">$</span> python flask_app.py`;
@@ -132,7 +131,7 @@ const fastapiRun = `<span class="tk-cm"># terminal 1  -  the bus</span>
 <span class="tk-op">$</span> python worker.py
 
 <span class="tk-cm"># optional  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
 
 <span class="tk-cm"># terminal 3  -  FastAPI via uvicorn</span>
 <span class="tk-op">$</span> uvicorn fastapi_app:app <span class="tk-op">--</span>port <span class="tk-num">8000</span>`;
@@ -186,69 +185,6 @@ const fastapiCurl = `<span class="tk-op">$</span> curl <span class="tk-op">-X</s
 <span class="tk-cm">{"response": "A Synapse is the message bus that carries Signals between ..."}</span>`;
 
 // ---------------------------------------------------------------------------
-// Express (TypeScript)
-// ---------------------------------------------------------------------------
-const expressInstall = `<span class="tk-cm"># Install SDK + Express</span>
-npm install <span class="tk-op">@</span>cosmonapse/sdk express
-npm install <span class="tk-op">-D</span> tsx <span class="tk-op">@</span>types/express`;
-
-const expressRun = `<span class="tk-cm"># terminal 1  -  the bus (devsynapse or NATS)</span>
-<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10
-
-<span class="tk-cm"># terminal 2  -  the Neuron worker (Python)</span>
-<span class="tk-op">$</span> SYNAPSE_URL<span class="tk-op">=</span>nats://127.0.0.1:4222 python worker.py
-
-<span class="tk-cm"># terminal 3  -  Express</span>
-<span class="tk-op">$</span> npx tsx express_app.ts`;
-
-const expressApp = `<span class="tk-cm">// express_app.ts</span>
-<span class="tk-kw">import</span> express <span class="tk-kw">from</span> <span class="tk-str">"express"</span>;
-<span class="tk-kw">import</span> { Dendrite, NatsSynapse, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-cm">// One Dendrite per process  -  connected at startup, reused for every request.</span>
-<span class="tk-kw">const</span> synapse  <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">NatsSynapse</span>({ url: process.env.SYNAPSE_URL <span class="tk-op">??</span> <span class="tk-str">"nats://127.0.0.1:4222"</span> });
-<span class="tk-kw">const</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"api-demo"</span>,
-                                 dendriteId: <span class="tk-str">"express-orchestrator"</span>, heartbeatMs: <span class="tk-num">0</span> });
-
-<span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> Map&lt;string, (v: unknown) =&gt; void&gt;();
-dendrite.<span class="tk-fn">onAgentOutput</span>((sig) =&gt; {
-  <span class="tk-kw">const</span> resolve <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-  <span class="tk-kw">if</span> (resolve) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">resolve</span>((sig.payload <span class="tk-kw">as</span> any).output); }
-});
-
-<span class="tk-kw">async function</span> <span class="tk-fn">dispatch</span>(prompt: string): Promise&lt;any&gt; {
-  <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
-  <span class="tk-kw">const</span> done    <span class="tk-op">=</span> <span class="tk-kw">new</span> Promise&lt;unknown&gt;((res) =&gt; pending.<span class="tk-fn">set</span>(traceId, res));
-  <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"worker"</span>, input: { prompt }, traceId });
-  <span class="tk-kw">return</span> done;
-}
-
-<span class="tk-kw">const</span> app <span class="tk-op">=</span> <span class="tk-fn">express</span>();
-app.<span class="tk-fn">use</span>(express.<span class="tk-fn">json</span>());
-
-app.<span class="tk-fn">post</span>(<span class="tk-str">"/ask"</span>, <span class="tk-kw">async</span> (req, res) =&gt; {
-  <span class="tk-kw">const</span> { prompt } <span class="tk-op">=</span> req.body;
-  <span class="tk-kw">if</span> (!prompt) { res.<span class="tk-fn">status</span>(<span class="tk-num">400</span>).<span class="tk-fn">json</span>({ error: <span class="tk-str">"prompt required"</span> }); <span class="tk-kw">return</span>; }
-  <span class="tk-kw">try</span> {
-    <span class="tk-kw">const</span> output <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">dispatch</span>(prompt) <span class="tk-kw">as</span> any;
-    res.<span class="tk-fn">json</span>({ response: output?.response <span class="tk-op">??</span> <span class="tk-str">""</span> });
-  } <span class="tk-kw">catch</span> (e: any) {
-    res.<span class="tk-fn">status</span>(<span class="tk-num">504</span>).<span class="tk-fn">json</span>({ error: e.message });
-  }
-});
-
-<span class="tk-cm">// Connect, then listen.</span>
-synapse.<span class="tk-fn">connect</span>()
-  .<span class="tk-fn">then</span>(() =&gt; dendrite.<span class="tk-fn">start</span>())
-  .<span class="tk-fn">then</span>(() =&gt; app.<span class="tk-fn">listen</span>(<span class="tk-num">3000</span>, () =&gt; console.<span class="tk-fn">log</span>(<span class="tk-str">"listening on :3000"</span>)));`;
-
-const expressCurl = `<span class="tk-op">$</span> curl <span class="tk-op">-X</span> POST http://localhost:3000/ask \\
-       <span class="tk-op">-H</span> <span class="tk-str">"Content-Type: application/json"</span> \\
-       <span class="tk-op">-d</span> <span class="tk-str">'{"prompt": "What is a Neuron?"}'</span>
-
-<span class="tk-cm">{"response": "A Neuron is any async callable that processes a task ..."}</span>`;
-
-// ---------------------------------------------------------------------------
 // WSGI (raw)
 // ---------------------------------------------------------------------------
 const wsgiInstall = `<span class="tk-cm"># No extra dependencies  -  wsgiref ships with Python.</span>
@@ -263,7 +199,7 @@ const wsgiRun = `<span class="tk-cm"># terminal 1  -  the bus</span>
 <span class="tk-op">$</span> python worker.py
 
 <span class="tk-cm"># optional  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> api-demo
 
 <span class="tk-cm"># terminal 3  -  raw WSGI (wsgiref dev server)</span>
 <span class="tk-op">$</span> python wsgi_app.py
@@ -430,64 +366,6 @@ reply <span class="tk-op">=</span> <span class="tk-kw">await</span> orchestrator
     neuron<span class="tk-op">=</span><span class="tk-str">"worker"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: prompt}, trace_id<span class="tk-op">=</span>trace_id,
 )`;
 
-// TypeScript (Express) variant
-const tsDecorators = `<span class="tk-cm">// Attach to the module-level Dendrite after start().</span>
-
-<span class="tk-cm">// ── onAgentOutput ─────────────────────────────────────────────────────────</span>
-dendrite.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`[\${sig.trace_id.slice(0, 8)}] output from \${sig.directed.id if sig.directed else '?'}\`</span>));
-
-dendrite.<span class="tk-fn">onAgentOutput</span>({ neuron: <span class="tk-str">"worker"</span> }, (sig) <span class="tk-op">=&gt;</span> { <span class="tk-cm">/* narrow by id */</span> });
-dendrite.<span class="tk-fn">onAgentOutput</span>({ capability: <span class="tk-str">"text-generation"</span> }, (sig) <span class="tk-op">=&gt;</span> { <span class="tk-cm">/* narrow by cap */</span> });
-
-
-<span class="tk-cm">// ── onClarification ───────────────────────────────────────────────────────</span>
-<span class="tk-cm">// The Neuron needs more context. respondToClarification keeps the trace alive.</span>
-dendrite.<span class="tk-fn">onClarification</span>(<span class="tk-kw">async</span> (sig) <span class="tk-op">=&gt;</span> {
-  <span class="tk-kw">const</span> question <span class="tk-op">=</span> (sig.payload <span class="tk-kw">as</span> any).question <span class="tk-kw">as</span> string;
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`clarification: \${question}\`</span>);
-  <span class="tk-kw">await</span> dendrite.<span class="tk-fn">respondToClarification</span>(sig, {
-    answer: <span class="tk-str">"Please use plain English, no technical jargon."</span>,
-  });
-});
-
-
-<span class="tk-cm">// ── onErrorSignal ─────────────────────────────────────────────────────────</span>
-dendrite.<span class="tk-fn">onErrorSignal</span>((sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">error</span>(<span class="tk-str">\`[\${sig.trace_id.slice(0, 8)}] error:\`</span>, (sig.payload <span class="tk-kw">as</span> any).message));
-
-
-<span class="tk-cm">// ── onEscalation ──────────────────────────────────────────────────────────</span>
-dendrite.<span class="tk-fn">onEscalation</span>(<span class="tk-kw">async</span> (sig) <span class="tk-op">=&gt;</span> {
-  console.<span class="tk-fn">warn</span>(<span class="tk-str">\`escalated: \${(sig.payload <span class="tk-kw">as</span> any).reason}\`</span>);
-  <span class="tk-kw">await</span> dendrite.<span class="tk-fn">respondToEscalation</span>(sig, { input: { override: <span class="tk-str">"proceed with best effort"</span> } });
-});
-
-
-<span class="tk-cm">// ── onThoughtDelta ────────────────────────────────────────────────────────</span>
-<span class="tk-cm">// Streamed reasoning tokens. Pipe to SSE or WebSocket for live output.</span>
-dendrite.<span class="tk-fn">onThoughtDelta</span>((sig) <span class="tk-op">=&gt;</span>
-  process.stdout.<span class="tk-fn">write</span>((sig.payload <span class="tk-kw">as</span> any).delta <span class="tk-op">??</span> <span class="tk-str">""</span>));
-
-
-<span class="tk-cm">// ── onToolCall / onToolResult ─────────────────────────────────────────────</span>
-dendrite.<span class="tk-fn">onToolCall</span>((sig) <span class="tk-op">=&gt;</span> console.<span class="tk-fn">log</span>(<span class="tk-str">"  tool →"</span>, (sig.payload <span class="tk-kw">as</span> any).tool_name));
-dendrite.<span class="tk-fn">onToolResult</span>((sig) <span class="tk-op">=&gt;</span> console.<span class="tk-fn">log</span>(<span class="tk-str">"  tool ←"</span>, (sig.payload <span class="tk-kw">as</span> any).tool_name));
-
-
-<span class="tk-cm">// ── onRegisterSignal / onHeartbeatSignal ──────────────────────────────────</span>
-dendrite.<span class="tk-fn">onRegisterSignal</span>((sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`worker joined: \${sig.directed.id if sig.directed else '?'}\`</span>));
-dendrite.<span class="tk-fn">onHeartbeatSignal</span>((sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`heartbeat: \${sig.directed.id if sig.directed else '?'}\`</span>));
-
-
-<span class="tk-cm">// ── onTrace  -  every Signal for one workflow ───────────────────────────────</span>
-<span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
-dendrite.<span class="tk-fn">onTrace</span>(traceId, (sig) <span class="tk-op">=&gt;</span>
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`  [\${sig.type.padEnd(20)}] \${sig.directed.id if sig.directed else '?'}\`</span>));
-<span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"worker"</span>, input: { prompt }, traceId });`;
-
 const decoratorProseShared = (
   <>
     Decorators register async callbacks on the Dendrite for specific Signal
@@ -590,54 +468,6 @@ const STEPS: Record<Framework, Step[]> = {
       maxWidth: 740,
     },
   ],
-  express: [
-    {
-      eyebrow: "Install",
-      prose: <>The TypeScript SDK ships <code className="inline">NatsSynapse</code> for cross-process use. The Express server connects on startup, then reuses one Dendrite for all requests.</>,
-      html: expressInstall,
-      maxWidth: 740,
-    },
-    {
-      eyebrow: "Start the bus and worker",
-      prose: <>Express uses NATS here  -  swap the <code className="inline">SYNAPSE_URL</code> env var to point at any NATS server.</>,
-      html: expressRun,
-      maxWidth: 740,
-    },
-    {
-      eyebrow: "The Express app",
-      prose: (
-        <>
-          <code className="inline">dispatchTask</code> fires the TASK and a{" "}
-          <code className="inline">Map</code> of pending promises resolves when{" "}
-          <code className="inline">onAgentOutput</code> fires. Route handlers{" "}
-          <code className="inline">await dispatch(prompt)</code>  -  clean and readable.
-        </>
-      ),
-      filename: "express_app.ts",
-      html: expressApp,
-    },
-    {
-      eyebrow: "Decorators",
-      prose: (
-        <>
-          The TypeScript SDK uses method calls instead of Python decorators, but
-          the semantics are identical  -  callbacks fire for every matching Signal
-          in the namespace. All filter options (<code className="inline">neuron</code>,{" "}
-          <code className="inline">capability</code>,{" "}
-          <code className="inline">traceId</code>) are available as an optional
-          first argument.
-        </>
-      ),
-      filename: "decorators.ts",
-      html: tsDecorators,
-    },
-    {
-      eyebrow: "Try it",
-      prose: <>Same endpoint, same JSON shape:</>,
-      html: expressCurl,
-      maxWidth: 740,
-    },
-  ],
   wsgi: [
     {
       eyebrow: "Install",
@@ -695,13 +525,6 @@ const EXTEND: Record<Framework, React.ReactNode> = {
       <p><strong>WebSockets.</strong> Open a WebSocket route, iterate over a <code className="inline">Pathway</code>, and stream each partial Signal token back to the browser in real time.</p>
     </>
   ),
-  express: (
-    <>
-      <p><strong>Capability routing.</strong> Instead of a fixed <code className="inline">"worker"</code> id, attach a <code className="inline">RegistryStore</code> to the Dendrite and call <code className="inline">findNeurons(capability)</code> to resolve the target at dispatch time.</p>
-      <p><strong>Middleware.</strong> Wrap <code className="inline">dispatch</code> in Express middleware to add tracing headers, rate-limiting, or auth  -  the Cosmonapse layer is completely isolated from HTTP concerns.</p>
-      <p><strong>Multiple Synapses.</strong> One Dendrite per Synapse  -  create two if you need to fan out across separate namespaces or brokers from the same Express server.</p>
-    </>
-  ),
   wsgi: (
     <>
       <p><strong>Gunicorn workers.</strong> Each gunicorn sync worker process creates its own Dendrite and asyncio loop  -  that&apos;s correct. The Synapse handles multi-producer traffic. Use <code className="inline">--workers=1</code> for dev; scale up as needed.</p>
@@ -745,7 +568,7 @@ export default function OrchestratorApiClient() {
             Dendrite in the Middle.
           </h1>
           <p className="page-sub">
-            Flask, FastAPI, Express, or raw WSGI  -  whichever HTTP layer you
+            Flask, FastAPI, or raw WSGI  -  whichever HTTP layer you
             already use. A route handler receives the request, calls{" "}
             <code className="inline">dispatch_and_wait</code> on a shared Dendrite,
             and returns the Neuron&apos;s reply. The framework never touches the
@@ -760,7 +583,7 @@ export default function OrchestratorApiClient() {
           <div className="arch-flow">
             <span className="arch-box">HTTP client</span>
             <span className="arch-arrow">→</span>
-            <span className="arch-box arch-box--highlight">Flask / FastAPI / Express / WSGI</span>
+            <span className="arch-box arch-box--highlight">Flask / FastAPI / WSGI</span>
             <span className="arch-arrow">→</span>
             <span className="arch-box arch-box--accent">Dendrite</span>
             <span className="arch-arrow">→</span>
@@ -870,7 +693,7 @@ export default function OrchestratorApiClient() {
           <div className="sub-eyebrow">Watch it</div>
           <h2 className="sub-title">See it live in Prism.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            <code className="inline">cosmo prism</code> opens a live, read-only view of
             every Signal on the bus as it fires. Run it against the dev synapse above to watch
             this workflow animate.
           </p>

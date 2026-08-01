@@ -1572,7 +1572,7 @@ export default function PythonDocs({ section }: { section?: string }) {
         <p className="docs-p">
           A <strong>Signal</strong> is the in-memory representation of an envelope  -  a Pydantic v2
           model. Every method that publishes or receives a message uses it. See{" "}
-          <Link href="/protocol">the envelope spec</Link> for the full wire-level field reference.
+          <Link href="/core/protocol">the envelope spec</Link> for the full wire-level field reference.
         </p>
         <ApiCard kind="model" name="cosmonapse.Signal" summary="Pydantic BaseModel mirroring the envelope schema. encode() / decode() round-trip with the wire format; field validators reject ids that don't carry the evt_ / trc_ prefixes.">
           <CodeBlock filename="signal.pyi" html={signalSnippet} maxWidth={840} />

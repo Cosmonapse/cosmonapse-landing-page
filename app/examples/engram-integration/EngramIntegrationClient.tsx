@@ -138,7 +138,7 @@ const prismSnippet = `<span class="tk-cm"># This example runs in-process on Memo
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -163,7 +163,7 @@ export default function EngramIntegrationClient() {
             <code className="inline">EngramBinding</code>. The Neuron calls{" "}
             <code className="inline">recall()</code> and{" "}
             <code className="inline">imprint()</code> to read and write the bound{" "}
-            <Link href="/concepts" className="inline-link">Engram</Link> without
+            <Link href="/core/concepts" className="inline-link">Engram</Link> without
             ever touching the protocol. Backed by{" "}
             <code className="inline">InMemoryEngram</code> here; swap for{" "}
             <code className="inline">SqliteEngram</code> or{" "}
@@ -279,7 +279,7 @@ export default function EngramIntegrationClient() {
           <div className="sub-eyebrow">06 · Watch it in Prism</div>
           <h2 className="sub-title">RECALL and IMPRINT, live on the bus.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> shows the full memory
+            <code className="inline">cosmo prism</code> shows the full memory
             round-trip  -  RECALL, RECALLED, IMPRINT, IMPRINTED  -  threaded through the
             same trace as the TASK that caused it.
           </p>
@@ -299,7 +299,7 @@ export default function EngramIntegrationClient() {
               <h3>Building a Neuron</h3>
               <p>The same shape without the Engram. Read this first if you skipped it.</p>
             </Link>
-            <Link href="/protocol" className="card">
+            <Link href="/core/protocol" className="card">
               <div className="card-icon">→</div>
               <h3>Engram envelope spec</h3>
               <p>RECALL / RECALLED / IMPRINT / IMPRINTED  -  the four signals the binding emits.</p>

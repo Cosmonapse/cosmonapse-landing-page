@@ -19,8 +19,8 @@ export const cliToc: TocGroup = {
     { href: "#cli-overview", label: "Overview" },
     { href: "#cli-init", label: "cosmo init" },
     { href: "#cli-synapse", label: "cosmo synapse" },
-    { href: "#cli-doppler", label: "cosmo doppler" },
-    { href: "#cli-prism", label: "cosmo doppler --prism" },
+    { href: "#cli-prism", label: "cosmo prism" },
+    { href: "#cli-tail", label: "cosmo prism --tail" },
     { href: "#cli-validate", label: "cosmo validate" },
     { href: "#cli-completion", label: "cosmo completion" },
     { href: "#cli-dispatch", label: "cosmo dispatch" },
@@ -48,8 +48,9 @@ Commands
   answer       Interactively answer CLARIFICATION / PERMISSION requests.
   completion   Print a shell-completion script (bash / zsh / fish).
   dispatch     Dispatch a TASK and print the reply.
-  doppler      Attach a read-only Doppler to a Synapse namespace.
+  genesis      Open Genesis - name a brain, scaffold it, grow it on a canvas.
   init         Scaffold a standard-skeleton Cosmonapse project.
+  prism        Open Prism, the live browser view onto a Synapse namespace.
   registry     Inspect the Neuron registry of a namespace.
   schema       Print the Signal envelope JSON Schema.
   synapse      Manage Cosmonapse synapse servers (start / view / stop).
@@ -125,12 +126,12 @@ Examples
 <span class="tk-op">$</span> cosmo synapse view <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev      <span class="tk-cm"># stream live signals</span>
 <span class="tk-op">$</span> cosmo synapse stop <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev      <span class="tk-cm"># graceful stop</span>`;
 
-const cliDopplerSnippet = `<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>help
+const cliPrismHelpSnippet = `<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>help
 
-Attach a read-only Doppler to a Synapse namespace and stream Signals.
+Open Prism, the live browser view onto a Synapse namespace.
 
 Usage
-  cosmo doppler <span class="tk-op">--</span>url <span class="tk-op">&lt;</span>url<span class="tk-op">&gt;</span> <span class="tk-op">--</span>namespace <span class="tk-op">&lt;</span>ns<span class="tk-op">&gt;</span> [filters] [output]
+  cosmo prism <span class="tk-op">--</span>url <span class="tk-op">&lt;</span>url<span class="tk-op">&gt;</span> <span class="tk-op">--</span>namespace <span class="tk-op">&lt;</span>ns<span class="tk-op">&gt;</span> [<span class="tk-op">--</span>tail] [filters] [output]
 
 Options
   <span class="tk-op">--</span>url <span class="tk-op">&lt;</span>url<span class="tk-op">&gt;</span>             Synapse URL, e.g. cosmo://127.0.0.1:7070
@@ -139,26 +140,26 @@ Options
   <span class="tk-op">--</span>type <span class="tk-op">&lt;</span>TYPE<span class="tk-op">&gt;</span>            Filter to specific signal types. Repeatable.
   <span class="tk-op">--</span>trace <span class="tk-op">&lt;</span>trc_…<span class="tk-op">&gt;</span>          Filter to a single trace_id.
   <span class="tk-op">--</span>neuron <span class="tk-op">&lt;</span>id<span class="tk-op">&gt;</span>            Filter to a single neuron id.
-  <span class="tk-op">--</span>json                   Output one JSON object per line (CLI mode).
-  <span class="tk-op">--</span>payload                Show a payload preview alongside each signal.
-  <span class="tk-op">--</span>prism                  Launch the Prism browser visualization instead of stdout.
+  <span class="tk-op">--</span>tail                   Stream Signals to stdout instead of opening Prism.
+  <span class="tk-op">--</span>json                   Output one JSON object per line (<span class="tk-op">--</span>tail only).
+  <span class="tk-op">--</span>payload                Show a payload preview alongside each signal (<span class="tk-op">--</span>tail only).
   <span class="tk-op">--</span>port <span class="tk-op">&lt;</span>n<span class="tk-op">&gt;</span>              Local port for the Prism server. Default: 7071
 
 Examples
 
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>tail <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
   REGISTER      neuron<span class="tk-op">=</span>hello-neuron
   TASK          trace<span class="tk-op">=</span>trc_…  neuron<span class="tk-op">=</span>hello-neuron
   AGENT_OUTPUT  trace<span class="tk-op">=</span>trc_…  neuron<span class="tk-op">=</span>hello-neuron
 
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>type<span class="tk-op">=</span>AGENT_OUTPUT <span class="tk-op">--</span>type<span class="tk-op">=</span>ERROR
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>trace<span class="tk-op">=</span>trc_01JV…
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>json <span class="tk-op">|</span> jq <span class="tk-str">'select(.type=="ERROR")'</span>`;
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>tail <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>type<span class="tk-op">=</span>AGENT_OUTPUT <span class="tk-op">--</span>type<span class="tk-op">=</span>ERROR
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>tail <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>trace<span class="tk-op">=</span>trc_01JV…
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>tail <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>json <span class="tk-op">|</span> jq <span class="tk-str">'select(.type=="ERROR")'</span>`;
 
-const cliPrismSnippet = `<span class="tk-cm"># Launch Prism  -  the browser visualization for the Doppler.</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism                                          <span class="tk-cm"># opens Prism, enter the synapse URL in the form</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>port<span class="tk-op">=</span>8080                              <span class="tk-cm"># serve on a custom port</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev      <span class="tk-cm"># skip the form, attach directly</span>
+const cliPrismSnippet = `<span class="tk-cm"># Launch Prism  -  the browser visualization. This is the default.</span>
+<span class="tk-op">$</span> cosmo prism                                          <span class="tk-cm"># opens Prism, enter the synapse URL in the form</span>
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>port<span class="tk-op">=</span>8080                              <span class="tk-cm"># serve on a custom port</span>
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev      <span class="tk-cm"># skip the form, attach directly</span>
 
   Prism serving on http://127.0.0.1:7071
   WS bridge   /ws  →  streams one JSON Signal envelope per message
@@ -323,19 +324,14 @@ export default function CliDocs({ section }: { section?: string }) {
       <Section id="cli-overview" eyebrow="CLI · 01" title="Overview">
         <p className="docs-p">
           <code className="inline">cosmo</code> has a single implementation that ships inside the
-          Python distribution (entry point <code className="inline">cosmo.main:cli</code>), and two
-          installs that reach it: <code className="inline">pip install cosmonapse</code> puts the
-          binary on your <code className="inline">PATH</code> directly, and{" "}
-          <code className="inline">npm install -g @cosmonapse/sdk</code> installs a zero-dependency
-          launcher that delegates to <code className="inline">python -m cosmo</code>  -  on first run
-          it auto-installs the CLI into a private environment (
-          <code className="inline">~/.cosmonapse/cli-venv</code>, pinned to the npm package&rsquo;s
-          version) if no Python already has it. Either way there is exactly one CLI build, so pip
-          and npm users can never drift apart. Requires Python 3.11+. It exposes{" "}
+          Python distribution (entry point <code className="inline">cosmo.main:cli</code>).{" "}
+          <code className="inline">pip install cosmonapse</code> puts the binary on your{" "}
+          <code className="inline">PATH</code>. Requires Python 3.11+. It exposes{" "}
           <code className="inline">init</code>, <code className="inline">synapse</code>,{" "}
           <code className="inline">dispatch</code>, <code className="inline">registry</code>,{" "}
           <code className="inline">answer</code>, <code className="inline">schema</code>,{" "}
-          <code className="inline">doppler</code>, <code className="inline">validate</code>, and{" "}
+          <code className="inline">prism</code>, <code className="inline">genesis</code>,{" "}
+          <code className="inline">validate</code>, and{" "}
           <code className="inline">completion</code>.
         </p>
         <CodeBlock html={cliRootSnippet} maxWidth={820} />
@@ -374,32 +370,43 @@ export default function CliDocs({ section }: { section?: string }) {
         </p>
       </Section>
 
-      <Section id="cli-doppler" eyebrow="CLI · 04" title="cosmo doppler">
+      <Section id="cli-prism" eyebrow="CLI · 04" title="cosmo prism">
         <p className="docs-p">
-          A Doppler is any process that subscribes to the channel as a passive, read-only consumer.{" "}
-          <code className="inline">cosmo doppler</code> is the built-in one  -  it tails every envelope,
-          applies filters, and renders to stdout (or the Prism browser UI with{" "}
-          <code className="inline">--prism</code>, documented below). Pass <code className="inline">--json</code> to emit
-          one JSON object per line for piping to <code className="inline">jq</code>. Give it a{" "}
-          <code className="inline">--url</code> and a <code className="inline">--namespace</code> (the
-          same shape as <code className="inline">cosmo synapse</code>); the legacy{" "}
-          <code className="inline">--synapse=url/namespace</code> form is still accepted.
-        </p>
-        <CodeBlock html={cliDopplerSnippet} maxWidth={860} />
-      </Section>
-
-      <Section id="cli-prism" eyebrow="CLI · 04b" title="cosmo doppler --prism">
-        <p className="docs-p">
-          Pass <code className="inline">--prism</code> to <code className="inline">cosmo doppler</code>{" "}
-          to launch <strong>Prism</strong>, the browser visualization for the Doppler, instead of
-          streaming envelopes to stdout. It boots a local server (default port{" "}
-          <code className="inline">7071</code>) that serves a single-page app and a WebSocket bridge;
-          each connection opens its own Synapse subscriber, so you can switch URL and namespace from
-          the form without restarting. Pre-fill the target with{" "}
+          <code className="inline">cosmo prism</code> launches <strong>Prism</strong>, the browser
+          visualization, and that is its default behaviour  -  no flag required. It boots a local
+          server (default port <code className="inline">7071</code>) that serves a single-page app and
+          a WebSocket bridge; each connection opens its own Synapse subscriber, so you can switch URL
+          and namespace from the form without restarting. Pre-fill the target with{" "}
           <code className="inline">--url</code> and <code className="inline">--namespace</code> to skip
           the form, or set <code className="inline">--port</code> to serve elsewhere.
         </p>
         <CodeBlock html={cliPrismSnippet} maxWidth={860} />
+        <p className="docs-p">
+          <code className="inline">cosmo doppler</code> is a deprecated alias that still works: it
+          prints a warning, and because bare <code className="inline">cosmo doppler</code> used to
+          stream to stdout, the alias flips the default back to{" "}
+          <code className="inline">--tail</code> for scripts that never migrated. The{" "}
+          <code className="inline">--prism</code> flag is accepted and ignored. Both will be removed
+          in a future release.
+        </p>
+      </Section>
+
+      <Section id="cli-tail" eyebrow="CLI · 04b" title="cosmo prism --tail">
+        <p className="docs-p">
+          A Doppler is any process that subscribes to the channel as a passive, read-only consumer.{" "}
+          <code className="inline">cosmo prism --tail</code> is the built-in one  -  it tails every
+          envelope, applies filters, and renders to stdout instead of opening the browser. Pass{" "}
+          <code className="inline">--json</code> to emit one JSON object per line for piping to{" "}
+          <code className="inline">jq</code>. Give it a <code className="inline">--url</code> and a{" "}
+          <code className="inline">--namespace</code> (the same shape as{" "}
+          <code className="inline">cosmo synapse</code>); the legacy{" "}
+          <code className="inline">--synapse=url/namespace</code> form is still accepted. The{" "}
+          <code className="inline">--type</code>, <code className="inline">--trace</code>,{" "}
+          <code className="inline">--neuron</code>, <code className="inline">--json</code> and{" "}
+          <code className="inline">--payload</code> filters apply to{" "}
+          <code className="inline">--tail</code> only.
+        </p>
+        <CodeBlock html={cliPrismHelpSnippet} maxWidth={860} />
       </Section>
 
       <Section id="cli-validate" eyebrow="CLI · 05" title="cosmo validate">
@@ -439,8 +446,7 @@ export default function CliDocs({ section }: { section?: string }) {
           <code className="inline">Dendrite.run_with_retry(retry=…)</code> /{" "}
           <code className="inline">dispatch_and_wait(retry=…)</code>; to cancel a whole trace use{" "}
           <code className="inline">Dendrite.stop_trace(...)</code>. See the{" "}
-          <Link href="/docs/python/dendrite">Python</Link> and{" "}
-          <Link href="/docs/typescript/dendrite">TypeScript</Link> Dendrite references.
+          <Link href="/docs/python/dendrite">Python</Link> Dendrite reference.
         </p>
       </Section>
 

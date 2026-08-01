@@ -4,7 +4,7 @@ import { pageMetadata, KW_PRODUCT } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Roadmap",
   description:
-    "Where the Cosmonapse protocol is heading: 0.2.0 hardens the core primitives, 0.3.0 stress-tests with real agents, 1.0.0 lands Prism, Brainwaves and Cloud.",
+    "Where Cosmonapse is heading: 0.2.0 hardens the core primitives, 0.3.0 stress-tests with real agents, 1.0.0 lands Brainwaves, deployment and Cloud.",
   path: "/roadmap",
   keywords: [
     ...KW_PRODUCT,
@@ -22,7 +22,7 @@ export default function RoadmapPage() {
           <div className="page-eyebrow">// Roadmap</div>
           <h1 className="page-title">From 0.1.0 to a Stable 1.0.0.</h1>
           <p className="page-sub">
-            0.1.9 is out  -  the protocol and SDK shapes are in place, and Effector joins them as the
+            0.1.11 is out  -  the protocol and SDK shapes are in place, and Effector joins them as the
             action layer. The 0.x line takes the six core primitives  -  Synapse, Dendrite, Neuron,
             Axon, Engram, Effector  -  from shapes to
             solid, freezes pathways and traces, and then stress-tests the protocol with real agents.
@@ -37,14 +37,14 @@ export default function RoadmapPage() {
         <div className="container container-narrow">
           <div className="timeline">
             <div className="timeline-item current">
-              <div className="timeline-version">0.1.x · shipped (0.1.9)  -  the start</div>
+              <div className="timeline-version">0.1.x · shipped (0.1.11)  -  the start</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>
-                  Out now as 0.1.9. The developer reads the envelope spec, writes an Axon and
+                  Out now as 0.1.11. The developer reads the envelope spec, writes an Axon and
                   Dendrite using the SDK primitives, chooses a Synapse adapter, and wires their own
                   orchestration logic. Full control, full complexity, appropriate for early adopters. The
-                  Python SDK is the complete reference implementation; the TypeScript SDK is at full parity.
+                  Python SDK is the complete reference implementation.
                 </p>
                 <p>What 0.1.x ships:</p>
                 <ul>
@@ -56,13 +56,13 @@ export default function RoadmapPage() {
                   <li>
                     <code className="inline">cosmo init</code> (project scaffolding),{" "}
                     <code className="inline">cosmo synapse start|view|stop</code>,{" "}
-                    <code className="inline">cosmo doppler</code>,{" "}
+                    <code className="inline">cosmo prism</code>,{" "}
                     <code className="inline">cosmo validate</code>,{" "}
                     <code className="inline">cosmo completion</code> (bash / zsh / fish)
                   </li>
                   <li>
                     <strong>Prism</strong>  -  a local browser frontend for monitoring a live Synapse,
-                    served by <code className="inline">cosmo doppler --prism</code>. A hero form picks the
+                    served by <code className="inline">cosmo prism</code>. A hero form picks the
                     Synapse URL + namespace, then an animated view streams every Signal on the wildcard
                     subject over a WebSocket in real time
                   </li>
@@ -78,11 +78,6 @@ export default function RoadmapPage() {
                     (<code className="inline">@AXON.host.on_agent_output</code> /{" "}
                     <code className="inline">on_tool_call</code>) that declare a node&apos;s chain
                     behaviour in its Neuron&apos;s module and self-apply on announce
-                  </li>
-                  <li>
-                    <code className="inline">cosmo</code> via npm  -  {" "}
-                    <code className="inline">@cosmonapse/sdk</code> installs a zero-dependency
-                    launcher that delegates to the single Python CLI implementation
                   </li>
                   <li>
                     <strong>Engram (shared memory)</strong>  -  RECALL / IMPRINT signals,{" "}
@@ -113,14 +108,6 @@ export default function RoadmapPage() {
                   <li>
                     Dispatch sugar  -  <code className="inline">dispatch_and_wait(...)</code> and{" "}
                     <code className="inline">dispatch_and_subscribe(...)</code>
-                  </li>
-                  <li>
-                    TypeScript SDK  -  full parity as of 0.1.6: envelope, builders, Axon,
-                    Dendrite (Pathway dispatch, offers / bidding, interactive cognition), all
-                    four Synapse adapters with{" "}
-                    <code className="inline">connectSynapse(url)</code>, all three RegistryStore
-                    backends, LifecycleHooks, the LLM / MCP / unified{" "}
-                    <code className="inline">neuron()</code> source factories, and Engram.
                   </li>
                 </ul>
               </div>
@@ -190,7 +177,7 @@ export default function RoadmapPage() {
                 <ul>
                   <li><strong>Strong protocol foundation</strong>  -  Synapse, Dendrite, Neuron, Axon, and Engram from cosmonapse-core are solid</li>
                   <li>
-                    <strong>Doppler Prism</strong>  -  basic observability and statistics, with{" "}
+                    <strong>Prism</strong>  -  deeper statistics and cognition analytics on top of the five views that ship today, with{" "}
                     <strong>Brain</strong> development alongside Synapse development. Maybe{" "}
                     <strong>&quot;Brainwaves&quot;</strong>: capture and replay a task or a set of
                     tasks. Shareable Brain architectures  -  think Terraform, for agent fabrics
@@ -214,9 +201,9 @@ export default function RoadmapPage() {
 
       <section className="section-sm">
         <div className="container container-narrow">
-          <div className="sub-eyebrow">Known limitations  -  0.1.9</div>
+          <div className="sub-eyebrow">Known limitations  -  0.1.11</div>
           <p className="prose">
-            0.1.9 is a 0.1: the protocol and SDK shapes are in place, and 0.2.0 hardens them
+            0.1.11 is a 0.1: the protocol and SDK shapes are in place, and 0.2.0 hardens them
             before anything is frozen. These are the edges we know about  -  each one points at
             the milestone that closes it.
           </p>
@@ -250,10 +237,10 @@ export default function RoadmapPage() {
           <div className="sub-eyebrow">Priority order  -  0.1.0 → 1.0.0</div>
           <p className="prose">The order matters. Each milestone lands on the baseline the last one established.</p>
           <ol className="prose" style={{ paddingLeft: 24 }}>
-            <li>0.1.x  -  shipped (0.1.9): protocol drafted, both SDKs and the CLI released, every primitive present</li>
+            <li>0.1.x  -  shipped (0.1.11): protocol drafted, both SDKs and the CLI released, every primitive present</li>
             <li>0.2.0  -  the six primitives solid with basic LLMs; the Axon output repair contract; Doppler multi-tab + filters; pathways and traces set in stone; heavy testing against NATS / Kafka</li>
             <li>0.3.0  -  agents from Claude and OpenAI stress-testing the protocol; fixing and development in tandem</li>
-            <li>1.0.0  -  strong foundation: Doppler Prism observability, Brains and Brainwaves, infra integration, complex RAG / agent systems built consistently, Cosmonapse Cloud</li>
+            <li>1.0.0  -  strong foundation: Prism deepened with cognition analytics, Brains and Brainwaves, deployment and infra integration, complex RAG / agent systems built consistently, Cosmonapse Cloud</li>
           </ol>
         </div>
       </section>

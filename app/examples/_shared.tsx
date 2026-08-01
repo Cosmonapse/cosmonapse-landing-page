@@ -46,13 +46,6 @@ pip install httpx
 
 <span class="tk-op">$</span> export HF_TOKEN<span class="tk-op">=</span>hf_xxxxxxxxxxxxxxxxxxxxxxxx`,
 
-  "ts-dev": `<span class="tk-cm"># The TypeScript SDK. MemorySynapse needs no broker.</span>
-npm install <span class="tk-op">@</span>cosmonapse/sdk
-npm install <span class="tk-op">-D</span> tsx        <span class="tk-cm"># run .ts files directly</span>`,
-
-  "ts-nats": `<span class="tk-cm"># The TypeScript SDK + the optional nats driver</span>
-npm install <span class="tk-op">@</span>cosmonapse/sdk nats
-npm install <span class="tk-op">-D</span> tsx`,
 };
 
 const INSTALL_PROSE: Record<Combo, React.ReactNode> = {
@@ -72,19 +65,6 @@ const INSTALL_PROSE: Record<Combo, React.ReactNode> = {
     <>
       Only the <code className="inline">kafka</code> extra differs. Kafka gives
       you a durable, replayable log of every Signal that crossed the Synapse.
-    </>
-  ),
-  "ts-dev": (
-    <>
-      One package. <code className="inline">MemorySynapse</code> is in-process,
-      so this combo runs in a single Node process with no broker at all.
-    </>
-  ),
-  "ts-nats": (
-    <>
-      The <code className="inline">nats</code> driver is an optional dependency,
-      lazy-imported only when you construct a{" "}
-      <code className="inline">NatsSynapse</code>.
     </>
   ),
 };
@@ -153,10 +133,9 @@ export function brokerStep(combo: Combo): Step | null {
 <span class="tk-cm">  ────────────────────────────────────────────────</span>
 
 <span class="tk-cm"># terminal 2  -  live browser visualization (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart`,
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart`,
       };
     case "py-nats":
-    case "ts-nats":
       return {
         eyebrow: "Start a NATS server",
         prose: (
@@ -173,7 +152,7 @@ export function brokerStep(combo: Combo): Step | null {
 <span class="tk-op">$</span> nats-server
 
 <span class="tk-cm"># optional  -  watch it live in Prism (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>nats://127.0.0.1:4222 <span class="tk-op">-n</span> quickstart`,
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>nats://127.0.0.1:4222 <span class="tk-op">-n</span> quickstart`,
       };
     case "py-kafka":
       return {
@@ -195,9 +174,8 @@ export function brokerStep(combo: Combo): Step | null {
     <span class="tk-op">--</span>advertise-kafka-addr PLAINTEXT://127.0.0.1:9092
 
 <span class="tk-cm"># optional  -  watch it live in Prism (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>kafka://127.0.0.1:9092 <span class="tk-op">-n</span> quickstart`,
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>kafka://127.0.0.1:9092 <span class="tk-op">-n</span> quickstart`,
       };
-    case "ts-dev":
     default:
       return null;
   }
@@ -211,8 +189,6 @@ const brokerRunLine: Record<Combo, string | null> = {
   "py-dev": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>quickstart`,
   "py-nats": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10`,
   "py-kafka": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 9092:9092 redpandadata/redpanda:latest redpanda start <span class="tk-op">--</span>smp 1`,
-  "ts-dev": null,
-  "ts-nats": `<span class="tk-cm"># terminal 1  -  the bus</span>\n<span class="tk-op">$</span> docker run <span class="tk-op">-p</span> 4222:4222 nats:2.10`,
 };
 
 /**
@@ -236,19 +212,12 @@ export function runStep(
   }
   return {
     eyebrow: "Run the topology",
-    prose:
-      combo === "ts-dev" ? (
-        <>
-          One process. <code className="inline">MemorySynapse</code> wires
-          everything together in-memory  -  no terminals to juggle. For a
-          multi-process version, switch to the NATS tab.
-        </>
-      ) : (
-        <>
-          Separate terminals, one Synapse shared by all. Start the bus first,
-          then the workers, then the driver.
-        </>
-      ),
+    prose: (
+      <>
+        Separate terminals, one Synapse shared by all. Start the bus first,
+        then the workers, then the driver.
+      </>
+    ),
     maxWidth: 760,
     html: blocks.join("\n\n"),
   };

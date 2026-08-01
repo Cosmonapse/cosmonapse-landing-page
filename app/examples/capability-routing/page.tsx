@@ -6,7 +6,7 @@ import CapabilityRoutingClient from "./CapabilityRoutingClient";
 export const metadata: Metadata = pageMetadata({
   title: "Capability-Based Agent Routing",
   description:
-    "A router Dendrite uses a RegistryStore to discover workers by capability and dispatch each task to a live Neuron that advertises it. Five stacks, one topology.",
+    "A router Dendrite uses a RegistryStore to discover workers by capability and dispatch each task to a live Neuron that advertises it. Three transports, one topology.",
   path: "/examples/capability-routing",
   keywords: [
     ...KW_EVENT_DRIVEN,

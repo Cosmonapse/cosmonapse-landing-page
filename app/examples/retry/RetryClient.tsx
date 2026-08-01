@@ -146,7 +146,7 @@ const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a 
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=retry-demo
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> retry-demo
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> retry-demo
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -319,7 +319,7 @@ export default function RetryClient() {
           <div className="sub-eyebrow">Watch it in Prism</div>
           <h2 className="sub-title">See the Signals fire in the browser.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            <code className="inline">cosmo prism</code> opens a live, read-only view of
             every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT, FINAL  -  as the workflow
             runs. The demo runs in-process on a <code className="inline">MemorySynapse</code>,
             which Prism can&apos;t attach to, so start a dev synapse and point the code at it.

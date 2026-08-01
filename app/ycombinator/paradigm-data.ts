@@ -234,7 +234,7 @@ export const COMPARISON: Row[] = [
     across: "yes",
     acrossNote:
       "Swap the Synapse backend and the same nodes run in separate processes or on separate machines. No agent code changes.",
-    src: "/protocol",
+    src: "/core/protocol",
     self: true,
   },
 ];

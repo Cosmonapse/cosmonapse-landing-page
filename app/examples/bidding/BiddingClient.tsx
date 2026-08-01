@@ -10,7 +10,7 @@ const watchSnippet = `<span class="tk-cm"># terminal 1  -  the bus</span>
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071).</span>
 <span class="tk-cm"># Watch the TASK_OFFER / BID / TASK_AWARDED auction animate in real time.</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo`;
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo`;
 
 const whySnippet = `<span class="tk-cm"># Capability-routed dispatch on a separate subject + queue group gives</span>
 <span class="tk-cm"># once-only delivery WITHIN a matching cap profile. But heterogeneous</span>
@@ -218,7 +218,7 @@ export default function BiddingClient() {
               <h3>Pathway</h3>
               <p>Three consumption shapes for the Pathway dispatch_offer returns.</p>
             </Link>
-            <Link href="/protocol" className="card">
+            <Link href="/core/protocol" className="card">
               <div className="card-icon">\u2192</div>
               <h3>Protocol</h3>
               <p>TASK_OFFER / BID / TASK_AWARDED / TASK_DECLINED envelope shapes.</p>

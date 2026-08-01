@@ -322,7 +322,7 @@ export default function YcClient() {
             {/* ---------------- signal log ---------------- */}
             <div className="yc-log">
               <div className="yc-log-head">
-                <span>cosmo doppler -n rag-cli</span>
+                <span>cosmo prism --tail -n rag-cli</span>
                 <span className="yc-log-hint">hover a Signal</span>
               </div>
               <div className="yc-log-body" ref={logRef}>
@@ -475,7 +475,7 @@ export default function YcClient() {
               <a className="btn btn-primary" href="/examples">
                 All examples
               </a>
-              <a className="btn btn-ghost" href="/quickstart">
+              <a className="btn btn-ghost" href="/core/quickstart">
                 Quickstart
               </a>
             </div>

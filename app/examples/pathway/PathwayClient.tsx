@@ -11,7 +11,7 @@ const watchSnippet = `<span class="tk-cm"># terminal 1  -  the bus</span>
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071).</span>
 <span class="tk-cm"># Every Signal on the trace  -  PLAN, THOUGHT_DELTA, AGENT_OUTPUT  -  animates</span>
 <span class="tk-cm"># across the bus as the three shapes consume it.</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo`;
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo`;
 
 const workerSnippet = `<span class="tk-cm"># worker.py - one Axon that streams PLAN / THOUGHT_DELTA / AGENT_OUTPUT</span>
 <span class="tk-kw">import</span> asyncio
@@ -133,7 +133,7 @@ export default function PathwayClient() {
           <h1 className="page-title">Pathway  -  Three Shapes, One Primitive.</h1>
           <p className="page-sub">
             <code className="inline">dendrite.dispatch(...)</code> returns a{" "}
-            <Link href="/concepts" className="inline-link">Pathway</Link>  -  a per-trace event
+            <Link href="/core/concepts" className="inline-link">Pathway</Link>  -  a per-trace event
             handle that exposes <strong>three consumption shapes</strong> on the same primitive.
             The developer picks the shape that fits the workflow; the SDK doesn&apos;t force a style.
           </p>

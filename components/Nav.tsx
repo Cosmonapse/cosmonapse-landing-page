@@ -5,37 +5,36 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import BrandMark from "@/components/BrandMark";
 import ThemeToggle from "@/components/ThemeToggle";
+import { PRODUCTS } from "@/lib/products";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
-const links = [
-  { href: "/protocol", label: "Protocol" },
-  { href: "/concepts", label: "Concepts" },
-];
-
 const learnLinks = [
-  { href: "/quickstart", label: "Quickstart" },
+  { href: "/core/quickstart", label: "Quickstart" },
+  { href: "/core/protocol", label: "Envelope spec" },
+  { href: "/core/concepts", label: "Concepts" },
   { href: "/examples", label: "Examples" },
   { href: "/community-examples", label: "Community Examples" },
 ];
 
 const docsLinks = [
   { href: "/docs/python", label: "Python SDK" },
-  { href: "/docs/typescript", label: "TypeScript SDK" },
   { href: "/docs/cli", label: "cosmo CLI" },
 ];
 
-const trailingLinks = [
-  { href: "/observability", label: "Observability" },
-  { href: "/roadmap", label: "Roadmap" },
-];
+const trailingLinks = [{ href: "/roadmap", label: "Roadmap" }];
+
+const Caret = () => (
+  <svg className="nav-caret" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">
+    <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);
 
 export default function Nav() {
   const pathname = usePathname();
+  const productsActive = PRODUCTS.some((p) => pathname?.startsWith(p.href));
   const learnActive =
-    pathname?.startsWith("/quickstart") ||
-    pathname?.startsWith("/examples") ||
-    pathname?.startsWith("/community-examples");
+    pathname?.startsWith("/examples") || pathname?.startsWith("/community-examples");
   const docsActive = pathname?.startsWith("/docs");
   const [open, setOpen] = useState(false);
 
@@ -60,31 +59,42 @@ export default function Nav() {
           <span className="brand-word">Cosmonapse</span>
         </Link>
         <ul className="nav-links">
-          {links.map((l) => (
-            <li key={l.href}>
-              <Link href={l.href} className={pathname?.startsWith(l.href) ? "active" : ""}>
-                {l.label}
-              </Link>
-            </li>
-          ))}
+          {/* Products dropdown - the suite is now the primary axis of the site */}
+          <li className="nav-dropdown">
+            <Link
+              href="/core"
+              className={`nav-dropdown-trigger ${productsActive ? "active" : ""}`}
+              aria-haspopup="true"
+            >
+              Products
+              <Caret />
+            </Link>
+            <div className="nav-dropdown-menu nav-dropdown-wide" role="menu">
+              {PRODUCTS.map((p) => (
+                <Link
+                  key={p.href}
+                  href={p.href}
+                  role="menuitem"
+                  className={pathname?.startsWith(p.href) ? "active" : ""}
+                >
+                  <span className="nav-product-name" style={{ color: p.color }}>
+                    {p.short}
+                  </span>
+                  <span className="nav-product-role">{p.role}</span>
+                </Link>
+              ))}
+            </div>
+          </li>
 
           {/* Learn dropdown */}
           <li className="nav-dropdown">
             <Link
-              href="/quickstart"
+              href="/core/quickstart"
               className={`nav-dropdown-trigger ${learnActive ? "active" : ""}`}
               aria-haspopup="true"
             >
               Learn
-              <svg
-                className="nav-caret"
-                viewBox="0 0 10 6"
-                width="10"
-                height="6"
-                aria-hidden="true"
-              >
-                <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
+              <Caret />
             </Link>
             <div className="nav-dropdown-menu" role="menu">
               {learnLinks.map((l) => (
@@ -92,7 +102,7 @@ export default function Nav() {
                   key={l.href}
                   href={l.href}
                   role="menuitem"
-                  className={pathname?.startsWith(l.href) ? "active" : ""}
+                  className={pathname === l.href ? "active" : ""}
                 >
                   {l.label}
                 </Link>
@@ -108,15 +118,7 @@ export default function Nav() {
               aria-haspopup="true"
             >
               Docs
-              <svg
-                className="nav-caret"
-                viewBox="0 0 10 6"
-                width="10"
-                height="6"
-                aria-hidden="true"
-              >
-                <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
+              <Caret />
             </Link>
             <div className="nav-dropdown-menu" role="menu">
               {docsLinks.map((d) => (
@@ -148,7 +150,7 @@ export default function Nav() {
             </svg>
             GitHub
           </a>
-          <Link href="/quickstart" className="nav-cta">
+          <Link href="/core/quickstart" className="nav-cta">
             Get started
             <span className="arrow">→</span>
           </Link>
@@ -169,10 +171,14 @@ export default function Nav() {
       {/* Mobile menu */}
       <div className={`nav-mobile${open ? " open" : ""}`}>
         <ul className="nav-mobile-links">
-          {links.map((l) => (
-            <li key={l.href}>
-              <Link href={l.href} className={pathname?.startsWith(l.href) ? "active" : ""}>
-                {l.label}
+          <li className="nav-mobile-group-label">Products</li>
+          {PRODUCTS.map((p) => (
+            <li key={p.href}>
+              <Link
+                href={p.href}
+                className={`nav-mobile-sub${pathname?.startsWith(p.href) ? " active" : ""}`}
+              >
+                {p.short}
               </Link>
             </li>
           ))}
@@ -181,7 +187,7 @@ export default function Nav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`nav-mobile-sub${pathname?.startsWith(l.href) ? " active" : ""}`}
+                className={`nav-mobile-sub${pathname === l.href ? " active" : ""}`}
               >
                 {l.label}
               </Link>
@@ -211,7 +217,7 @@ export default function Nav() {
             </a>
           </li>
           <li className="nav-mobile-cta-item">
-            <Link href="/quickstart" className="nav-cta nav-mobile-cta">
+            <Link href="/core/quickstart" className="nav-cta nav-mobile-cta">
               Get started
               <span className="arrow">→</span>
             </Link>

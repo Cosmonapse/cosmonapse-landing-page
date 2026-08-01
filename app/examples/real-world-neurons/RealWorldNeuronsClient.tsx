@@ -31,13 +31,6 @@ pip install flask mcp`,
 pip install <span class="tk-str">"cosmonapse"</span>
 pip install flask mcp`,
 
-  "ts-dev": `<span class="tk-cm"># SDK + express (the web edge) + the MCP SDK (the MCP worker)</span>
-npm install <span class="tk-op">@</span>cosmonapse/sdk express <span class="tk-op">@</span>modelcontextprotocol/sdk
-npm install <span class="tk-op">-D</span> tsx <span class="tk-op">@</span>types/express`,
-
-  "ts-nats": `<span class="tk-cm"># Same, plus the optional nats driver</span>
-npm install <span class="tk-op">@</span>cosmonapse/sdk express <span class="tk-op">@</span>modelcontextprotocol/sdk nats
-npm install <span class="tk-op">-D</span> tsx <span class="tk-op">@</span>types/express`,
 };
 
 function installStep(combo: Combo): Step {
@@ -144,112 +137,6 @@ const outputSnippet = `<span class="tk-op">$</span> curl <span class="tk-op">-s<
 <span class="tk-op">$</span> curl <span class="tk-op">-s</span> <span class="tk-op">-X</span> POST localhost:5000/files
 <span class="tk-cm">{"response": "[FILE] app.py\\n[FILE] brain.py\\n[FILE] worker.py\\n[DIR]  data", ...}</span>`;
 
-// ===========================================================================
-// TypeScript  -  devsynapse (single in-process file)
-// ===========================================================================
-
-const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse, mcpNeuron, newTraceId }
-  <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-<span class="tk-kw">import</span> express <span class="tk-kw">from</span> <span class="tk-str">"express"</span>;
-
-<span class="tk-kw">const</span> NS <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
-
-<span class="tk-cm">// The filesystem MCP server, wrapped as a Neuron  -  the only real Neuron here.</span>
-<span class="tk-kw">const</span> files <span class="tk-op">=</span> mcpNeuron({ server: <span class="tk-str">"filesystem"</span>, args: [<span class="tk-str">"."</span>] });
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> MemorySynapse();   <span class="tk-cm">// in-process  -  one terminal, no broker</span>
-  <span class="tk-kw">await</span> synapse.connect();
-
-  <span class="tk-cm">// Worker Dendrite: hosts the Neuron, replies to TASKs.</span>
-  <span class="tk-kw">const</span> worker <span class="tk-op">=</span> <span class="tk-kw">new</span> Dendrite({ synapse, namespace: NS, dendriteId: <span class="tk-str">"workers"</span>, heartbeatMs: <span class="tk-num">0</span> });
-  worker.attachAxon(<span class="tk-kw">new</span> Axon({ neuronId: <span class="tk-str">"files"</span>, neuronFn: files }));
-  <span class="tk-kw">await</span> worker.start();
-
-  <span class="tk-cm">// Orchestrator Dendrite  -  lives inside the web process.</span>
-  <span class="tk-kw">const</span> orch <span class="tk-op">=</span> <span class="tk-kw">new</span> Dendrite({ synapse, namespace: NS, dendriteId: <span class="tk-str">"http-edge"</span>, heartbeatMs: <span class="tk-num">0</span> });
-  <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> Map();
-  orch.onAgentOutput((sig) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> r <span class="tk-op">=</span> pending.get(sig.trace_id);
-    <span class="tk-kw">if</span> (r) { pending.delete(sig.trace_id); r((sig.payload <span class="tk-kw">as</span> any).output); }
-  });
-  <span class="tk-kw">await</span> orch.start();
-
-  <span class="tk-kw">const</span> ask <span class="tk-op">=</span> (neuron, input) <span class="tk-op">=&gt;</span> <span class="tk-kw">new</span> Promise((res) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> newTraceId();
-    pending.set(traceId, res);
-    orch.dispatchTask({ neuron, input, traceId });
-  });
-
-  <span class="tk-cm">// Express is the HTTP boundary  -  NOT a Neuron.</span>
-  <span class="tk-kw">const</span> app <span class="tk-op">=</span> express();
-  app.use(express.json());
-  app.post(<span class="tk-str">"/files"</span>, <span class="tk-kw">async</span> (_req, res) <span class="tk-op">=&gt;</span>
-    res.json(<span class="tk-kw">await</span> ask(<span class="tk-str">"files"</span>, { tool: <span class="tk-str">"list_directory"</span>, arguments: { path: <span class="tk-str">"."</span> } })));
-  app.listen(<span class="tk-num">5000</span>, () <span class="tk-op">=&gt;</span> console.log(<span class="tk-str">"edge on :5000"</span>));
-}
-
-main();`;
-
-// ===========================================================================
-// TypeScript  -  NATS (worker.ts + server.ts)
-// ===========================================================================
-
-const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSynapse, mcpNeuron } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> NatsSynapse({ url: <span class="tk-str">"nats://127.0.0.1:4222"</span> });
-  <span class="tk-kw">await</span> synapse.connect();
-
-  <span class="tk-kw">const</span> worker <span class="tk-op">=</span> <span class="tk-kw">new</span> Dendrite({
-    synapse, namespace: <span class="tk-str">"quickstart"</span>, dendriteId: <span class="tk-str">"workers"</span>, heartbeatMs: <span class="tk-num">0</span>,
-  });
-  worker.attachAxon(<span class="tk-kw">new</span> Axon({
-    neuronId: <span class="tk-str">"files"</span>,
-    neuronFn: mcpNeuron({ server: <span class="tk-str">"filesystem"</span>, args: [<span class="tk-str">"."</span>] }),
-    capabilities: [<span class="tk-str">"mcp"</span>, <span class="tk-str">"filesystem"</span>],
-  }));
-  <span class="tk-kw">await</span> worker.start();
-  console.log(<span class="tk-str">"workers ready"</span>);
-  <span class="tk-kw">await</span> <span class="tk-kw">new</span> Promise(() <span class="tk-op">=&gt;</span> {});   <span class="tk-cm">// run forever</span>
-}
-
-main();`;
-
-const tsServerNats = `<span class="tk-kw">import</span> { Dendrite, NatsSynapse, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-<span class="tk-kw">import</span> express <span class="tk-kw">from</span> <span class="tk-str">"express"</span>;
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> NatsSynapse({ url: <span class="tk-str">"nats://127.0.0.1:4222"</span> });
-  <span class="tk-kw">await</span> synapse.connect();
-
-  <span class="tk-cm">// Orchestrator Dendrite  -  owned by the web process.</span>
-  <span class="tk-kw">const</span> orch <span class="tk-op">=</span> <span class="tk-kw">new</span> Dendrite({
-    synapse, namespace: <span class="tk-str">"quickstart"</span>, dendriteId: <span class="tk-str">"http-edge"</span>, heartbeatMs: <span class="tk-num">0</span>,
-  });
-  <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> Map();
-  orch.onAgentOutput((sig) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> r <span class="tk-op">=</span> pending.get(sig.trace_id);
-    <span class="tk-kw">if</span> (r) { pending.delete(sig.trace_id); r((sig.payload <span class="tk-kw">as</span> any).output); }
-  });
-  <span class="tk-kw">await</span> orch.start();
-
-  <span class="tk-kw">const</span> ask <span class="tk-op">=</span> (neuron, input) <span class="tk-op">=&gt;</span> <span class="tk-kw">new</span> Promise((res) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> newTraceId();
-    pending.set(traceId, res);
-    orch.dispatchTask({ neuron, input, traceId });
-  });
-
-  <span class="tk-cm">// Express is the HTTP boundary  -  NOT a Neuron.</span>
-  <span class="tk-kw">const</span> app <span class="tk-op">=</span> express();
-  app.use(express.json());
-  app.post(<span class="tk-str">"/files"</span>, <span class="tk-kw">async</span> (_req, res) <span class="tk-op">=&gt;</span>
-    res.json(<span class="tk-kw">await</span> ask(<span class="tk-str">"files"</span>, { tool: <span class="tk-str">"list_directory"</span>, arguments: { path: <span class="tk-str">"."</span> } })));
-  app.listen(<span class="tk-num">5000</span>, () <span class="tk-op">=&gt;</span> console.log(<span class="tk-str">"edge on :5000"</span>));
-}
-
-main();`;
-
 // ---------------------------------------------------------------------------
 // Per-combo step assembly
 // ---------------------------------------------------------------------------
@@ -304,71 +191,6 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   };
 }
 
-function tsNatsData(): ComboData {
-  const broker = brokerStep("ts-nats");
-  return {
-    steps: [
-      installStep("ts-nats"),
-      ...(broker ? [broker] : []),
-      {
-        eyebrow: "Worker  -  the MCP server as a Neuron",
-        prose: (
-          <>
-            <code className="inline">mcpNeuron({"{"} server: &quot;filesystem&quot; {"}"})</code>{" "}
-            spawns the standard server via{" "}
-            <code className="inline">@modelcontextprotocol/sdk</code> and exposes
-            its tools behind an Axon.
-          </>
-        ),
-        filename: "worker.ts",
-        html: tsWorkerNats,
-      },
-      {
-        eyebrow: "Web edge  -  Express in front of an orchestrator Dendrite",
-        prose: (
-          <>
-            Express owns the orchestrator Dendrite and wires{" "}
-            <code className="inline">onAgentOutput</code> directly. A{" "}
-            <code className="inline">trace_id → resolver</code> map turns each{" "}
-            <code className="inline">AGENT_OUTPUT</code> back into a resolved
-            promise the route awaits.
-          </>
-        ),
-        filename: "server.ts",
-        html: tsServerNats,
-      },
-      runStep("ts-nats", [
-        { label: "the worker", cmd: "npx tsx worker.ts" },
-        { label: "the web edge", cmd: "npx tsx server.ts" },
-      ]),
-    ],
-    extend: extendBody("ts-nats"),
-  };
-}
-
-function tsDevData(): ComboData {
-  return {
-    steps: [
-      installStep("ts-dev"),
-      {
-        eyebrow: "Everything in one file",
-        prose: (
-          <>
-            <code className="inline">MemorySynapse</code> is in-process, so the MCP
-            worker and the Express web edge live in one Node program. Express
-            stays on the outside as the HTTP boundary; the orchestrator Dendrite
-            dispatches to the MCP Neuron.
-          </>
-        ),
-        filename: "realworld.ts",
-        html: tsDev,
-      },
-      runStep("ts-dev", [{ label: "everything", cmd: "npx tsx realworld.ts" }]),
-    ],
-    extend: extendBody("ts-dev"),
-  };
-}
-
 function extendBody(combo: Combo): React.ReactNode {
   return (
     <>
@@ -382,7 +204,7 @@ function extendBody(combo: Combo): React.ReactNode {
         at any other stdio MCP server you have.
       </p>
       <p>
-        <strong>Any framework.</strong> Flask, FastAPI, Express, Fastify  -  the
+        <strong>Any framework.</strong> Flask, FastAPI, Django, Starlette  -  the
         edge is ordinary web code. It is <em>not</em> a Neuron; it just owns an
         orchestrator Dendrite and dispatches TASKs from its handlers. Existing
         services gain a Cosmonapse mesh with no change to what a Neuron is.
@@ -395,21 +217,12 @@ function extendBody(combo: Combo): React.ReactNode {
         <code className="inline">capabilities</code> to pick the right Neuron per
         task.
       </p>
-      {combo === "ts-dev" ? (
-        <p>
-          <strong>Go multi-process.</strong> Switch{" "}
-          <code className="inline">MemorySynapse</code> for{" "}
-          <code className="inline">NatsSynapse</code> (the NATS tab) and split the
-          file into <code className="inline">worker.ts</code> and{" "}
-          <code className="inline">server.ts</code>  -  the wiring is identical.
-        </p>
-      ) : (
-        <p>
-          <strong>Change transport.</strong> Every other tab is the same topology
-           -  only the install, the synapse you connect to, and the launch commands
-          change. The Neuron wiring is byte-for-byte identical.
-        </p>
-      )}
+          <p>
+      <strong>Change transport.</strong> Every other tab is the same topology
+       -  only the install, the synapse you connect to, and the launch commands
+      change. The Neuron wiring is byte-for-byte identical.
+    </p>
+  
     </>
   );
 }
@@ -418,8 +231,6 @@ const DATA: Record<Combo, ComboData> = {
   "py-dev": pyData("py-dev"),
   "py-nats": pyData("py-nats"),
   "py-kafka": pyData("py-kafka"),
-  "ts-dev": tsDevData(),
-  "ts-nats": tsNatsData(),
 };
 
 const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a MemorySynapse, which Prism can't attach to.</span>
@@ -429,7 +240,7 @@ const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a 
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=quickstart
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -460,9 +271,9 @@ export default function RealWorldNeuronsClient() {
             A Neuron is <em>anything that interacts with the real world</em>  -  a
             function, a wrapped stdio <strong>MCP server</strong>, an LLM. An HTTP{" "}
             <strong>API is not a Neuron</strong>: your web framework (Flask /
-            Express) stays on the outside as an HTTP boundary and dispatches TASKs
+            FastAPI) stays on the outside as an HTTP boundary and dispatches TASKs
             from its route handlers via an orchestrator Dendrite. The same
-            topology runs over five language × transport stacks  -  pick one below.
+            topology runs over three transports  -  pick one below.
           </p>
         </div>
       </header>
@@ -474,7 +285,7 @@ export default function RealWorldNeuronsClient() {
           <div className="sub-eyebrow">Watch it in Prism</div>
           <h2 className="sub-title">See the Signals fire in the browser.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            <code className="inline">cosmo prism</code> opens a live, read-only view of
             every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT, FINAL  -  as the workflow
             runs. The demo runs in-process on a <code className="inline">MemorySynapse</code>,
             which Prism can&apos;t attach to, so start a dev synapse and point the code at it.
@@ -506,7 +317,7 @@ export default function RealWorldNeuronsClient() {
                 mcpNeuron / provider factories.
               </p>
             </Link>
-            <Link href="/concepts" className="card">
+            <Link href="/core/concepts" className="card">
               <div className="card-icon">→</div>
               <h3>Concepts</h3>
               <p>Neuron, Axon, Dendrite, Synapse  -  what each one is and isn&apos;t.</p>

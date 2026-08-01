@@ -32,12 +32,12 @@ const michroma = Michroma({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Cosmonapse - Open Protocol for Event-Driven AI Agents",
+    default: "Cosmonapse - Platform Suite for Event-Driven AI",
     // Every child page renders as "<page title> | Cosmonapse".
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "The open Apache 2.0 protocol for event-driven AI agents. Build reactive multi-agent harnesses on one signal envelope and one channel - no orchestrator loop.",
+    "Design, run and observe event-driven AI systems. Genesis to build them, the open Apache 2.0 Core protocol to run them, Prism to watch them. No orchestrator loop.",
   applicationName: SITE_NAME,
   keywords: KEYWORDS_ALL,
   authors: [{ name: "Cosmonapse", url: SITE_URL }],
@@ -57,9 +57,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Cosmonapse - Event-Driven AI Agents",
+    title: "Cosmonapse - Platform Suite for Event-Driven AI",
     description:
-      "The open protocol for event-driven AI agents and reactive multi-agent harnesses. One envelope. One channel. Replaceable neurons. Apache 2.0.",
+      "Design them in Genesis, run them on the open Core protocol, watch them in Prism. Build domain-specialised AI systems, not another model wrapper. Apache 2.0.",
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "en_US",
@@ -67,9 +67,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cosmonapse - Event-Driven AI Agents",
+    title: "Cosmonapse - Platform Suite for Event-Driven AI",
     description:
-      "The open protocol for event-driven AI agents and reactive multi-agent harnesses. One envelope. One channel. Replaceable neurons.",
+      "Design them in Genesis, run them on the open Core protocol, watch them in Prism. Build domain-specialised AI systems, not another model wrapper.",
     site: TWITTER,
     creator: TWITTER,
   },

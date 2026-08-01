@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import CodeBlock from "./CodeBlock";
 
 type TransportId = "memory" | "nats" | "kafka";
-type Lang = "python" | "typescript";
 
 const TRANSPORTS: { id: TransportId; label: string; synapse: string; scale: string; highlight?: boolean }[] = [
   { id: "memory", label: "MemorySynapse", synapse: "memory://",         scale: "In-process. Tests, prototypes, single-host demos." },
@@ -35,31 +34,8 @@ axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<s
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
-const tsSnippet = (url: string) =>
-  `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-kw">const</span> SYNAPSE_URL <span class="tk-op">=</span> <span class="tk-str">"${url}"</span>;   <span class="tk-cm">// ← the only line that changes</span>
-<span class="tk-kw">const</span> axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"greeter"</span>,
-  { endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
-    model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-    apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>, useChatApi: <span class="tk-kw">true</span> },
-  { capabilities: [<span class="tk-str">"chat"</span>] });
-
-<span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(SYNAPSE_URL);
-<span class="tk-kw">const</span> worker  <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"demo"</span>, role: <span class="tk-str">"worker"</span> });
-worker.<span class="tk-fn">attachAxon</span>(axon); <span class="tk-kw">await</span> worker.<span class="tk-fn">start</span>();
-<span class="tk-kw">const</span> orch    <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: <span class="tk-str">"demo"</span> });
-orch.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=></span> console.<span class="tk-fn">log</span>(sig.payload.output.response));
-<span class="tk-kw">await</span> orch.<span class="tk-fn">start</span>();
-
-<span class="tk-kw">await</span> orch.<span class="tk-fn">dispatchTask</span>({
-  neuron: <span class="tk-str">"greeter"</span>,
-  input: { prompt: <span class="tk-str">"Say hello to Cosmonapse."</span> },
-});`;
-
 export default function BuildOnCosmonapse() {
   const [active, setActive] = useState<TransportId>("memory");
-  const [lang, setLang] = useState<Lang>("python");
   const transport = TRANSPORTS.find((t) => t.id === active)!;
 
   return (
@@ -95,21 +71,13 @@ export default function BuildOnCosmonapse() {
               </button>
             ))}
           </div>
-
-          <div className="lang-toggle" style={{ marginTop: 0 }}>
-            {(["python", "typescript"] as const).map((l) => (
-              <button key={l} aria-pressed={lang === l} onClick={() => setLang(l)}>
-                {l === "python" ? "Python" : "TypeScript"}
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="boc-grid">
           <div className="boc-code">
             <CodeBlock
-              filename={lang === "python" ? "main.py" : "main.ts"}
-              html={lang === "python" ? pySnippet(transport.synapse) : tsSnippet(transport.synapse)}
+              filename="main.py"
+              html={pySnippet(transport.synapse)}
               variant="elevated"
               maxWidth={760}
             />

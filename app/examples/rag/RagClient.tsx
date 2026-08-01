@@ -222,7 +222,7 @@ A (cached): A Dendrite is the only component that touches the Synapse
 <span class="tk-op">$</span> uvicorn app:app <span class="tk-op">--</span>port 8000
 <span class="tk-op">$</span> curl <span class="tk-op">-X</span> POST localhost:8000/ask <span class="tk-op">-H</span> "Content-Type: application/json" \
        <span class="tk-op">-d</span> '{"question": "What is a Dendrite?"}'
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">-n</span> rag`;
+<span class="tk-op">$</span> cosmo prism --tail <span class="tk-op">-n</span> rag`;
 
 const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a MemorySynapse, which Prism can't attach to.</span>
 <span class="tk-cm"># To watch it live, start a dev synapse and point the code at it:</span>
@@ -231,7 +231,7 @@ const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a 
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=rag
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> rag
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> rag
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -253,7 +253,7 @@ export default function RagClient() {
           <h1 className="page-title">A Full RAG System, Built From Primitives.</h1>
           <p className="page-sub">
             Retrieval-augmented generation with nothing but Cosmonapse parts: four{" "}
-            <Link href="/concepts" className="inline-link">Neurons</Link> across two worker
+            <Link href="/core/concepts" className="inline-link">Neurons</Link> across two worker
             Dendrites, three <Link href="/docs/engram" className="inline-link">Engrams</Link>{" "}
             across two hosts, run as a staged retrieve → rerank → generate pipeline on one
             trace. We build it bottom-up  -  the two index backends first, then each Neuron,
@@ -372,7 +372,7 @@ export default function RagClient() {
           <div className="sub-eyebrow">05 · The generator</div>
           <h2 className="sub-title">Grounded answer, cached on the way out.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            A HuggingFace <Link href="/concepts" className="inline-link">Neuron</Link> answers
+            A HuggingFace <Link href="/core/concepts" className="inline-link">Neuron</Link> answers
             using only the reranked chunks, then imprints the answer into the same{" "}
             <code className="inline">cache</code> binding the retriever reads from. That shared
             binding is the entire mechanism behind the step-03 short-circuit  -  no special cache
@@ -405,7 +405,7 @@ export default function RagClient() {
             Each stage is an ordinary <code className="inline">dispatch_and_wait</code>. Threading
             one <code className="inline">trace_id</code> and the previous Signal&apos;s{" "}
             <code className="inline">parent_id</code> through the calls gives the whole workflow a
-            single lineage, so <code className="inline">cosmo doppler -n rag</code> renders it as
+            single lineage, so <code className="inline">cosmo prism --tail -n rag</code> renders it as
             one trace instead of three disconnected tasks.
           </p>
           <CodeBlock filename="brain.py" html={pipelineSnippet} maxWidth={880} />
@@ -439,7 +439,7 @@ export default function RagClient() {
           <div className="sub-eyebrow">Watch it in Prism</div>
           <h2 className="sub-title">See the Signals fire in the browser.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            <code className="inline">cosmo prism</code> opens a live, read-only view of
             every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT, FINAL  -  as the workflow
             runs. The demo runs in-process on a <code className="inline">MemorySynapse</code>,
             which Prism can&apos;t attach to, so start a dev synapse and point the code at it.

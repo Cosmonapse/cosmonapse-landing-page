@@ -1,124 +1,60 @@
 import Link from "next/link";
-import CodeSwitcher from "@/components/CodeSwitcher";
 import BuildOnCosmonapse from "@/components/BuildOnCosmonapse";
+import DemoFrame from "@/components/DemoFrame";
+import ProductGrid from "@/components/ProductGrid";
+import { NEXT_UP } from "@/lib/products";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
-// ─── Hero code snippets ────────────────────────────────────────────────────
-
-const heroPy = `<span class="tk-kw">import</span> os
-<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> Axon, Dendrite, connect_synapse
-
-<span class="tk-cm"># 1.  Axon.huggingface() wires the Neuron and protocol identity in one call.</span>
-axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
-    endpoint<span class="tk-op">=</span><span class="tk-str">"https://router.huggingface.co"</span>,
-    model<span class="tk-op">=</span><span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-    api_key<span class="tk-op">=</span>os.environ[<span class="tk-str">"HF_TOKEN"</span>],
-    use_chat_api<span class="tk-op">=</span><span class="tk-kw">True</span>, capabilities<span class="tk-op">=</span>[<span class="tk-str">"chat"</span>])
-
-<span class="tk-cm"># 2.  Dendrite  -  the only component that touches the Synapse.</span>
-synapse  <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
-dendrite <span class="tk-op">=</span> Dendrite(synapse<span class="tk-op">=</span>synapse, namespace<span class="tk-op">=</span><span class="tk-str">"quickstart"</span>)
-dendrite.<span class="tk-fn">attach_axon</span>(axon)
-
-<span class="tk-kw">async with</span> dendrite:
-    pw <span class="tk-op">=</span> <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatch_task</span>(
-        neuron<span class="tk-op">=</span><span class="tk-str">"llama"</span>, input<span class="tk-op">=</span>{<span class="tk-str">"prompt"</span>: <span class="tk-str">"Say hello to Cosmonapse."</span>})`;
-
-const heroTs = `<span class="tk-kw">import</span> { Axon, Dendrite, connectSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-cm">// 1.  Axon.huggingface() wires the Neuron and protocol identity in one call.</span>
-<span class="tk-kw">const</span> axon <span class="tk-op">=</span> Axon.<span class="tk-fn">huggingface</span>(<span class="tk-str">"llama"</span>,
-  { endpoint: <span class="tk-str">"https://router.huggingface.co"</span>,
-    model: <span class="tk-str">"meta-llama/Llama-3.1-8B-Instruct"</span>,
-    apiKey: process.env.<span class="tk-fn">HF_TOKEN</span>, useChatApi: <span class="tk-kw">true</span> },
-  { capabilities: [<span class="tk-str">"chat"</span>] });
-
-<span class="tk-cm">// 2.  Dendrite  -  the only component that touches the Synapse.</span>
-<span class="tk-kw">await using</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
-  synapse: <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>),
-  namespace: <span class="tk-str">"quickstart"</span>,
-});
-dendrite.<span class="tk-fn">attachAxon</span>(axon); <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
-
-<span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({
-  neuron: <span class="tk-str">"llama"</span>,
-  input: { prompt: <span class="tk-str">"Say hello to Cosmonapse."</span> },
-});`;
-
-// ─── Product line data ─────────────────────────────────────────────────────
-
-type Status = "active" | "scoping" | "not-planned";
-
-const STATUS_LABEL: Record<Status, string> = {
-  active: "Active Development",
-  scoping: "Scoping",
-  "not-planned": "Planned",
-};
-const STATUS_COLOR: Record<Status, string> = {
-  active: "var(--ok-strong)",
-  scoping: "var(--warn)",
-  "not-planned": "var(--status-none)",
-};
-const STATUS_BG: Record<Status, string> = {
-  active: "rgba(var(--ok-rgb), 0.07)",
-  scoping: "rgba(var(--warn-rgb), 0.07)",
-  "not-planned": "rgba(var(--status-none-rgb), 0.05)",
-};
-
-const products: {
-  name: string;
-  short: string;
-  tagline: string;
-  color: string;
-  status: Status;
-  concepts: string[];
-  desc: string;
-}[] = [
+// The lifecycle strip: which product you are in at each stage of the work.
+const LIFECYCLE: { verb: string; product: string; color: string; body: string }[] = [
   {
-    name: "Cosmonapse Core",
-    short: "Core",
-    tagline: "Distributed cognition runtime",
+    verb: "Design",
+    product: "Genesis",
+    color: "var(--accent-3)",
+    body:
+      "Lay the system out on a canvas - Neurons that think, Engrams that remember, Effectors that act, Receptors that listen. Genesis writes real source into your project and edits it through the AST as the shape changes.",
+  },
+  {
+    verb: "Run",
+    product: "Core",
     color: "var(--accent)",
-    status: "active",
-    concepts: ["Brain", "Neuron", "Axon", "Dendrite", "Synapse", "Signal", "Pathway"],
-    desc: "The open protocol and SDK. One envelope, one Synapse, replaceable Neurons  -  backed by OpenAI, Anthropic, HuggingFace, Groq, Ollama, or any async function. Everything else is built on top.",
+    body:
+      "Everything talks over one Signal envelope on one Synapse. Start in-process, move to NATS or Kafka by changing a URL. No orchestrator holds the loop, so nothing has to be rewritten to scale out.",
   },
   {
-    name: "Cosmonapse Engram",
-    short: "Engram",
-    tagline: "Context, memory & persistence",
-    color: "var(--p-engram)",
-    status: "active",
-    concepts: ["Recall", "Echo", "Imprint"],
-    desc: "Shared memory for agent systems. Recall and Imprint primitives ship in 0.1.0 with InMemory, SQLite, and Postgres backends. Vector search and snapshot replay (Echo) are next.",
+    verb: "Observe",
+    product: "Prism",
+    color: "var(--accent-2)",
+    body:
+      "Attach a read-only tap to the same bus and watch the system think: the live graph, the causal tree behind a single task, where a task's wall clock actually went. Tracing is free because the bus already saw it.",
+  },
+];
+
+const USE_CASES: { title: string; body: string; shape: string }[] = [
+  {
+    title: "Claims triage",
+    body:
+      "A first-notice-of-loss intake that reads the document, pulls policy history, flags the fraud signals a generalist model would miss, and escalates to a human with the reasoning attached.",
+    shape: "Receptor (API) → classifier Neuron → policy Engram → fraud Effector → adjuster escalation",
   },
   {
-    name: "Cosmonapse Doppler",
-    short: "Doppler",
-    tagline: "Observability, telemetry & cognition analytics",
-    color: "var(--p-doppler)",
-    status: "active",
-    concepts: ["Pulse", "Prism", "Resonance"],
-    desc: "Live telemetry and visualization over the Signal stream, reading the wave without disturbing the source. Pulse streams metrics, Prism turns them into dashboards, and Resonance adds cognition analytics  -  how Neurons influence each other and how Signals propagate through a Brain.",
+    title: "Clinical intake",
+    body:
+      "A patient-facing conversation that gathers history, checks it against a coded protocol, and hands a structured summary to a clinician - with every step in the record.",
+    shape: "Receptor (chat) → intake Neuron → protocol Engram → summariser → clinician review",
   },
   {
-    name: "Cosmonapse Immune",
-    short: "Immune",
-    tagline: "Identity, security & threat response",
-    color: "var(--p-immune)",
-    status: "not-planned",
-    concepts: ["Genome", "Myelin", "Reflex", "AntiBody"],
-    desc: "Identity management, encryption, anomaly detection, and automated threat response for production agent infrastructure.",
+    title: "Research desk",
+    body:
+      "Several models working the same question in parallel from different sources, disagreeing on the record, with the reconciliation step doing real work instead of a supervisor picking one.",
+    shape: "fan-out TASK → n Neurons → competing AGENT_OUTPUTs → reconciler → FINAL",
   },
   {
-    name: "Cosmonapse Cloud",
-    short: "Cloud",
-    tagline: "Managed cognition platform",
-    color: "var(--p-cloud)",
-    status: "not-planned",
-    concepts: ["Membrane"],
-    desc: "The fully managed runtime  -  Brains in isolated Membranes, quota-enforced, credential-scoped at the infrastructure level.",
+    title: "Contract review",
+    body:
+      "Clause-by-clause analysis against a firm's own precedent library, where the value is the precedent and the escalation policy - not the model underneath it.",
+    shape: "Receptor (upload) → splitter → clause Neurons → precedent Engram → risk report",
   },
 ];
 
@@ -129,28 +65,29 @@ export default function HomePage() {
         <div className="container">
           <div className="badge">
             <span className="dot" />
-            v0.1.9 · Research preview
+            v0.1.11 · Research preview
           </div>
           <h1 className="hero-title">
-            The Nervous System
+            AI systems don&rsquo;t run on graphs.
             <br />
-            for <span className="gradient-text">Autonomous AI Agents</span>.
+            They run on <span className="gradient-text">events</span>.
           </h1>
           <p className="hero-lead">
-            Cosmonapse is the open protocol for building distributed multi-agent/model harnesses. Start with the Core
-            today  -  one envelope, one Synapse, replaceable Neurons backed by any LLM provider, and a
-            CLI that boots a local broker in seconds.
+            Cosmonapse is a platform suite for building event-driven AI systems. Design them on a
+            canvas in <strong>Genesis</strong>, run them on the open <strong>Core</strong> protocol
+            and runtime, and watch them think in <strong>Prism</strong>. No supervisor loop, no
+            control-flow graph to maintain - just components reacting to Signals on one bus.
           </p>
           <div className="hero-ctas">
-            <Link href="/quickstart" className="btn btn-primary">
+            <Link href="/core/quickstart" className="btn btn-primary">
               Get started <span className="arrow">→</span>
+            </Link>
+            <Link href="/genesis" className="btn btn-ghost">
+              See Genesis
             </Link>
             <a href={GITHUB} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
               <span aria-hidden>★</span> Star on GitHub
             </a>
-            <Link href="/protocol" className="btn btn-ghost">
-              View envelope spec
-            </Link>
           </div>
           <p
             style={{
@@ -161,288 +98,214 @@ export default function HomePage() {
               marginBottom: 36,
             }}
           >
-            Open source · Apache 2.0 licensed · Python + TypeScript SDK
+            Open source · Apache 2.0 licensed · Python SDK
           </p>
-
-          {/* <div style={{ maxWidth: 780, margin: "0 auto", textAlign: "left" }}>
-            <CodeSwitcher
-              python={{ html: heroPy, filename: "main.py" }}
-              typescript={{ html: heroTs, filename: "main.ts" }}
-              variant="elevated"
-            />
-          </div> */}
         </div>
       </header>
 
-      {/* Build on Cosmonapse */}
-      <BuildOnCosmonapse />
+      {/* ── Hero demo ────────────────────────────────────────────────────── */}
+      <section className="section-sm">
+        <div className="container">
+          <div className="demo-hero">
+            <DemoFrame
+              src="/demo/loop.mp4"
+              address="cosmo genesis  ·  brain.py  ·  cosmo prism"
+              badge="THE LOOP"
+              caption="Design a system on the Genesis canvas, run it on Core, and watch the same components light up in Prism - one project, three windows."
+              maxWidth={1000}
+            />
+          </div>
+        </div>
+      </section>
 
-      {/* Product line */}
+      {/* ── The two bets ─────────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
-          <div className="section-eyebrow">// Product line</div>
-          <h2 className="section-title">Five layers. One nervous system.</h2>
+          <div className="section-eyebrow">// Why this exists</div>
+          <h2 className="section-title">Two bets.</h2>
           <p className="section-sub">
-            Cosmonapse Core ships today as an open protocol and SDK, with Engram primitives landed in
-            0.1.0. Doppler, Immune, and Cloud extend it  -  each a self-contained product with its own
-            primitives, all speaking the same Signal envelope.
+            Cosmonapse is not a nicer wrapper around the same idea. It starts from two positions
+            that most of the current tooling disagrees with.
           </p>
+
+          <div className="thesis">
+            <div className="thesis-card">
+              <div className="thesis-num">// Bet 01</div>
+              <h3>A graph is a diagram. It is not a program.</h3>
+              <p>
+                Graph and loop frameworks ask you to declare control flow before you know what the
+                system does - nodes, edges, conditional branches, and a supervisor that turns the
+                crank. That holds until something arrives that you didn&rsquo;t draw: a tool returns
+                late, a human answers halfway through, a second model disagrees with the first.
+              </p>
+              <p>
+                Real systems are concurrent and only partially ordered. Encoding them as a graph
+                means encoding <em>time</em> as topology, and you end up maintaining a state machine
+                larger than the problem it solves. Every new branch is a new edge, and the supervisor
+                becomes the thing you can&rsquo;t change.
+              </p>
+              <p className="thesis-turn">
+                Cosmonapse takes the other side. Components emit Signals and react to Signals on one
+                bus. Nobody holds the loop. Concurrency, fan-out, retries, ordering and backpressure
+                are properties of the transport - the same properties that have run distributed
+                systems for twenty years - rather than branches you drew in advance.
+              </p>
+            </div>
+
+            <div className="thesis-card">
+              <div className="thesis-num">// Bet 02</div>
+              <h3>Wrappers don&rsquo;t have moats. Systems do.</h3>
+              <p>
+                Most AI products are a prompt, a vector store and a UI over somebody else&rsquo;s
+                model - which is exactly why they are so cheap to clone and so hard to price. The
+                teams getting past that are building something narrower and deeper: a system that
+                knows one domain properly, with its own memory, its own tools, its own escalation
+                paths and its own opinion about the work.
+              </p>
+              <p>
+                That is an architecture problem, and it is the one we keep hearing about from
+                founders, early adopters and enterprise architects alike. Not &ldquo;which model&rdquo; -
+                they solved that. They can&rsquo;t get from a demo to something with a shape:
+                observable, ownable, operable by a team, and defensible enough to charge for.
+              </p>
+              <p className="thesis-turn">
+                Cosmonapse is the substrate for those systems. Boutique AI - domain-specialised,
+                built from parts you own, running on an open protocol, and legible enough that you
+                can sell it with a straight face.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── The suite ────────────────────────────────────────────────────── */}
+      <section className="section">
+        <div className="container">
+          <div className="section-eyebrow">// The suite</div>
+          <h2 className="section-title">Three products. One event stream.</h2>
+          <p className="section-sub">
+            Genesis, Core and Prism are separate products with separate jobs, and they share exactly
+            one thing: the Signal envelope. That is what lets the designer, the runtime and the
+            observability plane stay honest about the same system without any of them owning it.
+          </p>
+
+          <ProductGrid />
+
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: 20,
-              marginTop: 40,
+              marginTop: 24,
+              padding: "18px 22px",
+              border: "1px dashed var(--border-strong)",
+              borderRadius: 10,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 14,
+              alignItems: "baseline",
             }}
           >
-            {products.map((p) => {
-              const dim = p.status === "not-planned";
-              return (
-                <div
-                  key={p.name}
-                  style={{
-                    border: `1px solid ${dim ? "var(--border)" : p.color + "44"}`,
-                    borderRadius: 12,
-                    padding: "28px 28px 24px",
-                    background: dim ? "var(--surface)" : STATUS_BG[p.status],
-                    opacity: dim ? 0.6 : 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 0,
-                  }}
-                >
-                  <div style={{ marginBottom: 16 }}>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 6,
-                        fontSize: 11,
-                        fontFamily: "var(--font-mono)",
-                        color: STATUS_COLOR[p.status],
-                        background: STATUS_COLOR[p.status] + "18",
-                        border: `1px solid ${STATUS_COLOR[p.status]}44`,
-                        padding: "3px 10px",
-                        borderRadius: 20,
-                        letterSpacing: "0.06em",
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: STATUS_COLOR[p.status],
-                          display: "inline-block",
-                          flexShrink: 0,
-                        }}
-                      />
-                      {STATUS_LABEL[p.status]}
-                    </span>
-                  </div>
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--status-none)",
+                flexShrink: 0,
+              }}
+            >
+              Next up · {NEXT_UP.name}
+            </span>
+            <span style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.65, flex: 1, minWidth: 260 }}>
+              {NEXT_UP.desc}{" "}
+              <Link href="/roadmap" className="inline-link">
+                See the roadmap
+              </Link>
+            </span>
+          </div>
+        </div>
+      </section>
 
-                  <div
-                    style={{
-                      fontSize: 11,
-                      fontFamily: "var(--font-mono)",
-                      color: p.color,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                      marginBottom: 6,
-                    }}
-                  >
-                    {p.short}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 600,
-                      color: "var(--text)",
-                      lineHeight: 1.3,
-                      marginBottom: 8,
-                    }}
-                  >
-                    {p.name}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      fontFamily: "var(--font-mono)",
-                      color: "var(--text-dim)",
-                      letterSpacing: "0.06em",
-                      marginBottom: 12,
-                    }}
-                  >
-                    {p.tagline}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: "var(--text-dim)",
-                      lineHeight: 1.65,
-                      marginBottom: 20,
-                    }}
-                  >
-                    {p.desc}
-                  </div>
-
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: "auto" }}>
-                    {p.concepts.map((c) => (
-                      <span
-                        key={c}
-                        style={{
-                          fontSize: 11,
-                          fontFamily: "var(--font-mono)",
-                          padding: "4px 10px",
-                          borderRadius: 6,
-                          background: "var(--bg)",
-                          border: "1px solid var(--border)",
-                          color: dim ? "var(--text-faint)" : "var(--text-dim)",
-                        }}
-                      >
-                        {c}
-                      </span>
-                    ))}
-                  </div>
+      {/* ── Lifecycle ────────────────────────────────────────────────────── */}
+      <section className="section">
+        <div className="container">
+          <div className="section-eyebrow">// How they fit</div>
+          <h2 className="section-title">Design it. Run it. Watch it.</h2>
+          <p className="section-sub">
+            You are never handed off between tools. The canvas, the runtime and the traces are three
+            views of the same running system, and the source on disk is the only artifact.
+          </p>
+          <div className="lifecycle">
+            {LIFECYCLE.map((s) => (
+              <div className="lifecycle-step" key={s.verb}>
+                <div className="lifecycle-verb" style={{ color: s.color }}>
+                  {s.verb} · {s.product}
                 </div>
-              );
-            })}
-          </div>
-          <div style={{ textAlign: "center", marginTop: 32 }}>
-            <Link href="/concepts" className="btn btn-ghost">
-              Explore all concepts <span className="arrow">→</span>
-            </Link>
+                <h4>{s.verb}</h4>
+                <p>{s.body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* What ships today */}
+      {/* ── Proof: the code ──────────────────────────────────────────────── */}
+      <BuildOnCosmonapse />
+
+      {/* ── Boutique systems ─────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
-          <div className="section-eyebrow">// What ships today</div>
-          <h2 className="section-title">Core  -  open protocol and SDK.</h2>
+          <div className="section-eyebrow">// What you build with it</div>
+          <h2 className="section-title">Boutique AI systems, not another wrapper.</h2>
           <p className="section-sub">
-            The protocol and the primitives. Routing decisions, workflow rules, and lifecycle
-            policies stay with you  -  build the system that fits your team.
+            The shape is always the same: an interface people actually use, domain memory that is
+            yours, tools that touch real systems, and a policy for when a human gets involved. The
+            model is the cheapest part. Everything around it is the product.
           </p>
-          <div className="grid-2">
-            <div className="card">
-              <div className="card-icon">01</div>
-              <h3>Envelope spec</h3>
-              <p>
-                The single shared contract. Two components that produce valid Signals can always talk
-                to each other. That is the only guarantee Cosmonapse makes.
-              </p>
-            </div>
-            <div className="card">
-              <div className="card-icon">02</div>
-              <h3>Neuron factory</h3>
-              <p>
-                <code className="inline">Neuron(source=&quot;huggingface&quot;)</code>,{" "}
-                <code className="inline">&quot;openai&quot;</code>,{" "}
-                <code className="inline">&quot;anthropic&quot;</code>,{" "}
-                <code className="inline">&quot;groq&quot;</code>,{" "}
-                <code className="inline">&quot;ollama&quot;</code>, and more  -  or any plain async
-                function. All behind the same signature. Zero protocol knowledge required.
-              </p>
-            </div>
-            <div className="card">
-              <div className="card-icon">03</div>
-              <h3>Axon  -  agent-side tool</h3>
-              <p>
-                Owns the Neuron&rsquo;s identity and wraps its output into protocol-valid Signals.
-                Never touches the Synapse  -  that boundary is enforced in code, not convention.
-              </p>
-            </div>
-            <div className="card">
-              <div className="card-icon">04</div>
-              <h3>Dendrite  -  synapse-side connector</h3>
-              <p>
-                The only thing that touches the Synapse. Hosts Axons, emits REGISTER / HEARTBEAT /
-                DEREGISTER, routes inbound TASKs, and exposes every orchestration primitive.
-              </p>
-            </div>
-            <div className="card">
-              <div className="card-icon">05</div>
-              <h3>cosmo CLI</h3>
-              <p>
-                <code className="inline">cosmo synapse start memory</code> boots a local TCP broker.{" "}
-                <code className="inline">cosmo doppler</code> streams every Signal to stdout.{" "}
-                <code className="inline">cosmo validate</code> checks envelope conformance. One
-                implementation, installable from pip or npm.
-              </p>
-            </div>
+          <div className="usecases">
+            {USE_CASES.map((u) => (
+              <div className="usecase" key={u.title}>
+                <div className="usecase-title">{u.title}</div>
+                <div className="usecase-body">{u.body}</div>
+                <div className="usecase-shape">{u.shape}</div>
+              </div>
+            ))}
           </div>
+          <p
+            style={{
+              marginTop: 28,
+              fontSize: 13.5,
+              color: "var(--text-dim)",
+              lineHeight: 1.75,
+              maxWidth: 760,
+            }}
+          >
+            None of these are graphs. Each one is a set of independent components reacting to
+            Signals, where the interesting behaviour - escalation, disagreement, a late tool result,
+            a human in the middle - is a Signal arriving rather than an edge you drew.{" "}
+            <Link href="/examples" className="inline-link">
+              Fourteen runnable examples
+            </Link>{" "}
+            show the patterns end to end.
+          </p>
         </div>
       </section>
 
-      {/* Building the platform */}
-      <section className="section">
-        <div className="container">
-          <div className="section-eyebrow">// Where we&rsquo;re going</div>
-          <h2 className="section-title">Building the platform.</h2>
-          <p className="section-sub">
-            Core is the foundation. The full Cosmonapse platform adds memory, observability,
-            security, and managed infrastructure  -  each layer speaking the same Signal envelope.
-          </p>
-          <div className="grid-2">
-            <div className="card">
-              <h3>Neurons are black boxes</h3>
-              <p>
-                A Neuron is a pure function -{" "}
-                <code className="inline">async fn(input, context) → output</code>. Zero protocol
-                knowledge. The <code className="inline">Neuron(source=...)</code> factory wraps any
-                LLM provider or MCP server behind that interface without modification.
-              </p>
-            </div>
-            <div className="card">
-              <h3>Memory is a product layer</h3>
-              <p>
-                The Core protocol defines <code className="inline">MEMORY_APPEND</code>,{" "}
-                <code className="inline">CONTEXT_SYNC</code>,{" "}
-                <code className="inline">RECALL</code>, and{" "}
-                <code className="inline">IMPRINT</code>{" "}
-                signals. Cosmonapse Engram ships Recall and Imprint in 0.1.0 with InMemory, SQLite,
-                and Postgres backends; Echo (snapshot replay) is next.
-              </p>
-            </div>
-            <div className="card">
-              <h3>Observability &amp; cognition analytics</h3>
-              <p>
-                Doppler is a non-competing read-only tap on the Synapse. Pulse streams live
-                telemetry  -  latency, throughput, cost per Neuron. Prism turns it into dashboards
-                and traces. Resonance maps Neuron influence, tracks Signal propagation, and scores
-                collaboration efficiency.
-              </p>
-            </div>
-            <div className="card">
-              <h3>Secure and managed at scale</h3>
-              <p>
-                Immune will handle identity, encryption, and automated threat response. Cloud runs
-                the entire stack inside Membrane  -  isolated, quota-enforced, credential-scoped at
-                the infrastructure level.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
           <div className="cta-card">
-            <h2>Build the substrate for agent swarms.</h2>
+            <h2>Build a system, not a demo.</h2>
             <p>
-              Cosmonapse Core 0.1.9 is in research preview  -  the protocol is drafted, the SDK ships
-              with Engram, Pathway, capability-routed dispatch, competitive bidding, and first-class
-              LLM provider Neurons. Doppler is next.
+              Core 0.1.11 is a research preview: the envelope is drafted, both SDKs are at parity, and
+              Genesis and Prism run locally today off the same CLI. It is open source under Apache
+              2.0 - read the spec, disagree with it in public, and build on it either way.
             </p>
             <div className="hero-ctas" style={{ marginBottom: 0 }}>
-              <Link href="/quickstart" className="btn btn-primary">
+              <Link href="/core/quickstart" className="btn btn-primary">
                 Get started <span className="arrow">→</span>
               </Link>
-              <Link href="/concepts" className="btn btn-ghost">
-                Explore the product line
+              <Link href="/core/protocol" className="btn btn-ghost">
+                Read the envelope spec
               </Link>
             </div>
           </div>

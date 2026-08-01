@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BrandMark from "@/components/BrandMark";
+import { PRODUCTS } from "@/lib/products";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
@@ -14,8 +15,9 @@ export default function Footer() {
               <span className="brand-word">Cosmonapse</span>
             </Link>
             <p>
-              The open protocol for building distributed multi-agent/model harnesses. One envelope. One channel.
-              Replaceable neurons. Open source under the Apache 2.0 license.
+              A platform suite for event-driven AI systems - Core to run them, Genesis to design
+              them, Prism to watch them. One envelope, one channel, replaceable neurons. Open source
+              under the Apache 2.0 license.
             </p>
             <a
               href="https://www.producthunt.com/products/cosmonapse?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-cosmonapse"
@@ -40,21 +42,29 @@ export default function Footer() {
             </a>
           </div>
           <div className="footer-col">
-            <h5>Protocol</h5>
+            <h5>Products</h5>
             <ul>
-              <li>
-                <Link href="/protocol">Envelope spec</Link>
-              </li>
-              <li>
-                <Link href="/concepts">Terminology</Link>
-              </li>
+              {PRODUCTS.map((p) => (
+                <li key={p.href}>
+                  <Link href={p.href}>{p.short}</Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="footer-col">
             <h5>Developers</h5>
             <ul>
               <li>
-                <Link href="/quickstart">Quickstart</Link>
+                <Link href="/core/quickstart">Quickstart</Link>
+              </li>
+              <li>
+                <Link href="/core/protocol">Envelope spec</Link>
+              </li>
+              <li>
+                <Link href="/core/concepts">Concepts</Link>
+              </li>
+              <li>
+                <Link href="/examples">Examples</Link>
               </li>
               <li>
                 <Link href="/ycombinator">Interactive demo</Link>
@@ -113,7 +123,7 @@ export default function Footer() {
         </div>
         <div className="footer-bottom">
           <span>© 2026 Cosmonapse  -  Research preview</span>
-          <span>v0.1.9-alpha</span>
+          <span>v0.1.11-alpha</span>
         </div>
       </div>
     </footer>

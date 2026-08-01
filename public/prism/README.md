@@ -30,7 +30,7 @@ which file goes where  -  just match the name it prints.
 1. Start a dev synapse (the bus) on that example's namespace, e.g. rag:
        cosmo synapse start memory --namespace=rag
 2. Open Prism (live browser view at http://127.0.0.1:7071):
-       cosmo doppler --prism --url=cosmo://127.0.0.1:7070 -n rag
+       cosmo prism --url=cosmo://127.0.0.1:7070 -n rag
 3. In a third terminal, run that example pointed at the synapse
    (swap `MemorySynapse()` for `await connect_synapse("cosmo://127.0.0.1:7070")`,
    or set SYNAPSE_URL where the example supports it).

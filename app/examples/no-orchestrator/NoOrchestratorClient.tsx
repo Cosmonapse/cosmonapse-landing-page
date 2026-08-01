@@ -99,135 +99,6 @@ SYNAPSE_URL <span class="tk-op">=</span> <span class="tk-str">"${url}"</span>
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
-// ===========================================================================
-// TypeScript  -  NATS variant (cross-process: worker.ts + producer.ts)
-// ===========================================================================
-
-const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSynapse, SignalType } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-<span class="tk-kw">import</span> { createHash } <span class="tk-kw">from</span> <span class="tk-str">"node:crypto"</span>;
-
-<span class="tk-kw">const</span> MY_ID <span class="tk-op">=</span> process.argv[<span class="tk-num">2</span>] <span class="tk-op">??</span> <span class="tk-str">"worker-a"</span>;
-<span class="tk-kw">const</span> PEERS <span class="tk-op">=</span> [<span class="tk-str">"worker-a"</span>, <span class="tk-str">"worker-b"</span>];
-<span class="tk-kw">const</span> NAMESPACE <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
-
-<span class="tk-cm">// Pure function: every peer computes the SAME owner  -  no coordination.</span>
-<span class="tk-kw">const</span> <span class="tk-fn">ownerOf</span> <span class="tk-op">=</span> (traceId: string) <span class="tk-op">=&gt;</span> {
-  <span class="tk-kw">const</span> h <span class="tk-op">=</span> <span class="tk-fn">createHash</span>(<span class="tk-str">"sha1"</span>).<span class="tk-fn">update</span>(traceId).<span class="tk-fn">digest</span>();
-  <span class="tk-kw">return</span> PEERS[h.<span class="tk-fn">readUInt32BE</span>(<span class="tk-num">0</span>) <span class="tk-op">%</span> PEERS.length];
-};
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">NatsSynapse</span>({ url: <span class="tk-str">"nats://127.0.0.1:4222"</span> });
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
-
-  <span class="tk-kw">const</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
-    synapse, namespace: NAMESPACE, dendriteId: MY_ID, heartbeatMs: <span class="tk-num">0</span>,
-  });
-  <span class="tk-cm">// The Axon is NOT attached  -  we route by hash, not by neuron-id.</span>
-  <span class="tk-kw">const</span> axon <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({
-    neuronId: MY_ID,
-    neuronFn: <span class="tk-kw">async</span> (input: any) <span class="tk-op">=&gt;</span> ({ response: <span class="tk-str">\`[\${MY_ID}] line about \${input.prompt}\`</span> }),
-    capabilities: [<span class="tk-str">"chat"</span>],
-  });
-
-  <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
-  <span class="tk-kw">await</span> dendrite.<span class="tk-fn">subscribe</span>(SignalType.TASK, <span class="tk-kw">async</span> (task) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">if</span> (<span class="tk-fn">ownerOf</span>(task.trace_id) <span class="tk-op">!==</span> MY_ID) <span class="tk-kw">return</span>;   <span class="tk-cm">// a peer owns it</span>
-    console.<span class="tk-fn">log</span>(<span class="tk-str">\`[\${MY_ID}] claims \${task.trace_id.slice(4, 12)}\`</span>);
-    <span class="tk-kw">await</span> dendrite.<span class="tk-fn">publish</span>(<span class="tk-kw">await</span> axon.<span class="tk-fn">handleTask</span>(task));   <span class="tk-cm">// AGENT_OUTPUT</span>
-  });
-
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${MY_ID} listening  -  no cortex, no queue\`</span>);
-  <span class="tk-kw">await</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>(() <span class="tk-op">=&gt;</span> {});
-}
-
-<span class="tk-fn">main</span>();`;
-
-const tsProducerNats = `<span class="tk-kw">import</span> { Dendrite, NatsSynapse, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">NatsSynapse</span>({ url: <span class="tk-str">"nats://127.0.0.1:4222"</span> });
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
-
-  <span class="tk-kw">const</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
-    synapse, namespace: <span class="tk-str">"quickstart"</span>, dendriteId: <span class="tk-str">"producer"</span>, heartbeatMs: <span class="tk-num">0</span>,
-  });
-  <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Map</span>();
-  dendrite.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> r <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-    <span class="tk-kw">if</span> (r) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">r</span>([sig.directed?.id, (sig.payload <span class="tk-kw">as</span> any).output]); }
-  });
-  <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
-
-  <span class="tk-kw">for</span> (<span class="tk-kw">const</span> prompt <span class="tk-kw">of</span> [<span class="tk-str">"the sun"</span>, <span class="tk-str">"the moon"</span>, <span class="tk-str">"the sea"</span>, <span class="tk-str">"the wind"</span>]) {
-    <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
-    <span class="tk-kw">const</span> done: any <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>((res) <span class="tk-op">=&gt;</span> pending.<span class="tk-fn">set</span>(traceId, res));
-    <span class="tk-cm">// No routing here  -  the workers decide who answers.</span>
-    <span class="tk-kw">await</span> dendrite.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"pool"</span>, input: { prompt }, traceId });
-    <span class="tk-kw">const</span> [who, out] <span class="tk-op">=</span> <span class="tk-kw">await</span> done;
-    console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${who} answered: \${out.response}\`</span>);
-  }
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>();
-}
-
-<span class="tk-fn">main</span>();`;
-
-// ===========================================================================
-// TypeScript  -  devsynapse variant (MemorySynapse, single in-process file)
-// ===========================================================================
-
-const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse, SignalType, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-<span class="tk-kw">import</span> { createHash } <span class="tk-kw">from</span> <span class="tk-str">"node:crypto"</span>;
-
-<span class="tk-kw">const</span> NS <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
-<span class="tk-kw">const</span> PEERS <span class="tk-op">=</span> [<span class="tk-str">"worker-a"</span>, <span class="tk-str">"worker-b"</span>];
-
-<span class="tk-cm">// Every peer runs this identically  -  exactly one claims each trace.</span>
-<span class="tk-kw">const</span> <span class="tk-fn">ownerOf</span> <span class="tk-op">=</span> (t: string) <span class="tk-op">=&gt;</span> {
-  <span class="tk-kw">const</span> h <span class="tk-op">=</span> <span class="tk-fn">createHash</span>(<span class="tk-str">"sha1"</span>).<span class="tk-fn">update</span>(t).<span class="tk-fn">digest</span>();
-  <span class="tk-kw">return</span> PEERS[h.<span class="tk-fn">readUInt32BE</span>(<span class="tk-num">0</span>) <span class="tk-op">%</span> PEERS.length];
-};
-
-<span class="tk-kw">const</span> <span class="tk-fn">makeWorker</span> <span class="tk-op">=</span> <span class="tk-kw">async</span> (synapse: MemorySynapse, id: string) <span class="tk-op">=&gt;</span> {
-  <span class="tk-kw">const</span> d <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: NS, dendriteId: id, heartbeatMs: <span class="tk-num">0</span> });
-  <span class="tk-kw">const</span> axon <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({
-    neuronId: id,
-    neuronFn: <span class="tk-kw">async</span> (input: any) <span class="tk-op">=&gt;</span> ({ response: <span class="tk-str">\`[\${id}] line about \${input.prompt}\`</span> }),
-    capabilities: [<span class="tk-str">"chat"</span>],
-  });
-  <span class="tk-kw">await</span> d.<span class="tk-fn">start</span>();
-  <span class="tk-kw">await</span> d.<span class="tk-fn">subscribe</span>(SignalType.TASK, <span class="tk-kw">async</span> (task) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">if</span> (<span class="tk-fn">ownerOf</span>(task.trace_id) <span class="tk-op">!==</span> id) <span class="tk-kw">return</span>;
-    <span class="tk-kw">await</span> d.<span class="tk-fn">publish</span>(<span class="tk-kw">await</span> axon.<span class="tk-fn">handleTask</span>(task));
-  });
-  <span class="tk-kw">return</span> d;
-};
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">MemorySynapse</span>();   <span class="tk-cm">// in-process  -  no broker</span>
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
-  <span class="tk-kw">await</span> Promise.<span class="tk-fn">all</span>(PEERS.<span class="tk-fn">map</span>((id) <span class="tk-op">=&gt;</span> <span class="tk-fn">makeWorker</span>(synapse, id)));
-
-  <span class="tk-kw">const</span> producer <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: NS, dendriteId: <span class="tk-str">"producer"</span>, heartbeatMs: <span class="tk-num">0</span> });
-  <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Map</span>();
-  producer.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> r <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-    <span class="tk-kw">if</span> (r) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">r</span>([sig.directed?.id, (sig.payload <span class="tk-kw">as</span> any).output]); }
-  });
-  <span class="tk-kw">await</span> producer.<span class="tk-fn">start</span>();
-
-  <span class="tk-kw">for</span> (<span class="tk-kw">const</span> prompt <span class="tk-kw">of</span> [<span class="tk-str">"the sun"</span>, <span class="tk-str">"the moon"</span>, <span class="tk-str">"the sea"</span>, <span class="tk-str">"the wind"</span>]) {
-    <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
-    <span class="tk-kw">const</span> done: any <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>((res) <span class="tk-op">=&gt;</span> pending.<span class="tk-fn">set</span>(traceId, res));
-    <span class="tk-kw">await</span> producer.<span class="tk-fn">dispatchTask</span>({ neuron: <span class="tk-str">"pool"</span>, input: { prompt }, traceId });
-    <span class="tk-kw">const</span> [who, out] <span class="tk-op">=</span> <span class="tk-kw">await</span> done;
-    console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${who} answered: \${out.response}\`</span>);
-  }
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>();
-}
-
-<span class="tk-fn">main</span>();`;
-
 const outputSnippet = `<span class="tk-op">$</span> python demo.py
 <span class="tk-cm"># …meanwhile, in the two worker terminals:</span>
 [worker-b] claims a3f2c1d8
@@ -302,73 +173,6 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   };
 }
 
-function tsNatsData(): ComboData {
-  const broker = brokerStep("ts-nats");
-  return {
-    steps: [
-      installStep("ts-nats"),
-      ...(broker ? [broker] : []),
-      {
-        eyebrow: "Worker  -  it decides for itself",
-        prose: (
-          <>
-            Same idea as Python: subscribe to{" "}
-            <code className="inline">SignalType.TASK</code>, gate on{" "}
-            <code className="inline">ownerOf(traceId)</code>, and only then run
-            the Neuron and <code className="inline">publish</code> the result.
-            One file serves both workers.
-          </>
-        ),
-        filename: "worker.ts",
-        html: tsWorkerNats,
-      },
-      {
-        eyebrow: "Producer  -  drops work in, routes nothing",
-        prose: (
-          <>
-            Dispatches to the logical{" "}
-            <code className="inline">&quot;pool&quot;</code> neuron and reads{" "}
-            <code className="inline">sig.directed.id</code> off each output to see who
-            answered.
-          </>
-        ),
-        filename: "producer.ts",
-        html: tsProducerNats,
-      },
-      runStep("ts-nats", [
-        { label: "first worker", cmd: "npx tsx worker.ts worker-a" },
-        { label: "second worker", cmd: "npx tsx worker.ts worker-b" },
-        { label: "the producer", cmd: "npx tsx producer.ts" },
-      ]),
-    ],
-    extend: extendBody("ts-nats"),
-  };
-}
-
-function tsDevData(): ComboData {
-  return {
-    steps: [
-      installStep("ts-dev"),
-      {
-        eyebrow: "Everything in one file",
-        prose: (
-          <>
-            <code className="inline">MemorySynapse</code> is in-process, so both
-            self-selecting workers and the producer share one Node program. The
-            ownership rule is identical to the multi-process version.
-          </>
-        ),
-        filename: "no-orchestrator.ts",
-        html: tsDev,
-      },
-      runStep("ts-dev", [
-        { label: "everything", cmd: "npx tsx no-orchestrator.ts" },
-      ]),
-    ],
-    extend: extendBody("ts-dev"),
-  };
-}
-
 function extendBody(combo: Combo): React.ReactNode {
   return (
     <>
@@ -397,15 +201,6 @@ function extendBody(combo: Combo): React.ReactNode {
         <code className="inline">DEREGISTER</code> so the pool tracks workers
         joining and leaving.
       </p>
-      {combo === "ts-dev" && (
-        <p>
-          <strong>Go multi-process.</strong> Swap{" "}
-          <code className="inline">MemorySynapse</code> for{" "}
-          <code className="inline">NatsSynapse</code> (the NATS tab) and split
-          into <code className="inline">worker.ts</code> +{" "}
-          <code className="inline">producer.ts</code>.
-        </p>
-      )}
     </>
   );
 }
@@ -414,8 +209,6 @@ const DATA: Record<Combo, ComboData> = {
   "py-dev": pyData("py-dev"),
   "py-nats": pyData("py-nats"),
   "py-kafka": pyData("py-kafka"),
-  "ts-dev": tsDevData(),
-  "ts-nats": tsNatsData(),
 };
 
 const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a MemorySynapse, which Prism can't attach to.</span>
@@ -425,7 +218,7 @@ const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a 
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=quickstart
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -469,7 +262,7 @@ export default function NoOrchestratorClient() {
           <div className="sub-eyebrow">Watch it in Prism</div>
           <h2 className="sub-title">See the Signals fire in the browser.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            <code className="inline">cosmo prism</code> opens a live, read-only view of
             every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT, FINAL  -  as the workflow
             runs. The demo runs in-process on a <code className="inline">MemorySynapse</code>,
             which Prism can&apos;t attach to, so start a dev synapse and point the code at it.
@@ -493,7 +286,7 @@ export default function NoOrchestratorClient() {
                 rotation.
               </p>
             </Link>
-            <Link href="/concepts" className="card">
+            <Link href="/core/concepts" className="card">
               <div className="card-icon">→</div>
               <h3>Concepts</h3>
               <p>Neuron, Axon, Dendrite, Synapse  -  what each one is and isn&apos;t.</p>

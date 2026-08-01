@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_PRODUCT } from "@/lib/seo";
 import CodeBlock from "@/components/CodeBlock";
-import CodeSwitcher from "@/components/CodeSwitcher";
 
 export const metadata: Metadata = pageMetadata({
   title: "Signal Envelope Spec",
   description:
     "The event contract every Cosmonapse agent speaks: one versioned JSON envelope - id, trace_id, parent_id, type, payload - readable by any Neuron, any language.",
-  path: "/protocol",
+  path: "/core/protocol",
   keywords: [
     ...KW_EVENT_DRIVEN,
     ...KW_PRODUCT,
@@ -49,17 +48,6 @@ sig <span class="tk-op">=</span> Signal.<span class="tk-fn">model_validate</span
 
 <span class="tk-cm"># Or use the CLI:</span>
 <span class="tk-cm"># $ cosmo validate &lt; signals.ndjson</span>`;
-
-const connectTs = `<span class="tk-kw">import</span> { connectSynapse, validateSignal } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-cm">// Connect to any Synapse  -  memory, NATS, Kafka.</span>
-<span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">await</span> <span class="tk-fn">connectSynapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>);
-
-<span class="tk-cm">// Validate an envelope against the spec (throws on violation).</span>
-<span class="tk-fn">validateSignal</span>(envelopeObj);
-
-<span class="tk-cm">// Or use the CLI:</span>
-<span class="tk-cm">// $ cosmo validate &lt; signals.ndjson</span>`;
 
 type MsgProps = {
   name: string;
@@ -197,10 +185,7 @@ export default function ProtocolPage() {
             <div>
               <CodeBlock filename="signal.json" html={envelopeSnippet} variant="elevated" />
               <div style={{ marginTop: 16 }}>
-                <CodeSwitcher
-                  python={{ html: connectPy, filename: "connect.py" }}
-                  typescript={{ html: connectTs, filename: "connect.ts" }}
-                />
+                <CodeBlock html={connectPy} filename="connect.py" />
               </div>
             </div>
 
@@ -702,7 +687,7 @@ export default function ProtocolPage() {
             Doppler is a non-competing, read-only consumer of the Synapse. It does not define its own
             Signal types  -  it taps every Signal emitted by Core, Engram, and Effector. Pulse streams the raw
             telemetry; Prism renders it as dashboards and trace graphs.{" "}
-            <code className="inline">cosmo doppler</code> in the CLI is the baseline implementation.
+            <code className="inline">cosmo prism --tail</code> in the CLI is the baseline implementation.
           </p>
           <div
             style={{
@@ -716,7 +701,7 @@ export default function ProtocolPage() {
             }}
           >
             <strong style={{ color: "var(--p-doppler)" }}>Pulse</strong>  -  real-time Signal metrics: latency,
-            throughput, error rates, cost per Neuron.{" "}
+            throughput, error rates.{" "}
             <strong style={{ color: "var(--p-doppler)" }}>Prism</strong>  -  the visualization layer: trace graphs,
             audit logs, dashboard views. Both build on the existing Synapse subscription model  -  no new
             envelope types required.

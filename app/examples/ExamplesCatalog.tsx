@@ -36,7 +36,7 @@ const examples: Example[] = [
     tag: "Web integration",
     title: "Building an Orchestrator API",
     description:
-      "Wire a Dendrite into Flask, FastAPI, Express, or raw WSGI. Your HTTP framework stays at the edge and dispatches TASKs from its route handlers  -  the Neuron never sees HTTP, the framework never sees the Synapse.",
+      "Wire a Dendrite into Flask, FastAPI, or raw WSGI. Your HTTP framework stays at the edge and dispatches TASKs from its route handlers  -  the Neuron never sees HTTP, the framework never sees the Synapse.",
     primitives: ["Dendrite", "Synapse", "Pathway"],
     difficulty: "Intermediate",
     accentColor: "var(--accent-3)",
@@ -47,7 +47,7 @@ const examples: Example[] = [
     tag: "Orchestration",
     title: "Orchestrator + Round Robin",
     description:
-      "A Cortex (orchestrator Dendrite) load-balances prompts across two workers in a plain rotation. Slide across five stacks  -  Python and TypeScript over devsynapse, NATS, and Kafka.",
+      "A Cortex (orchestrator Dendrite) load-balances prompts across two workers in a plain rotation. Slide across three transports  -  devsynapse, NATS, and Kafka.",
     primitives: ["Neuron", "Axon", "Dendrite", "Synapse"],
     difficulty: "Beginner",
     accentColor: "var(--accent)",
@@ -80,7 +80,7 @@ const examples: Example[] = [
     tag: "Decentralised",
     title: "No Orchestrator",
     description:
-      "Drop the Cortex. Every worker hears every task and runs the same pure owner_of(trace_id), so exactly one claims each  -  no coordination, no queue. Same five stacks via the slider.",
+      "Drop the Cortex. Every worker hears every task and runs the same pure owner_of(trace_id), so exactly one claims each  -  no coordination, no queue. Same three transports via the slider.",
     primitives: ["Axon", "Dendrite", "Synapse"],
     difficulty: "Intermediate",
     accentColor: "var(--accent-3)",
@@ -91,7 +91,7 @@ const examples: Example[] = [
     tag: "Neuron sources",
     title: "Real-world Neurons (MCP + web edge)",
     description:
-      "A Neuron is anything that interacts with the real world  -  here, a wrapped stdio MCP server. An HTTP API is not a Neuron: your web framework (Flask / Express) stays at the edge and dispatches TASKs from its route handlers via an orchestrator Dendrite. Same five stacks via the slider.",
+      "A Neuron is anything that interacts with the real world  -  here, a wrapped stdio MCP server. An HTTP API is not a Neuron: your web framework (Flask / FastAPI) stays at the edge and dispatches TASKs from its route handlers via an orchestrator Dendrite. Same three transports via the slider.",
     primitives: ["Neuron", "Axon", "Dendrite", "Synapse"],
     difficulty: "Intermediate",
     accentColor: "var(--accent-3)",
@@ -102,7 +102,7 @@ const examples: Example[] = [
     tag: "Discovery",
     title: "Capability-based Routing",
     description:
-      "A router Dendrite holds a RegistryStore and discovers workers from their REGISTER signals. Each task names a capability; the router finds a live worker that advertises it  -  no hard-coded ids. Same five stacks via the slider.",
+      "A router Dendrite holds a RegistryStore and discovers workers from their REGISTER signals. Each task names a capability; the router finds a live worker that advertises it  -  no hard-coded ids. Same three transports via the slider.",
     primitives: ["Axon", "Dendrite", "RegistryStore", "Synapse"],
     difficulty: "Advanced",
     accentColor: "var(--accent-2)",

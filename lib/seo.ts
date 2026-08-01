@@ -3,8 +3,8 @@
  *
  * Every page builds its <head> through `pageMetadata()` so that canonical
  * URLs, OpenGraph, and Twitter cards stay consistent and can never drift.
- * Keyword clusters live here too - the three we compete on are
- * event-driven AI, reactive AI, and harness engineering.
+ * Keyword clusters live here too - the four we compete on are event-driven
+ * AI, reactive AI, harness engineering, and the platform suite itself.
  */
 
 import type { Metadata } from "next";
@@ -65,10 +65,25 @@ export const KW_PRODUCT = [
   "multi-agent framework",
   "AI agent SDK",
   "Python agent framework",
-  "TypeScript agent framework",
   "distributed cognition",
   "A2A protocol alternative",
   "agent observability",
+];
+
+/** Cluster 4 - the platform suite. Added with the 2026-07 restructure. */
+export const KW_PLATFORM = [
+  "AI agent platform",
+  "AI system design tool",
+  "agent development platform",
+  "build production AI systems",
+  "domain-specific AI systems",
+  "vertical AI agents",
+  "enterprise AI architecture",
+  "AI beyond wrappers",
+  "AI agent observability platform",
+  "Cosmonapse Genesis",
+  "Cosmonapse Prism",
+  "Cosmonapse Core",
 ];
 
 export const KEYWORDS_ALL = [
@@ -76,13 +91,14 @@ export const KEYWORDS_ALL = [
   ...KW_REACTIVE,
   ...KW_HARNESS,
   ...KW_PRODUCT,
+  ...KW_PLATFORM,
 ];
 
 export type PageSeo = {
   /** Title without the site suffix - the suffix is applied by the template. */
   title: string;
   description: string;
-  /** Root-relative path, e.g. "/quickstart". Used for the canonical URL. */
+  /** Root-relative path, e.g. "/core/quickstart". Used for the canonical URL. */
   path: string;
   keywords?: string[];
   /** Set true only for pages that should stay out of the index. */

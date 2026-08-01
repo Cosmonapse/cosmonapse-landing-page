@@ -5,7 +5,7 @@ import { DOC_REFS } from "./docs/docsNav";
 /**
  * Sitemap. Docs routes are derived from DOC_REFS so a new section added to
  * the sidebar is indexed automatically. Redirect-only routes (/docs,
- * /docs/python, /docs/typescript, /docs/engram, /docs/cli) are excluded -
+ * /docs/python, /docs/engram, /docs/cli) are excluded -
  * a sitemap should only list 200s.
  */
 
@@ -31,11 +31,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const core = [
     { url: `${SITE_URL}/`, priority: 1.0, changeFrequency: "weekly" },
-    { url: `${SITE_URL}/quickstart`, priority: 0.9, changeFrequency: "weekly" },
-    { url: `${SITE_URL}/protocol`, priority: 0.9, changeFrequency: "monthly" },
-    { url: `${SITE_URL}/concepts`, priority: 0.8, changeFrequency: "monthly" },
+    // The three products - the primary axis of the site since the 2026-07
+    // platform restructure. Pre-move URLs (/protocol, /concepts, /quickstart,
+    // /observability) are 308 redirects in next.config.js and stay out of here.
+    { url: `${SITE_URL}/core`, priority: 0.95, changeFrequency: "weekly" },
+    { url: `${SITE_URL}/genesis`, priority: 0.95, changeFrequency: "weekly" },
+    { url: `${SITE_URL}/prism`, priority: 0.95, changeFrequency: "weekly" },
+    { url: `${SITE_URL}/core/quickstart`, priority: 0.9, changeFrequency: "weekly" },
+    { url: `${SITE_URL}/core/protocol`, priority: 0.9, changeFrequency: "monthly" },
+    { url: `${SITE_URL}/core/concepts`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${SITE_URL}/examples`, priority: 0.8, changeFrequency: "weekly" },
-    { url: `${SITE_URL}/observability`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${SITE_URL}/roadmap`, priority: 0.6, changeFrequency: "monthly" },
     { url: `${SITE_URL}/community-examples`, priority: 0.4, changeFrequency: "monthly" },
   ].map((e) => ({ ...e, lastModified: now })) as MetadataRoute.Sitemap;

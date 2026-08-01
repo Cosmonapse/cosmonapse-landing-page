@@ -24,7 +24,7 @@ const graph = {
         url: `${SITE_URL}/icon.png`,
       },
       description:
-        "Cosmonapse builds the open protocol and SDKs for event-driven AI agents and reactive multi-agent harnesses.",
+        "Cosmonapse builds the platform suite for event-driven AI systems: the open Core protocol and SDKs, the Genesis designer, and the Prism observability plane.",
       email: "dev@cosmonapse.com",
       sameAs: [
         "https://x.com/Cosmonapse",
@@ -39,7 +39,7 @@ const graph = {
       url: SITE_URL,
       name: SITE_NAME,
       description:
-        "Open protocol and SDK for event-driven AI agents and reactive multi-agent harnesses.",
+        "Platform suite for event-driven AI systems - Core protocol and SDKs, Genesis designer, Prism observability.",
       publisher: { "@id": `${SITE_URL}/#organization` },
       inLanguage: "en-US",
     },
@@ -48,22 +48,24 @@ const graph = {
       "@id": `${SITE_URL}/#software`,
       name: SITE_NAME,
       applicationCategory: "DeveloperApplication",
-      applicationSubCategory: "AI agent framework",
+      applicationSubCategory: "AI agent platform",
       operatingSystem: "Linux, macOS, Windows",
       url: SITE_URL,
       downloadUrl: GITHUB,
-      softwareVersion: "0.1.9",
+      softwareVersion: "0.1.11",
       license: "https://www.apache.org/licenses/LICENSE-2.0",
-      programmingLanguage: ["Python", "TypeScript"],
+      programmingLanguage: "Python",
       description:
-        "Cosmonapse is an open protocol and SDK for building event-driven AI agents. Agents communicate as Neurons over a single Signal envelope on one channel, so multi-agent harnesses are choreographed reactively instead of driven by an orchestrator loop. Python and TypeScript SDKs, a cosmo CLI, shared Engram memory, and Doppler Prism observability.",
+        "Cosmonapse is a platform suite for building event-driven AI systems. Core is the open protocol, SDKs and runtime: components communicate as Neurons over a single Signal envelope on one channel, so systems are choreographed reactively instead of driven by an orchestrator loop. Genesis is the designer that lays a system out on a canvas and writes real source into your project. Prism is the read-only observability plane over the same Signal stream.",
       featureList: [
         "Event-driven signal envelope shared by every agent",
         "Reactive choreography with no central orchestrator loop",
         "Replaceable Neurons behind a uniform Axon interface",
         "Engram shared memory over RECALL / IMPRINT signals",
         "Capability-based routing and task bidding",
-        "Live Signal observability through Doppler Prism",
+        "Live Signal observability through Prism - graph, causal tree and metrics",
+        "Genesis visual designer that writes and surgically edits real project source",
+        "Receptors: CLI, HTTP and chat interfaces into the same dispatch path",
       ],
       offers: {
         "@type": "Offer",

@@ -4,21 +4,15 @@ import React, { useState } from "react";
 import CodeBlock from "./CodeBlock";
 
 // ---------------------------------------------------------------------------
-// The five real language × transport combinations.
-//
-// The TypeScript SDK ships MemorySynapse + NatsSynapse only  -  the Kafka
-// adapter is not ported to TS yet (see packages/ts-sdk/src/index.ts), so
-// there is no TS + Kafka tab.
+// The three real transport combinations.
 // ---------------------------------------------------------------------------
 
-export type Combo = "py-dev" | "py-nats" | "py-kafka" | "ts-dev" | "ts-nats";
+export type Combo = "py-dev" | "py-nats" | "py-kafka";
 
 export const COMBOS: { id: Combo; lang: string; transport: string }[] = [
   { id: "py-dev", lang: "Python", transport: "devsynapse" },
   { id: "py-nats", lang: "Python", transport: "NATS" },
   { id: "py-kafka", lang: "Python", transport: "Kafka" },
-  { id: "ts-dev", lang: "TypeScript", transport: "devsynapse" },
-  { id: "ts-nats", lang: "TypeScript", transport: "NATS" },
 ];
 
 export type Step = {
@@ -56,16 +50,16 @@ export default function ComboExample({
     <>
       <section className="section-sm">
         <div className="container">
-          <div className="sub-eyebrow">Pick your stack</div>
+          <div className="sub-eyebrow">Pick your transport</div>
           <p className="prose" style={{ marginBottom: 18, marginTop: 4 }}>
-            The same topology, expressed across language and transport. Slide
-            between tabs  -  the routing logic never changes; only the imports,
-            the synapse you connect to, and how you launch it do.
+            The same topology, expressed across transports. Slide between tabs
+            -  the routing logic never changes; only the synapse you connect to
+            and how you launch it do.
           </p>
           <div
             className="combo-tabs"
             role="tablist"
-            aria-label="Choose language and transport"
+            aria-label="Choose transport"
           >
             {COMBOS.map((c) => {
               const active = combo === c.id;

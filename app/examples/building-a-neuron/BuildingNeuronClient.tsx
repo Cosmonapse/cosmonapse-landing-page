@@ -140,7 +140,7 @@ const prismSnippet = `<span class="tk-cm"># This example runs in-process on Memo
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace<span class="tk-op">=</span>demo
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> demo
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -164,7 +164,7 @@ export default function BuildingNeuronClient() {
             The smallest possible Cosmonapse program  -  one LLM Neuron backed by
             Hugging Face, one Axon, one Dendrite, one TASK, one reply. Single
             process, in-memory{" "}
-            <Link href="/concepts" className="inline-link">Synapse</Link>, no
+            <Link href="/core/concepts" className="inline-link">Synapse</Link>, no
             broker to start. Read this first; every other example adds
             something on top of this shape, and the LLM doesn&apos;t add any
             boilerplate.
@@ -212,7 +212,7 @@ export default function BuildingNeuronClient() {
           <div className="sub-eyebrow">01 · The Neuron</div>
           <h2 className="sub-title">An LLM, behind the same interface.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            A <Link href="/concepts" className="inline-link">Neuron</Link> is
+            A <Link href="/core/concepts" className="inline-link">Neuron</Link> is
             anything that satisfies{" "}
             <code className="inline">async fn(input, context) → output</code>.{" "}
             <code className="inline">Neuron(source=&quot;huggingface&quot;, ...)</code>{" "}
@@ -231,7 +231,7 @@ export default function BuildingNeuronClient() {
           <div className="sub-eyebrow">02 · The Axon</div>
           <h2 className="sub-title">Identity, capabilities, validation.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            The <Link href="/concepts" className="inline-link">Axon</Link> wraps
+            The <Link href="/core/concepts" className="inline-link">Axon</Link> wraps
             the Neuron, gives it an addressable id on the bus, and turns return
             values into protocol-valid AGENT_OUTPUT Signals. It never touches
             the Synapse itself  -  that boundary is enforced in code, not
@@ -247,7 +247,7 @@ export default function BuildingNeuronClient() {
           <div className="sub-eyebrow">03 · The Dendrite</div>
           <h2 className="sub-title">The only thing that touches the Synapse.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            The <Link href="/concepts" className="inline-link">Dendrite</Link>{" "}
+            The <Link href="/core/concepts" className="inline-link">Dendrite</Link>{" "}
             hosts Axons, emits REGISTER / HEARTBEAT / DEREGISTER on their
             behalf, routes inbound TASKs, and exposes the dispatch API. We
             build two  -  a{" "}
@@ -314,7 +314,7 @@ export default function BuildingNeuronClient() {
           <div className="sub-eyebrow">07 · Watch it in Prism</div>
           <h2 className="sub-title">See the Signals animate in the browser.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only
+            <code className="inline">cosmo prism</code> opens a live, read-only
             visualization of every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT  - 
             as the greeter answers.
           </p>

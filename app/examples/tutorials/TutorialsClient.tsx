@@ -70,7 +70,7 @@ orch = Dendrite(synapse=synapse, namespace=<span class="tk-str">"demo"</span>)
   {
     number: 2,
     title: "Multi-process dev with the CLI",
-    surface: "cosmo synapse start · cosmo doppler · DevSynapse · connect_synapse",
+    surface: "cosmo synapse start · cosmo prism · DevSynapse · connect_synapse",
     tier: "start",
     note: (
       <>
@@ -85,10 +85,10 @@ orch = Dendrite(synapse=synapse, namespace=<span class="tk-str">"demo"</span>)
 cosmo synapse start memory <span class="tk-op">--namespace</span>=demo
 
 <span class="tk-cm"># Terminal 2  -  watch every signal</span>
-cosmo doppler <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo
+cosmo prism --tail <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo
 
 <span class="tk-cm"># …or open Prism, the live browser view (http://127.0.0.1:7071)</span>
-cosmo doppler <span class="tk-op">--prism</span> <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo`,
+cosmo prism <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo`,
       },
       {
         html: `<span class="tk-cm"># worker.py  -  one URL change, everything else identical</span>
@@ -102,7 +102,7 @@ worker.attach_axon(Axon(neuron_id=<span class="tk-str">"greeter"</span>, neuron_
     <span class="tk-kw">await</span> asyncio.sleep(<span class="tk-fn">float</span>(<span class="tk-str">"inf"</span>))  <span class="tk-cm"># stay alive</span>`,
       },
     ],
-    deeperLink: { href: "/quickstart", label: "Quickstart  -  install and first 5 minutes" },
+    deeperLink: { href: "/core/quickstart", label: "Quickstart  -  install and first 5 minutes" },
   },
   {
     number: 3,
@@ -256,7 +256,7 @@ Axon(neuron_id=<span class="tk-str">"chat"</span>,
 Axon(neuron_id=<span class="tk-str">"summarise"</span>,
      neuron_fn=Neuron(source=<span class="tk-str">"ollama"</span>, model=<span class="tk-str">"llama3"</span>))
 
-<span class="tk-cm"># An HTTP API is NOT a Neuron  -  keep your framework (Flask/Express) at the</span>
+<span class="tk-cm"># An HTTP API is NOT a Neuron  -  keep your framework (Flask/FastAPI) at the</span>
 <span class="tk-cm"># edge and dispatch TASKs from its routes via an orchestrator Dendrite.</span>
 
 <span class="tk-cm"># Stdio MCP server  -  tools become a Neuron surface</span>
@@ -516,13 +516,13 @@ const cliCards: CliCard[] = [
       "Gracefully stop a namespace on a running synapse. Sends DEREGISTER to all attached Dendrites before shutting down.",
   },
   {
-    title: "cosmo doppler",
+    title: "cosmo prism",
     commands: [
-      { html: `cosmo doppler <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=dev` },
-      { html: `cosmo doppler <span class="tk-op">--prism</span> <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># browser view</span>` },
+      { html: `cosmo prism <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># browser view</span>` },
+      { html: `cosmo prism <span class="tk-op">--tail</span> <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=dev` },
     ],
     description:
-      "Passive read-only signal watcher. Attaches a Doppler to the synapse and streams every signal type to stdout. Zero side-effects on the bus.",
+      "Live browser view onto a namespace, or a passive read-only signal watcher with --tail. Attaches a Doppler to the synapse; zero side-effects on the bus.",
   },
   {
     title: "cosmo validate",
@@ -551,13 +551,13 @@ const cliCards: CliCard[] = [
     commands: [
       { html: "cosmo init" },
       { html: `cosmo synapse start memory <span class="tk-op">--namespace</span>=dev` },
-      { html: `cosmo doppler <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># separate terminal</span>` },
-      { html: `cosmo doppler <span class="tk-op">--prism</span> <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># …or in the browser</span>` },
+      { html: `cosmo prism --tail <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># separate terminal</span>` },
+      { html: `cosmo prism <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># …or in the browser</span>` },
       { html: `python worker.py  <span class="tk-cm"># separate terminal</span>` },
       { html: `cosmo validate <span class="tk-op">--namespace</span>=dev` },
     ],
     description:
-      "Four terminals: broker, watcher, worker, validator. The doppler and validator are read-only  -  you can attach and detach them at any time.",
+      "Four terminals: broker, watcher, worker, validator. The Doppler and validator are read-only  -  you can attach and detach them at any time.",
   },
 ];
 

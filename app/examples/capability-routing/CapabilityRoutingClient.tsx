@@ -13,7 +13,7 @@ import { PY_URL, isPython, scaffoldStep, brokerStep, runStep } from "../_shared"
 
 // ===========================================================================
 // Install  -  plain-function Neurons (no provider, so no HF_TOKEN / httpx).
-// Only the SDK (+ optional transport driver) and, for TS, tsx.
+// Only the SDK (+ optional transport driver).
 // ===========================================================================
 
 const INSTALL_HTML: Record<Combo, string> = {
@@ -24,12 +24,6 @@ pip install <span class="tk-str">"cosmonapse"</span>`,
   "py-kafka": `<span class="tk-cm"># SDK + the Kafka driver (KafkaSynapse imports aiokafka lazily).</span>
 pip install cosmonapse
 pip install aiokafka`,
-  "ts-dev": `<span class="tk-cm"># The TypeScript SDK. MemorySynapse needs no broker.</span>
-npm install <span class="tk-op">@</span>cosmonapse/sdk
-npm install <span class="tk-op">-D</span> tsx        <span class="tk-cm"># run .ts files directly</span>`,
-  "ts-nats": `<span class="tk-cm"># The TypeScript SDK + the optional nats driver.</span>
-npm install <span class="tk-op">@</span>cosmonapse/sdk nats
-npm install <span class="tk-op">-D</span> tsx`,
 };
 
 function installStep(combo: Combo): Step {
@@ -169,144 +163,6 @@ TASKS <span class="tk-op">=</span> [
 
 asyncio.<span class="tk-fn">run</span>(<span class="tk-fn">main</span>())`;
 
-// ===========================================================================
-// TypeScript  -  NATS variant (cross-process: worker.ts + router.ts)
-// ===========================================================================
-
-const tsWorkerNats = `<span class="tk-kw">import</span> { Axon, Dendrite, NatsSynapse } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-kw">const</span> NS <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
-
-<span class="tk-cm">// role → [capabilities, neuronFn]. A Neuron is just an async function.</span>
-<span class="tk-kw">const</span> ROLES: Record&lt;string, [string[], (i: any) =&gt; any]&gt; <span class="tk-op">=</span> {
-  summarizer: [[<span class="tk-str">"summarize"</span>, <span class="tk-str">"text"</span>], (i) <span class="tk-op">=&gt;</span> ({ result: <span class="tk-str">\`summary: \${i.text.slice(0, 40)}…\`</span> })],
-  translator: [[<span class="tk-str">"translate"</span>, <span class="tk-str">"text"</span>], (i) <span class="tk-op">=&gt;</span> ({ result: <span class="tk-str">\`[fr] \${i.text}\`</span> })],
-};
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> role <span class="tk-op">=</span> process.argv[<span class="tk-num">2</span>] <span class="tk-op">??</span> <span class="tk-str">"summarizer"</span>;   <span class="tk-cm">// pass the role on the CLI</span>
-  <span class="tk-kw">const</span> [capabilities, fn] <span class="tk-op">=</span> ROLES[role];
-
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">NatsSynapse</span>({ url: <span class="tk-str">"nats://127.0.0.1:4222"</span> });
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
-
-  <span class="tk-kw">const</span> dendrite <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
-    synapse, namespace: NS, dendriteId: role, heartbeatMs: <span class="tk-num">5_000</span>,
-  });
-  dendrite.<span class="tk-fn">attachAxon</span>(<span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({ neuronId: role, neuronFn: fn, capabilities }));
-
-  <span class="tk-kw">await</span> dendrite.<span class="tk-fn">start</span>();
-  console.<span class="tk-fn">log</span>(<span class="tk-str">\`\${role} ready  -  advertising \${capabilities.join(", ")}\`</span>);
-  <span class="tk-kw">await</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>(() <span class="tk-op">=&gt;</span> {});   <span class="tk-cm">// run forever</span>
-}
-
-<span class="tk-fn">main</span>();`;
-
-const tsRouterNats = `<span class="tk-kw">import</span> { Dendrite, MemoryRegistryStore, NatsSynapse, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-kw">const</span> NS <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
-<span class="tk-kw">const</span> TASKS <span class="tk-op">=</span> [
-  { capability: <span class="tk-str">"summarize"</span>, text: <span class="tk-str">"Cosmonapse is an A2A protocol that…"</span> },
-  { capability: <span class="tk-str">"translate"</span>, text: <span class="tk-str">"Hello, world"</span> },
-  { capability: <span class="tk-str">"summarize"</span>, text: <span class="tk-str">"Neurons are plain functions that…"</span> },
-];
-
-<span class="tk-kw">async function</span> <span class="tk-fn">waitForCaps</span>(d: Dendrite, needed: string[], timeoutMs <span class="tk-op">=</span> <span class="tk-num">15_000</span>) {
-  <span class="tk-kw">const</span> start <span class="tk-op">=</span> Date.<span class="tk-fn">now</span>();
-  <span class="tk-kw">while</span> (Date.<span class="tk-fn">now</span>() <span class="tk-op">-</span> start <span class="tk-op">&lt;</span> timeoutMs) {
-    <span class="tk-kw">const</span> lists <span class="tk-op">=</span> <span class="tk-kw">await</span> Promise.<span class="tk-fn">all</span>(needed.<span class="tk-fn">map</span>((c) <span class="tk-op">=&gt;</span> d.<span class="tk-fn">findNeurons</span>({ capability: c })));
-    <span class="tk-kw">if</span> (lists.<span class="tk-fn">every</span>((l) <span class="tk-op">=&gt;</span> l.length <span class="tk-op">&gt;</span> <span class="tk-num">0</span>)) <span class="tk-kw">return</span>;
-    <span class="tk-kw">await</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>((r) <span class="tk-op">=&gt;</span> <span class="tk-fn">setTimeout</span>(r, <span class="tk-num">250</span>));
-  }
-  <span class="tk-kw">throw new</span> <span class="tk-fn">Error</span>(<span class="tk-str">"timed out waiting for workers"</span>);
-}
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">NatsSynapse</span>({ url: <span class="tk-str">"nats://127.0.0.1:4222"</span> });
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
-
-  <span class="tk-kw">const</span> router <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
-    synapse, namespace: NS, dendriteId: <span class="tk-str">"router"</span>,
-    registryStore: <span class="tk-kw">new</span> <span class="tk-fn">MemoryRegistryStore</span>(),   <span class="tk-cm">// ← powers findNeurons()</span>
-    heartbeatMs: <span class="tk-num">0</span>,
-  });
-
-  <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Map</span>();
-  router.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> resolve <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-    <span class="tk-kw">if</span> (resolve) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">resolve</span>((sig.payload <span class="tk-kw">as</span> any).output); }
-  });
-  <span class="tk-kw">await</span> router.<span class="tk-fn">start</span>();
-
-  <span class="tk-kw">const</span> needed <span class="tk-op">=</span> [...<span class="tk-kw">new</span> <span class="tk-fn">Set</span>(TASKS.<span class="tk-fn">map</span>((t) <span class="tk-op">=&gt;</span> t.capability))];
-  <span class="tk-kw">await</span> <span class="tk-fn">waitForCaps</span>(router, needed);
-
-  <span class="tk-kw">for</span> (<span class="tk-kw">const</span> t <span class="tk-kw">of</span> TASKS) {
-    <span class="tk-kw">const</span> [worker] <span class="tk-op">=</span> <span class="tk-kw">await</span> router.<span class="tk-fn">findNeurons</span>({ capability: t.capability });
-    <span class="tk-kw">if</span> (<span class="tk-op">!</span>worker) { console.<span class="tk-fn">log</span>(<span class="tk-str">\`no neuron for \${t.capability}\`</span>); <span class="tk-kw">continue</span>; }
-    <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
-    <span class="tk-kw">const</span> done: any <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>((res) <span class="tk-op">=&gt;</span> pending.<span class="tk-fn">set</span>(traceId, res));
-    <span class="tk-kw">await</span> router.<span class="tk-fn">dispatchTask</span>({ neuron: worker.neuron_id, input: { text: t.text }, traceId });
-    console.<span class="tk-fn">log</span>(<span class="tk-str">\`→ \${t.capability} routed to \${worker.neuron_id}   ← \${(await done).result}\`</span>);
-  }
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>();
-}
-
-<span class="tk-fn">main</span>();`;
-
-// ===========================================================================
-// TypeScript  -  devsynapse variant (MemorySynapse, single in-process file)
-// ===========================================================================
-
-const tsDev = `<span class="tk-kw">import</span> { Axon, Dendrite, MemorySynapse, MemoryRegistryStore, newTraceId } <span class="tk-kw">from</span> <span class="tk-str">"@cosmonapse/sdk"</span>;
-
-<span class="tk-kw">const</span> NS <span class="tk-op">=</span> <span class="tk-str">"quickstart"</span>;
-<span class="tk-kw">const</span> ROLES <span class="tk-op">=</span> {
-  summarizer: { caps: [<span class="tk-str">"summarize"</span>, <span class="tk-str">"text"</span>], fn: (i: any) <span class="tk-op">=&gt;</span> ({ result: <span class="tk-str">\`summary: \${i.text.slice(0, 40)}…\`</span> }) },
-  translator: { caps: [<span class="tk-str">"translate"</span>, <span class="tk-str">"text"</span>], fn: (i: any) <span class="tk-op">=&gt;</span> ({ result: <span class="tk-str">\`[fr] \${i.text}\`</span> }) },
-};
-
-<span class="tk-kw">async function</span> <span class="tk-fn">main</span>() {
-  <span class="tk-kw">const</span> synapse <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">MemorySynapse</span>();
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">connect</span>();
-
-  <span class="tk-cm">// Router first, so its REGISTER subscription is live before workers announce.</span>
-  <span class="tk-kw">const</span> router <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({
-    synapse, namespace: NS, dendriteId: <span class="tk-str">"router"</span>,
-    registryStore: <span class="tk-kw">new</span> <span class="tk-fn">MemoryRegistryStore</span>(), heartbeatMs: <span class="tk-num">0</span>,
-  });
-  <span class="tk-kw">const</span> pending <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Map</span>();
-  router.<span class="tk-fn">onAgentOutput</span>((sig) <span class="tk-op">=&gt;</span> {
-    <span class="tk-kw">const</span> r <span class="tk-op">=</span> pending.<span class="tk-fn">get</span>(sig.trace_id);
-    <span class="tk-kw">if</span> (r) { pending.<span class="tk-fn">delete</span>(sig.trace_id); <span class="tk-fn">r</span>((sig.payload <span class="tk-kw">as</span> any).output); }
-  });
-  <span class="tk-kw">await</span> router.<span class="tk-fn">start</span>();
-
-  <span class="tk-cm">// Bring up the two specialised workers, sharing the same in-process bus.</span>
-  <span class="tk-kw">for</span> (<span class="tk-kw">const</span> [role, { caps, fn }] <span class="tk-kw">of</span> Object.<span class="tk-fn">entries</span>(ROLES)) {
-    <span class="tk-kw">const</span> w <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Dendrite</span>({ synapse, namespace: NS, dendriteId: role, heartbeatMs: <span class="tk-num">0</span> });
-    w.<span class="tk-fn">attachAxon</span>(<span class="tk-kw">new</span> <span class="tk-fn">Axon</span>({ neuronId: role, neuronFn: fn, capabilities: caps }));
-    <span class="tk-kw">await</span> w.<span class="tk-fn">start</span>();
-  }
-  <span class="tk-kw">await</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>((r) <span class="tk-op">=&gt;</span> <span class="tk-fn">setTimeout</span>(r, <span class="tk-num">50</span>));   <span class="tk-cm">// let REGISTERs arrive</span>
-
-  <span class="tk-kw">const</span> TASKS <span class="tk-op">=</span> [
-    { capability: <span class="tk-str">"summarize"</span>, text: <span class="tk-str">"Cosmonapse is an A2A protocol that…"</span> },
-    { capability: <span class="tk-str">"translate"</span>, text: <span class="tk-str">"Hello, world"</span> },
-  ];
-  <span class="tk-kw">for</span> (<span class="tk-kw">const</span> t <span class="tk-kw">of</span> TASKS) {
-    <span class="tk-kw">const</span> [worker] <span class="tk-op">=</span> <span class="tk-kw">await</span> router.<span class="tk-fn">findNeurons</span>({ capability: t.capability });
-    <span class="tk-kw">if</span> (<span class="tk-op">!</span>worker) { console.<span class="tk-fn">log</span>(<span class="tk-str">\`no neuron for \${t.capability}\`</span>); <span class="tk-kw">continue</span>; }
-    <span class="tk-kw">const</span> traceId <span class="tk-op">=</span> <span class="tk-fn">newTraceId</span>();
-    <span class="tk-kw">const</span> done: any <span class="tk-op">=</span> <span class="tk-kw">new</span> <span class="tk-fn">Promise</span>((res) <span class="tk-op">=&gt;</span> pending.<span class="tk-fn">set</span>(traceId, res));
-    <span class="tk-kw">await</span> router.<span class="tk-fn">dispatchTask</span>({ neuron: worker.neuron_id, input: { text: t.text }, traceId });
-    console.<span class="tk-fn">log</span>(<span class="tk-str">\`→ \${t.capability} → \${worker.neuron_id}   ← \${(await done).result}\`</span>);
-  }
-  <span class="tk-kw">await</span> synapse.<span class="tk-fn">close</span>();
-}
-
-<span class="tk-fn">main</span>();`;
-
 const outputSnippet = `<span class="tk-op">$</span> python demo.py
 waiting for workers advertising {'summarize', 'translate'}…
 → summarize routed to summarizer
@@ -375,74 +231,6 @@ function pyData(combo: "py-dev" | "py-nats" | "py-kafka"): ComboData {
   };
 }
 
-function tsNatsData(): ComboData {
-  const broker = brokerStep("ts-nats");
-  return {
-    steps: [
-      installStep("ts-nats"),
-      ...(broker ? [broker] : []),
-      {
-        eyebrow: "Workers  -  bring-your-own Neuron",
-        prose: (
-          <>
-            A Neuron is simply an{" "}
-            <code className="inline">async (input) =&gt; output</code> function.
-            One file serves both roles; pass the role as an argv. Capabilities
-            are advertised through the Axon.
-          </>
-        ),
-        filename: "worker.ts",
-        html: tsWorkerNats,
-      },
-      {
-        eyebrow: "The Router  -  discover by capability",
-        prose: (
-          <>
-            Identical logic to Python: a{" "}
-            <code className="inline">registryStore</code> makes{" "}
-            <code className="inline">findNeurons(&#123; capability &#125;)</code>{" "}
-            return the live workers that can serve each task. No worker ids in
-            the routing code.
-          </>
-        ),
-        filename: "router.ts",
-        html: tsRouterNats,
-      },
-      runStep("ts-nats", [
-        { label: "the summarizer", cmd: "npx tsx worker.ts summarizer" },
-        { label: "the translator", cmd: "npx tsx worker.ts translator" },
-        { label: "the router", cmd: "npx tsx router.ts" },
-      ]),
-    ],
-    extend: extendBody("ts-nats"),
-  };
-}
-
-function tsDevData(): ComboData {
-  return {
-    steps: [
-      installStep("ts-dev"),
-      {
-        eyebrow: "Everything in one file",
-        prose: (
-          <>
-            <code className="inline">MemorySynapse</code> is in-process, so the
-            router and both workers live in one Node program. The router starts
-            first so its REGISTER subscription is live before the workers
-            announce; the capability lookup is unchanged.
-          </>
-        ),
-        filename: "capability-routing.ts",
-        html: tsDev,
-      },
-      runStep("ts-dev", [
-        { label: "everything", cmd: "npx tsx capability-routing.ts" },
-      ]),
-    ],
-    extend: extendBody("ts-dev"),
-  };
-}
-
 function extendBody(combo: Combo): React.ReactNode {
   return (
     <>
@@ -466,23 +254,13 @@ function extendBody(combo: Combo): React.ReactNode {
         <code className="inline">registry_snapshot(include_deregistered=True)</code>{" "}
         shows the full history, while routing skips anything offline.
       </p>
-      {combo === "ts-dev" ? (
-        <p>
-          <strong>Go multi-process.</strong> Swap{" "}
-          <code className="inline">MemorySynapse</code> for{" "}
-          <code className="inline">NatsSynapse</code> (the NATS tab) and split
-          the file into <code className="inline">worker.ts</code> +{" "}
-          <code className="inline">router.ts</code>  -  the discovery code is
-          identical.
-        </p>
-      ) : (
-        <p>
-          <strong>Change transport.</strong> Every other tab is the same
-          topology  -  only the install, the synapse you connect to, and the
-          launch commands change. The capability-routing logic is byte-for-byte
-          identical.
-        </p>
-      )}
+          <p>
+      <strong>Change transport.</strong> Every other tab is the same
+      topology  -  only the install, the synapse you connect to, and the
+      launch commands change. The capability-routing logic is byte-for-byte
+      identical.
+    </p>
+  
     </>
   );
 }
@@ -491,8 +269,6 @@ const DATA: Record<Combo, ComboData> = {
   "py-dev": pyData("py-dev"),
   "py-nats": pyData("py-nats"),
   "py-kafka": pyData("py-kafka"),
-  "ts-dev": tsDevData(),
-  "ts-nats": tsNatsData(),
 };
 
 const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a MemorySynapse, which Prism can't attach to.</span>
@@ -502,7 +278,7 @@ const prismWatchSnippet = `<span class="tk-cm"># This demo runs in-process on a 
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=quickstart
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> quickstart
 
 <span class="tk-cm"># in the code  -  swap one line:</span>
 <span class="tk-cm"># synapse = MemorySynapse()</span>
@@ -584,7 +360,7 @@ export default function CapabilityRoutingClient() {
           <div className="sub-eyebrow">Watch it in Prism</div>
           <h2 className="sub-title">See the Signals fire in the browser.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
-            <code className="inline">cosmo doppler --prism</code> opens a live, read-only view of
+            <code className="inline">cosmo prism</code> opens a live, read-only view of
             every Signal on the bus  -  REGISTER, TASK, AGENT_OUTPUT, FINAL  -  as the workflow
             runs. The demo runs in-process on a <code className="inline">MemorySynapse</code>,
             which Prism can&apos;t attach to, so start a dev synapse and point the code at it.
@@ -612,11 +388,10 @@ export default function CapabilityRoutingClient() {
               <div className="card-icon">→</div>
               <h3>RegistryStore reference</h3>
               <p>
-                Every method on the store and the Dendrite discovery helpers,
-                for Python and TypeScript.
+                Every method on the store and the Dendrite discovery helpers.
               </p>
             </Link>
-            <Link href="/concepts" className="card">
+            <Link href="/core/concepts" className="card">
               <div className="card-icon">→</div>
               <h3>Concepts</h3>
               <p>Neuron, Axon, Dendrite, Synapse  -  what each one is and isn&apos;t.</p>

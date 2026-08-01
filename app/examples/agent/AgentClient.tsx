@@ -217,7 +217,7 @@ const prismWatchSnippet = `<span class="tk-cm"># Set SYNAPSE_URL to a running sy
 <span class="tk-op">$</span> cosmo synapse start memory <span class="tk-op">--</span>namespace=agent
 
 <span class="tk-cm"># terminal 2  -  Prism, the live browser view (http://127.0.0.1:7071)</span>
-<span class="tk-op">$</span> cosmo doppler <span class="tk-op">--</span>prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> agent
+<span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>url=cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> agent
 
 <span class="tk-cm"># terminal 3  -  the agent, pointed at the bus</span>
 <span class="tk-op">$</span> SYNAPSE_URL=cosmo://127.0.0.1:7070 uvicorn app:app <span class="tk-op">--</span>port 8000`;
@@ -410,7 +410,7 @@ export default function AgentClient() {
           <h2 className="sub-title">TASK → TOOL_CALL → TOOL_RESULT → IMPRINT → FINAL, live.</h2>
           <p style={{ color: "var(--text-dim)", maxWidth: 760, marginBottom: 24 }}>
             No observability is baked into the example  -  point{" "}
-            <code className="inline">cosmo doppler</code> at the synapse and watch the chain hop
+            <code className="inline">cosmo prism --tail</code> at the synapse and watch the chain hop
             between nodes as the run unfolds.
           </p>
           <CodeBlock filename="terminal" html={prismWatchSnippet} maxWidth={880} />

@@ -11,7 +11,7 @@ Built with Next.js 14 (App Router) and deployed on Vercel.
 | `/` | Home  -  hero, what Cosmonapse ships, terminology preview |
 | `/protocol` | Envelope specification  -  fields, message types, validation |
 | `/concepts` | Terminology  -  Brain, Neuron, Axon, Dendrite, Synapse, Signal, Pathway, Engram, Doppler |
-| `/docs` | Reference  -  Python SDK, TypeScript SDK, `cosmo` CLI |
+| `/docs` | Reference  -  Python SDK, `cosmo` CLI |
 | `/examples` | End-to-end topologies  -  round-robin, no-orchestrator, capability routing, bidding, pathway, real-world neurons |
 | `/quickstart` | Install + first-five-minutes example |
 | `/roadmap` | v0.1 → v0.4 |

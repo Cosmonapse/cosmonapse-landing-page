@@ -757,13 +757,6 @@ export default function EngramDocs() {
         </p>
         <CodeBlock filename="engram_host.py" html={engramHostSnippet} maxWidth={840} />
 
-        <p className="docs-p">
-          <strong>TypeScript note:</strong> <code className="inline">Engram.serve()</code> and the host
-          proxy are Python-only today. In the TypeScript SDK, extend the abstract{" "}
-          <code className="inline">Engram</code> class instead  -  see the{" "}
-          <Link href="/docs/typescript/engram" className="docs-link">TS Engram section</Link>. The
-          Effector equivalents <em>are</em> at parity in both SDKs.
-        </p>
       </Section>
 
       {/* ─── Result types ─── */}
@@ -931,7 +924,7 @@ export default function EngramDocs() {
         <p className="docs-p" style={{ marginTop: 24 }}>
           For the protocol-level design rationale  -  routing precedence, broadcast semantics, and the
           full envelope grammar  -  see the{" "}
-          <Link href="/protocol" className="inline-link">
+          <Link href="/core/protocol" className="inline-link">
             envelope spec
           </Link>{" "}
           and the Python SDK&rsquo;s{" "}
