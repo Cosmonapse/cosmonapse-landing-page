@@ -21,6 +21,7 @@ export const cliToc: TocGroup = {
     { href: "#cli-synapse", label: "cosmo synapse" },
     { href: "#cli-prism", label: "cosmo prism" },
     { href: "#cli-tail", label: "cosmo prism --tail" },
+    { href: "#cli-genesis", label: "cosmo genesis" },
     { href: "#cli-validate", label: "cosmo validate" },
     { href: "#cli-completion", label: "cosmo completion" },
     { href: "#cli-dispatch", label: "cosmo dispatch" },
@@ -155,6 +156,28 @@ Examples
 <span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>tail <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>type<span class="tk-op">=</span>AGENT_OUTPUT <span class="tk-op">--</span>type<span class="tk-op">=</span>ERROR
 <span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>tail <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>trace<span class="tk-op">=</span>trc_01JV…
 <span class="tk-op">$</span> cosmo prism <span class="tk-op">--</span>tail <span class="tk-op">--</span>url<span class="tk-op">=</span>cosmo://127.0.0.1:7070 <span class="tk-op">-n</span> dev <span class="tk-op">--</span>json <span class="tk-op">|</span> jq <span class="tk-str">'select(.type=="ERROR")'</span>`;
+
+const cliGenesisSnippet = `<span class="tk-op">$</span> cosmo genesis <span class="tk-op">--</span>help
+
+Launch Genesis: name a brain, pick a folder, scaffold it, grow it on a canvas.
+
+Usage
+  cosmo genesis [OPTIONS]
+
+Options
+  <span class="tk-op">--</span>port <span class="tk-op">&lt;</span>n<span class="tk-op">&gt;</span>              Local port for the Genesis server. Default: 7072
+  <span class="tk-op">--</span>help                   Show this message and exit.
+
+Examples
+
+<span class="tk-op">$</span> cosmo genesis                                        <span class="tk-cm"># opens Genesis on http://127.0.0.1:7072</span>
+<span class="tk-op">$</span> cosmo genesis <span class="tk-op">--</span>port<span class="tk-op">=</span>8080                            <span class="tk-cm"># serve on a custom port</span>
+
+  Genesis serving on http://127.0.0.1:7072
+
+<span class="tk-cm"># Genesis is the same Vite + React + TS bundle split as Prism  -  the Python side</span>
+<span class="tk-cm"># serves static assets plus a local API for folder browsing, scaffolding, and the</span>
+<span class="tk-cm"># canvas / code / test views; no Node on the install path.</span>`;
 
 const cliPrismSnippet = `<span class="tk-cm"># Launch Prism  -  the browser visualization. This is the default.</span>
 <span class="tk-op">$</span> cosmo prism                                          <span class="tk-cm"># opens Prism, enter the synapse URL in the form</span>
@@ -407,6 +430,20 @@ export default function CliDocs({ section }: { section?: string }) {
           <code className="inline">--tail</code> only.
         </p>
         <CodeBlock html={cliPrismHelpSnippet} maxWidth={860} />
+      </Section>
+
+      <Section id="cli-genesis" eyebrow="CLI · 04c" title="cosmo genesis">
+        <p className="docs-p">
+          <code className="inline">cosmo genesis</code> launches <strong>Genesis</strong>, the
+          browser wizard for starting a new brain. Name the project, pick a folder, scaffold it
+          (the same standard skeleton as <code className="inline">cosmo init</code>), then see it
+          as a draw.io-style canvas  -  one Synapse with the Neurons, Engrams, and Effectors it
+          hosts laid out around it, each wearing the same silhouette Prism gives it. Add
+          components from the canvas and Genesis writes the module and wires it into{" "}
+          <code className="inline">brain.py</code>; read every one of them in the Code tab, and
+          run the brain from the Test tab.
+        </p>
+        <CodeBlock html={cliGenesisSnippet} maxWidth={860} />
       </Section>
 
       <Section id="cli-validate" eyebrow="CLI · 05" title="cosmo validate">
