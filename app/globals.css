@@ -860,6 +860,80 @@ code.inline {
   margin-bottom: 20px;
 }
 
+/* Quickstart tabs (Core / Genesis) - a top-level path switcher, not to be
+   confused with the numbered .sub-eyebrow steps inside each path. */
+.qs-tablist {
+  display: flex;
+  gap: 4px 28px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 44px;
+}
+.qs-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 2px 13px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.qs-tab:hover { color: var(--text-dim); }
+.qs-tab .qs-tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+.qs-tab.active {
+  color: var(--qs-tab-color, var(--accent));
+  border-bottom-color: var(--qs-tab-color, var(--accent));
+}
+.qs-tab.active .qs-tab-dot {
+  opacity: 1;
+  box-shadow: 0 0 8px currentColor;
+}
+.qs-tab-sub {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--text-faint);
+  text-transform: none;
+}
+
+/* Jump nav - a row of anchor pills to the numbered steps within a path. */
+.qs-jumpnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 44px;
+}
+.qs-jumpnav a {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+  background: var(--bg-card-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.qs-jumpnav a:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: rgba(var(--fg-rgb), 0.06);
+}
+
 /* Cards */
 .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
 .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }

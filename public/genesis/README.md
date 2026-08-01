@@ -1,42 +1,48 @@
-# Genesis recordings
+# Genesis screenshots
 
-`/genesis` renders three `<DemoFrame />` slots that load a recording from this
-folder. Until a file exists, the frame shows browser chrome with a placeholder
-naming the exact path - so an empty slot still looks deliberate to a visitor,
-and you never have to guess which file goes where.
+`/genesis` renders three `<DemoFrame />` slots that load a screenshot from
+this folder, and `/core/quickstart` (the Genesis tab) renders a fourth. Until
+a file exists, the frame shows browser chrome with a placeholder naming the
+exact path - so an empty slot still looks deliberate to a visitor, and you
+never have to guess which file goes where.
 
-## The three files
+## The four files
 
-    public/genesis/canvas.mp4
-    public/genesis/code.mp4
-    public/genesis/test.mp4
+    public/genesis/canvas.jpg
+    public/genesis/code.jpg
+    public/genesis/test.jpg
+    public/genesis/quickstart.jpg
 
-`.mp4` and `.webm` autoplay muted on a loop; a `.gif` works too if you'd rather
-(just change the `src` in `app/genesis/page.tsx` to match the extension).
+`.jpg`, `.png` and `.gif` all render as a plain `<img>`; an `.mp4` or `.webm`
+autoplays muted on a loop instead if you'd rather go back to video (just
+change the `src` in `app/genesis/page.tsx` or
+`app/core/quickstart/QuickstartTabs.tsx` to match the extension).
 
 ## What each shot should show
 
-**canvas.mp4** - adding a component. Open the palette, pick a primitive, name
-it, and let the node land on the ring around the Synapse. The point being made
-is that Genesis wrote a real module and wired it into `brain.py`, so it is
-worth cutting to the Code tab for a beat to show the file that appeared. If you
-can fit it, add a Receptor too - the CLI / API / chat choice is the one thing
-the palette asks that nothing else does.
+**canvas.jpg** - a component just added. The palette open or just closed,
+a new node landed on the ring around the Synapse, mid-wire into `brain.py`.
+The point being made is that Genesis wrote a real module, so a beat that
+also shows the Code tab with the new file is worth a second shot if you
+want to string a couple together later.
 
-**code.mp4** - the interactive Code tab. Show a declaration rendered as a form
-(a Neuron or an Engram both read well), change one field, save, and let the
-re-read model come back. The thing to make legible is that the surrounding
-source is untouched - if a module has hand-written comments above the
-declaration, keep them in frame. An Axon source switch (OpenAI -> Ollama) or an
-Engram shape switch is a strong second beat.
+**code.jpg** - the interactive Code tab. A declaration rendered as a form
+(a Neuron or an Engram both read well), mid-edit on one field. The thing to
+make legible is that the surrounding source is untouched - if a module has
+hand-written comments above the declaration, keep them in frame.
 
-**test.mp4** - running it. Press Run, let the liveness pill go green, then
-Connect and drive the Receptor: a command in the terminal panel, a request in
-the API panel, or a turn in the chat panel. Whichever Receptor you demo, show
-the reply arriving. If Prism is easy to open from the gear menu at the end,
-that is a good handoff into the rest of the site.
+**test.jpg** - running it. The liveness pill green after Run, and the
+Connect panel open - a command in the terminal panel, a request in the API
+panel, or a turn in the chat panel, with a reply already on screen.
 
-## How to record one
+**quickstart.jpg** - the first five minutes, captured at the moment a reply
+comes back through a freshly-dropped Receptor: a Neuron and a Receptor on an
+otherwise empty ring, Run green, Connect open with the reply visible. This is
+the one visitors on `/core/quickstart` see before they've read anything else
+about Genesis, so it should read as a complete loop on its own rather than
+assuming the context the `/genesis` page builds up.
+
+## How to capture one
 
 1. Start Genesis:
 
@@ -44,12 +50,12 @@ that is a good handoff into the rest of the site.
 
 2. Open an example project with a few components already in it - the canvas
    reads as a system rather than an empty ring. Anything from
-   `cosmonapse-examples/` works.
-3. Screen-record the Genesis window only, not the whole desktop. 8-15 seconds
-   each is plenty; these are loops, not tutorials.
+   `cosmonapse-examples/` works. For quickstart.jpg, start from an *empty*
+   scaffold instead, since the point is the first-run experience.
+3. Screenshot the Genesis window only, not the whole desktop.
 4. Export 16:9 (the frame is `aspect-ratio: 16/9` and letterboxes anything
-   else), keep it under ~5 MB, and save it here under the matching name.
+   else), keep it under ~1 MB, and save it here under the matching name.
 
-Record in whichever theme you prefer - the frame's chrome is themed by the
+Capture in whichever theme you prefer - the frame's chrome is themed by the
 site, so a dark capture on a light page still reads fine. Dark is the safer
 default since it matches the site's default theme.

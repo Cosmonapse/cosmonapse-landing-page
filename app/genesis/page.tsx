@@ -88,23 +88,23 @@ const TABS: { label: string; tagline: string; what: string[] }[] = [
 ];
 
 /**
- * Demo slots. Each renders framed browser chrome now and the recording as
- * soon as the file lands at public/genesis/<name>.mp4 - see the README there
+ * Demo slots. Each renders framed browser chrome now and the screenshot as
+ * soon as the file lands at public/genesis/<name>.jpg - see the README there
  * for what each shot should show.
  */
 const DEMOS: { src: string; caption: string }[] = [
   {
-    src: "/genesis/canvas.mp4",
+    src: "/genesis/canvas.jpg",
     caption:
       "Canvas - adding a Neuron from the palette: Genesis writes the module, wires it into brain.py, and the node lands on the ring around the Synapse.",
   },
   {
-    src: "/genesis/code.mp4",
+    src: "/genesis/code.jpg",
     caption:
       "Code - the declaration as a form and the handlers as code boxes, with an edit applied through the AST and the file re-read from disk.",
   },
   {
-    src: "/genesis/test.mp4",
+    src: "/genesis/test.jpg",
     caption:
       "Test - Run starts brain.py, the liveness pill goes green, and Connect opens the Receptor's own surface to drive it.",
   },

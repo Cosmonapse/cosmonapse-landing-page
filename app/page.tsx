@@ -103,20 +103,22 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ── Hero demo ────────────────────────────────────────────────────── */}
-      <section className="section-sm">
-        <div className="container">
-          <div className="demo-hero">
-            <DemoFrame
-              src="/demo/loop.mp4"
-              address="cosmo genesis  ·  brain.py  ·  cosmo prism"
-              badge="THE LOOP"
-              caption="Design a system on the Genesis canvas, run it on Core, and watch the same components light up in Prism - one project, three windows."
-              maxWidth={1000}
-            />
+      {/* ── Hero demo - hidden for now, no recording captured yet ─────────── */}
+      {false && (
+        <section className="section-sm">
+          <div className="container">
+            <div className="demo-hero">
+              <DemoFrame
+                src="/demo/loop.mp4"
+                address="cosmo genesis  ·  brain.py  ·  cosmo prism"
+                badge="THE LOOP"
+                caption="Design a system on the Genesis canvas, run it on Core, and watch the same components light up in Prism - one project, three windows."
+                maxWidth={1000}
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── The two bets ─────────────────────────────────────────────────── */}
       <section className="section">
