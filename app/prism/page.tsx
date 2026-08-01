@@ -184,15 +184,6 @@ export default function PrismPage() {
       </section>
 
       <div className="container">
-        <div className="obs-disclaimer" role="note">
-          <span className="obs-disclaimer-badge">Heads up</span>
-          <p>
-            All five views - <strong>Brain View</strong>, Constellation, Signal Tree, Signal List and
-            Metrics - ship today in <strong>0.1.11</strong>. Some of the captures below are
-            placeholders until we record real ones.
-          </p>
-        </div>
-
         <PrismClient />
       </div>
 

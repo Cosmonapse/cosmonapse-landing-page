@@ -8,7 +8,6 @@ type ViewId = "brain" | "constellation" | "tree" | "list" | "metrics";
 type ViewDef = {
   id: ViewId;
   label: string;
-  version: "0.1.11";
   tagline: string;
   /** Sub-line shown in the accordion when expanded. */
   blurb: string;
@@ -24,7 +23,6 @@ const VIEWS: ViewDef[] = [
   {
     id: "brain",
     label: "Brain View",
-    version: "0.1.11",
     tagline: "The live neural graph",
     blurb: "Watch a running Synapse think in real time.",
     what: [
@@ -49,7 +47,6 @@ const VIEWS: ViewDef[] = [
   {
     id: "constellation",
     label: "Constellation",
-    version: "0.1.11",
     tagline: "One run, drawn as its execution graph",
     blurb: "The topology your system actually formed  -  not the one you drew.",
     what: [
@@ -73,7 +70,6 @@ const VIEWS: ViewDef[] = [
   {
     id: "tree",
     label: "Signal Tree",
-    version: "0.1.11",
     tagline: "The causal structure of a task",
     blurb: "Follow exactly what caused what, TASK to FINAL.",
     what: [
@@ -96,7 +92,6 @@ const VIEWS: ViewDef[] = [
   {
     id: "list",
     label: "Signal List",
-    version: "0.1.11",
     tagline: "The chronological record",
     blurb: "The raw trace  -  timestamps, payloads, and a copy you can send someone.",
     what: [
@@ -120,7 +115,6 @@ const VIEWS: ViewDef[] = [
   {
     id: "metrics",
     label: "Metrics",
-    version: "0.1.11",
     tagline: "Aggregate health and statistics",
     blurb: "Quantify a system instead of eyeballing it.",
     what: [
@@ -177,9 +171,6 @@ export default function PrismClient() {
                       onClick={() => setActive(v.id)}
                     >
                       <span className="obs-viewbtn-label">{v.label}</span>
-                      <span className="obs-badge obs-badge-now">
-                        {v.version}
-                      </span>
                     </button>
                   </li>
                 );
@@ -191,11 +182,6 @@ export default function PrismClient() {
 
       {/* ─── Main content: the selected view explained ─── */}
       <main className="obs-content">
-        <div className="obs-view-eyebrow">
-          <span className="obs-badge obs-badge-now">
-            Available in {view.version}
-          </span>
-        </div>
         <h2 className="obs-view-title">{view.label}</h2>
         <p className="obs-view-tagline">{view.tagline}</p>
         <p className="obs-view-blurb">{view.blurb}</p>
