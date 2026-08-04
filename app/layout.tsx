@@ -3,7 +3,7 @@ import { Inter, JetBrains_Mono, Michroma } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react";
-import { KEYWORDS_ALL, SITE_NAME, SITE_URL, TWITTER } from "@/lib/seo";
+import { KEYWORDS_ALL, OG_IMAGE, SITE_NAME, SITE_URL, TWITTER, ogImage } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import ThemeScript from "@/components/ThemeScript";
 import "./globals.css";
@@ -64,6 +64,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: "en_US",
     type: "website",
+    images: [ogImage()],
   },
   twitter: {
     card: "summary_large_image",
@@ -72,6 +73,7 @@ export const metadata: Metadata = {
       "Design them in Genesis, run them on the open Core protocol, watch them in Prism. Build domain-specialised AI systems, not another model wrapper.",
     site: TWITTER,
     creator: TWITTER,
+    images: [`${SITE_URL}${OG_IMAGE}`],
   },
 };
 

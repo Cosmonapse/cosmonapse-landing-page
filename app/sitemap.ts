@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo";
+import { EARLY_ACCESS_HREF } from "@/lib/early-access";
 import { DOC_REFS } from "./docs/docsNav";
 
 /**
@@ -42,6 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/core/concepts`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${SITE_URL}/examples`, priority: 0.8, changeFrequency: "weekly" },
     { url: `${SITE_URL}/roadmap`, priority: 0.6, changeFrequency: "monthly" },
+    { url: `${SITE_URL}${EARLY_ACCESS_HREF}`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${SITE_URL}/community-examples`, priority: 0.4, changeFrequency: "monthly" },
   ].map((e) => ({ ...e, lastModified: now })) as MetadataRoute.Sitemap;
 

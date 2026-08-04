@@ -3,6 +3,7 @@ import BuildOnCosmonapse from "@/components/BuildOnCosmonapse";
 import DemoFrame from "@/components/DemoFrame";
 import ProductGrid from "@/components/ProductGrid";
 import { NEXT_UP } from "@/lib/products";
+import { EARLY_ACCESS_HREF } from "@/lib/early-access";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
@@ -289,6 +290,29 @@ export default function HomePage() {
             </Link>{" "}
             show the patterns end to end.
           </p>
+        </div>
+      </section>
+
+      {/* ── Early access ─────────────────────────────────────────────────── */}
+      <section className="section-sm">
+        <div className="container">
+          <div className="ea-band">
+            <div className="ea-band-copy">
+              <div className="ea-band-eyebrow">// Early Access Program</div>
+              <h3>Building something real on this? Come talk to us.</h3>
+              <p>
+                We run architecture sessions with early adopters on the system they are actually
+                building - free, framework-agnostic, and with the people writing the protocol.
+                Members also get credits and a standing discount on Cosmonapse Cloud when it
+                launches. Limited slots, subject to availability.
+              </p>
+            </div>
+            <div className="ea-band-actions">
+              <Link href={EARLY_ACCESS_HREF} className="btn btn-primary">
+                Early access <span className="arrow">→</span>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import BrandMark from "@/components/BrandMark";
 import ThemeToggle from "@/components/ThemeToggle";
 import { PRODUCTS } from "@/lib/products";
+import { EARLY_ACCESS_HREF, EARLY_ACCESS_LABEL } from "@/lib/early-access";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
@@ -150,6 +151,9 @@ export default function Nav() {
             </svg>
             GitHub
           </a>
+          <Link href={EARLY_ACCESS_HREF} className="nav-cta nav-cta-accent">
+            {EARLY_ACCESS_LABEL}
+          </Link>
           <Link href="/core/quickstart" className="nav-cta">
             Get started
             <span className="arrow">→</span>
@@ -215,6 +219,14 @@ export default function Nav() {
             <a href={GITHUB} target="_blank" rel="noopener noreferrer">
               GitHub ↗
             </a>
+          </li>
+          <li className="nav-mobile-cta-item">
+            <Link
+              href={EARLY_ACCESS_HREF}
+              className="nav-cta nav-cta-accent nav-mobile-cta"
+            >
+              {EARLY_ACCESS_LABEL}
+            </Link>
           </li>
           <li className="nav-mobile-cta-item">
             <Link href="/core/quickstart" className="nav-cta nav-mobile-cta">

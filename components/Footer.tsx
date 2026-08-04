@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BrandMark from "@/components/BrandMark";
 import { PRODUCTS } from "@/lib/products";
+import { EARLY_ACCESS_HREF, EARLY_ACCESS_LABEL } from "@/lib/early-access";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
@@ -94,6 +95,9 @@ export default function Footer() {
                 <a href={`${GITHUB}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer">
                   License  -  Apache 2.0
                 </a>
+              </li>
+              <li>
+                <Link href={EARLY_ACCESS_HREF}>{EARLY_ACCESS_LABEL}</Link>
               </li>
               <li>
                 <a href="mailto:dev@cosmonapse.com">Contact</a>
