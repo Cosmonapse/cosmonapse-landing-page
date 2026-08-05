@@ -6,7 +6,7 @@ import { EARLY_ACCESS_FORM_URL } from "@/lib/early-access";
 export const metadata: Metadata = pageMetadata({
   title: "Early Access Program",
   description:
-    "Build on Cosmonapse before 1.0. Early access members get architecture sessions with the team and credits or discounts on Cosmonapse Cloud when it goes live. Limited slots, no cost, no exclusivity.",
+    "Build on Cosmonapse before 1.0. Early access members get architecture sessions with the team, and the first 50 accepted members get credits and a standing discount on Cosmonapse Cloud when it goes live. No cost, no exclusivity.",
   path: "/early-access",
   image: "/og/early-access.png",
   keywords: [
@@ -23,9 +23,9 @@ export const metadata: Metadata = pageMetadata({
 /** What a member gets out of it. */
 const PERKS = [
   {
-    name: "Credits and discounts at launch",
+    name: "Credits and discounts - first 50 only",
     body:
-      "Core, Genesis and Prism are Apache 2.0 and free to run locally - that does not change. Cosmonapse Cloud is the part that will eventually be paid. Everyone who joins the programme is recorded now and gets launch credits plus a standing discount when Cloud goes live.",
+      "Core, Genesis and Prism are Apache 2.0 and free to run locally - that does not change. Cosmonapse Cloud is the part that will eventually be paid, and the first 50 members accepted into the programme get launch credits plus a standing discount on it. Member 51 onward is welcome and gets everything else; the concessions are capped at 50 so they mean something.",
   },
   {
     name: "Architecture sessions with the team",
@@ -63,7 +63,7 @@ const STEPS = [
     n: "04",
     title: "Credits land when the platform does",
     body:
-      "Your slot and join date are on record from the day you are accepted. When Cosmonapse Cloud launches, the credits and the discount are applied to your account - no re-application, no window to miss.",
+      "Your slot, join date and member number are on record from the day you are accepted. If your number is 50 or below, the credits and the standing discount are applied when Cosmonapse Cloud launches - no re-application, no window to miss.",
   },
 ];
 
@@ -95,7 +95,7 @@ const FAQ = [
   },
   {
     q: "How firm are the credits?",
-    a: "It is a commitment we are putting in writing on a public page, not a signed contract - and we will not attach a date to it, because 1.0.0 and Cloud do not have one. What is fixed is the order: everyone who joins during early access is in before anyone who signs up on launch day.",
+    a: "It is a commitment we are putting in writing on a public page, not a signed contract - and we will not attach a date to it, because 1.0.0 and Cloud do not have one. What is fixed is who qualifies: the first 50 members accepted, in the order they were accepted, and that list stops at 50.",
   },
   {
     q: "Do I have to build on Cosmonapse?",
@@ -106,8 +106,8 @@ const FAQ = [
     a: "You do. No NDA, no exclusivity, no claim on your code. You are free to talk publicly about the sessions, the product and where it fell short.",
   },
   {
-    q: "How many slots are there?",
-    a: "Enough that the sessions stay real. Sessions are run by the people writing the code, so intake is limited by how many hours exist in a week - which is why the form asks what you are building rather than just for an email.",
+    q: "What happens after the 50 are taken?",
+    a: "The programme stays open and the sessions keep running - they are limited by how many hours exist in a week, not by a headcount. What closes at 50 is the credits and the launch discount. Applying early is the only way to be inside that number, which is also why the form asks what you are building rather than just for an email.",
   },
   {
     q: "What happens to my form response?",
@@ -121,12 +121,17 @@ export default function EarlyAccessPage() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Early Access Program</div>
+          <div className="badge">
+            <span className="dot" />
+            First 50 members only
+          </div>
           <h1 className="page-title">Build on Cosmonapse before 1.0.</h1>
           <p className="page-sub">
             Cosmonapse is a research preview being taken to a stable 1.0.0. Early access is for
             people pointing it at a real problem while that happens. You get working sessions with
-            the team on your architecture, and credits plus a standing discount on Cosmonapse Cloud
-            when it goes live. Free to join, limited slots, subject to availability.
+            the team on your architecture, and the first 50 members accepted also get credits plus
+            a standing discount on Cosmonapse Cloud when it goes live. Free to join, sessions
+            subject to availability.
           </p>
           <div className="hero-ctas" style={{ marginTop: 28 }}>
             <a
@@ -151,8 +156,9 @@ export default function EarlyAccessPage() {
           <h2 className="section-title">Sessions now, credits at launch.</h2>
           <p className="section-sub">
             Two things are on the table. One is worth something today; the other is worth something
-            the day the platform ships. Both are aimed at the same person - someone building a
-            system that is hard enough to be worth designing properly.
+            the day the platform ships, and only to the first 50 through the door. Both are aimed
+            at the same person - someone building a system that is hard enough to be worth
+            designing properly.
           </p>
           <div className="grid-3" style={{ marginTop: 32 }}>
             {PERKS.map((p) => (
@@ -272,7 +278,8 @@ export default function EarlyAccessPage() {
                 color: "var(--text-faint)",
               }}
             >
-              Slots are limited and sessions are subject to availability. Prefer email?{" "}
+              Concessions are capped at the first 50 members; sessions are subject to
+              availability. Prefer email?{" "}
               <a href="mailto:dev@cosmonapse.com" className="inline-link">
                 dev@cosmonapse.com
               </a>

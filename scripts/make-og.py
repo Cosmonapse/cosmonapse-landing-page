@@ -212,8 +212,8 @@ CARDS = {
         eyebrow="// EARLY ACCESS PROGRAM",
         headline=["Build on Cosmonapse", "before 1.0."],
         sub=[
-            "Architecture sessions with the team, and credits when",
-            "the platform goes live. Limited slots.",
+            "Architecture sessions with the team. First 50 members",
+            "get credits when the platform goes live.",
         ],
         url="cosmonapse.dev/early-access",
     ),

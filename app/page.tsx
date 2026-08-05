@@ -303,8 +303,8 @@ export default function HomePage() {
               <p>
                 We run architecture sessions with early adopters on the system they are actually
                 building - free, framework-agnostic, and with the people writing the protocol.
-                Members also get credits and a standing discount on Cosmonapse Cloud when it
-                launches. Limited slots, subject to availability.
+                The first 50 members accepted also get credits and a standing discount on
+                Cosmonapse Cloud when it launches.
               </p>
             </div>
             <div className="ea-band-actions">
