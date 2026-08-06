@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import DemoFrame from "@/components/DemoFrame";
+import CanvasToSource from "@/components/diagrams/CanvasToSource";
+import ModuleInThreeParts from "@/components/diagrams/ModuleInThreeParts";
+import PrimitivesOnTheBus from "@/components/diagrams/PrimitivesOnTheBus";
 import ProductGrid from "@/components/ProductGrid";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS } from "@/lib/seo";
 
@@ -189,6 +192,8 @@ export default function GenesisPage() {
               </div>
             ))}
           </div>
+
+          <PrimitivesOnTheBus />
         </div>
       </section>
 
@@ -254,6 +259,10 @@ export default function GenesisPage() {
             Three ways of looking at one project - the shape, the source, and the running thing. No
             build step and no export between them.
           </p>
+
+          <CanvasToSource />
+
+          <ModuleInThreeParts />
           {TABS.map((t, i) => (
             <div
               key={t.label}

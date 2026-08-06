@@ -1,5 +1,10 @@
 import Link from "next/link";
 import BuildOnCosmonapse from "@/components/BuildOnCosmonapse";
+import BoutiqueSystem from "@/components/diagrams/BoutiqueSystem";
+import CallStackVsBus from "@/components/diagrams/CallStackVsBus";
+import HeroBus from "@/components/diagrams/HeroBus";
+import DesignRunObserve from "@/components/diagrams/DesignRunObserve";
+import SuiteStream from "@/components/diagrams/SuiteStream";
 import DemoFrame from "@/components/DemoFrame";
 import ProductGrid from "@/components/ProductGrid";
 import { NEXT_UP } from "@/lib/products";
@@ -101,6 +106,8 @@ export default function HomePage() {
           >
             Open source · Apache 2.0 licensed · Python SDK
           </p>
+
+          <HeroBus />
         </div>
       </header>
 
@@ -178,6 +185,8 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+
+          <CallStackVsBus />
         </div>
       </section>
 
@@ -225,6 +234,8 @@ export default function HomePage() {
               </Link>
             </span>
           </div>
+
+          <SuiteStream />
         </div>
       </section>
 
@@ -248,6 +259,8 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+
+          <DesignRunObserve />
         </div>
       </section>
 
@@ -290,6 +303,8 @@ export default function HomePage() {
             </Link>{" "}
             show the patterns end to end.
           </p>
+
+          <BoutiqueSystem />
         </div>
       </section>
 

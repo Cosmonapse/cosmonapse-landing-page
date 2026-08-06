@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ProductGrid from "@/components/ProductGrid";
+import LineageAttribution from "@/components/diagrams/LineageAttribution";
+import ReadOnlyTap from "@/components/diagrams/ReadOnlyTap";
+import TwoLegJourney from "@/components/diagrams/TwoLegJourney";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_REACTIVE } from "@/lib/seo";
 import PrismClient from "./PrismClient";
 
@@ -125,6 +128,9 @@ export default function PrismPage() {
             nothing extra for observability&rsquo;s sake - there is no instrumentation to add, and no
             way to accidentally leave it out.
           </p>
+
+          <ReadOnlyTap />
+
           <div className="grid-2">
             <div className="card">
               <h3>Read-only by construction</h3>
@@ -164,6 +170,8 @@ export default function PrismPage() {
               </p>
             </div>
           </div>
+
+          <LineageAttribution />
         </div>
       </section>
 
@@ -180,6 +188,8 @@ export default function PrismPage() {
             even gives Receptors their own outer ring, because they are the boundary of the system
             and burying the edge in the middle of the graph would misrepresent it.
           </p>
+
+          <TwoLegJourney />
         </div>
       </section>
 

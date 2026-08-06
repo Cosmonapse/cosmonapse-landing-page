@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_PRODUCT } from "@/lib/seo";
 import CodeBlock from "@/components/CodeBlock";
+import EnvelopeAnatomy from "@/components/diagrams/EnvelopeAnatomy";
 
 export const metadata: Metadata = pageMetadata({
   title: "Signal Envelope Spec",
@@ -306,6 +307,8 @@ export default function ProtocolPage() {
             lowercase type prefix, an underscore, and a 26-character canonical ULID. Globally unique without
             coordination; lexicographically sortable by creation time.
           </p>
+
+          <EnvelopeAnatomy />
           <div className="table-scroll">
           <table className="spec-table">
             <thead>

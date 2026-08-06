@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ProductGrid from "@/components/ProductGrid";
+import PrimitivesOnTheBus from "@/components/diagrams/PrimitivesOnTheBus";
+import TransportSwap from "@/components/diagrams/TransportSwap";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS, KW_PRODUCT } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -127,6 +129,8 @@ export default function CorePage() {
               </div>
             ))}
           </div>
+          <PrimitivesOnTheBus />
+
           <div style={{ textAlign: "center", marginTop: 32 }}>
             <Link href="/core/concepts" className="btn btn-ghost">
               Every concept in the protocol <span className="arrow">→</span>
@@ -194,6 +198,8 @@ export default function CorePage() {
               </div>
             ))}
           </div>
+
+          <TransportSwap />
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import NobodyHoldsTheLoop from "@/components/diagrams/NobodyHoldsTheLoop";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS, KW_REACTIVE } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -291,6 +292,8 @@ export default function ConceptsPage() {
             to events on that trace, or stream them - and can walk away entirely, because the work
             proceeds whether or not anyone is listening.
           </p>
+
+          <NobodyHoldsTheLoop />
 
           <div className="layer-stack" style={{ marginTop: 40 }}>
             <div className="layer">
