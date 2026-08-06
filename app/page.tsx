@@ -6,11 +6,20 @@ import HeroBus from "@/components/diagrams/HeroBus";
 import DesignRunObserve from "@/components/diagrams/DesignRunObserve";
 import SuiteStream from "@/components/diagrams/SuiteStream";
 import DemoFrame from "@/components/DemoFrame";
+import InstallCommands from "@/components/InstallCommands";
 import ProductGrid from "@/components/ProductGrid";
 import { NEXT_UP } from "@/lib/products";
 import { EARLY_ACCESS_HREF } from "@/lib/early-access";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
+
+// One package, two commands: install it, then open the designer. Repeated
+// verbatim in the closing CTA rather than varied, so the thing you scrolled
+// past at the top is the thing you copy at the bottom.
+const INSTALL = [
+  { cmd: "pip install cosmonapse", note: "the cosmo CLI ships with it" },
+  { cmd: "cosmo genesis", note: "opens the designer at 127.0.0.1:7072" },
+];
 
 // The lifecycle strip: which product you are in at each stage of the work.
 const LIFECYCLE: { verb: string; product: string; color: string; body: string }[] = [
@@ -95,17 +104,10 @@ export default function HomePage() {
               <span aria-hidden>★</span> Star on GitHub
             </a>
           </div>
-          <p
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12.5,
-              color: "var(--text-faint)",
-              letterSpacing: "0.04em",
-              marginBottom: 36,
-            }}
-          >
-            Open source · Apache 2.0 licensed · Python SDK
-          </p>
+          <InstallCommands
+            commands={INSTALL}
+            caption="Python 3.11+ · Apache 2.0 · Core, Genesis and Prism all ship in the one package"
+          />
 
           <HeroBus />
         </div>
@@ -349,6 +351,8 @@ export default function HomePage() {
                 Read the envelope spec
               </Link>
             </div>
+
+            <InstallCommands commands={INSTALL} center />
           </div>
         </div>
       </section>

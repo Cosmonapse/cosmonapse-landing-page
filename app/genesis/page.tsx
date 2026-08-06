@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import DemoFrame from "@/components/DemoFrame";
+import InstallCommands from "@/components/InstallCommands";
 import CanvasToSource from "@/components/diagrams/CanvasToSource";
 import ModuleInThreeParts from "@/components/diagrams/ModuleInThreeParts";
 import PrimitivesOnTheBus from "@/components/diagrams/PrimitivesOnTheBus";
@@ -134,16 +135,13 @@ export default function GenesisPage() {
               What it builds on
             </Link>
           </div>
-          <p
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12.5,
-              color: "var(--text-faint)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            cosmo genesis · opens on 127.0.0.1:7072 · ships in 0.1.11
-          </p>
+          <InstallCommands
+            commands={[
+              { cmd: "pip install cosmonapse", note: "the cosmo CLI ships with it" },
+              { cmd: "cosmo genesis", note: "opens on 127.0.0.1:7072" },
+            ]}
+            caption="ships in 0.1.11 · no separate download, no runtime dependency on Genesis"
+          />
         </div>
       </header>
 

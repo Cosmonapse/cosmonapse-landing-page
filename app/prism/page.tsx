@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import InstallCommands from "@/components/InstallCommands";
 import ProductGrid from "@/components/ProductGrid";
 import LineageAttribution from "@/components/diagrams/LineageAttribution";
 import ReadOnlyTap from "@/components/diagrams/ReadOnlyTap";
@@ -97,16 +98,13 @@ export default function PrismPage() {
               What it reads from
             </Link>
           </div>
-          <p
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12.5,
-              color: "var(--text-faint)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            cosmo prism · opens on 127.0.0.1:7071 · ships in 0.1.11
-          </p>
+          <InstallCommands
+            commands={[
+              { cmd: "pip install cosmonapse", note: "the cosmo CLI ships with it" },
+              { cmd: "cosmo prism", note: "opens on 127.0.0.1:7071" },
+            ]}
+            caption="ships in 0.1.11 · runs on your machine, connects out to a Synapse"
+          />
         </div>
       </header>
 
