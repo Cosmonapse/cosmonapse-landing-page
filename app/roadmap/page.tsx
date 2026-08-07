@@ -237,7 +237,7 @@ export default function RoadmapPage() {
           <div className="sub-eyebrow">Priority order  -  0.1.0 → 1.0.0</div>
           <p className="prose">The order matters. Each milestone lands on the baseline the last one established.</p>
           <ol className="prose" style={{ paddingLeft: 24 }}>
-            <li>0.1.x  -  shipped (0.1.11): protocol drafted, both SDKs and the CLI released, every primitive present</li>
+            <li>0.1.x  -  shipped (0.1.11): protocol drafted, the Python SDK and the CLI released, every primitive present</li>
             <li>0.2.0  -  the six primitives solid with basic LLMs; the Axon output repair contract; Doppler multi-tab + filters; pathways and traces set in stone; heavy testing against NATS / Kafka</li>
             <li>0.3.0  -  agents from Claude and OpenAI stress-testing the protocol; fixing and development in tandem</li>
             <li>1.0.0  -  strong foundation: Prism deepened with cognition analytics, Brains and Brainwaves, deployment and infra integration, complex RAG / agent systems built consistently, Cosmonapse Cloud</li>

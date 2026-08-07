@@ -339,8 +339,8 @@ export default function HomePage() {
           <div className="cta-card">
             <h2>Build a system, not a demo.</h2>
             <p>
-              Core 0.1.11 is a research preview: the envelope is drafted, both SDKs are at parity, and
-              Genesis and Prism run locally today off the same CLI. It is open source under Apache
+              Core 0.1.11 is a research preview: the envelope is drafted, the Python SDK implements
+              it, and Genesis and Prism run locally today off the same CLI. It is open source under Apache
               2.0 - read the spec, disagree with it in public, and build on it either way.
             </p>
             <div className="hero-ctas" style={{ marginBottom: 0 }}>

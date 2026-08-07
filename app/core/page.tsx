@@ -207,7 +207,7 @@ export default function CorePage() {
       <section className="section">
         <div className="container">
           <div className="section-eyebrow">// Tooling</div>
-          <h2 className="section-title">One CLI, two SDKs.</h2>
+          <h2 className="section-title">One CLI, one SDK, one spec.</h2>
           <div className="grid-2">
             <div className="card">
               <h3>cosmo</h3>
@@ -222,9 +222,9 @@ export default function CorePage() {
             <div className="card">
               <h3>The wire, not the language</h3>
               <p>
-                The Python SDK is the reference implementation, but nothing about the protocol is
-                Python. Any component that emits and accepts valid Signals is a participant on the
-                bus  -  the envelope is the whole contract.
+                Python is the single first-party SDK, and nothing about the protocol is Python. Any
+                component that emits and accepts valid Signals is a participant on the bus  -  the
+                envelope is the whole contract, whatever wrote it.
               </p>
             </div>
             <div className="card">
@@ -233,7 +233,10 @@ export default function CorePage() {
                 The <Link href="/core/protocol" className="inline-link">envelope specification</Link>{" "}
                 is short on purpose. If you want to write a Cosmonapse implementation in a third
                 language, that page plus{" "}
-                <code className="inline">cosmo schema</code> is everything you need.
+                <code className="inline">cosmo schema</code> is everything you need. A first-party
+                TypeScript SDK shipped during 0.1.x and was retired: two implementations meant every
+                protocol change had to land twice before it could be called shipped, and the spec
+                carries the language-agnostic claim better than a parity table did.
               </p>
             </div>
             <div className="card">
