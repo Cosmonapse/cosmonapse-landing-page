@@ -81,7 +81,7 @@ const FIT = [
     name: "Probably not yet if",
     items: [
       "You need a production SLA today - Core is 0.1.11-alpha and the protocol is not frozen until 0.2.0",
-      "You are looking for a managed hosted service right now - Cloud is a 1.0.0 target, not a thing you can buy",
+      "You are looking for a managed hosted service right now - Cloud is a 0.3.0 target, not a thing you can buy",
       "You want an agent that is one model behind a chat box - you do not need a protocol for that",
       "You cannot share anything at all about what you are building, which makes an architecture session hard to run",
     ],
@@ -95,7 +95,7 @@ const FAQ = [
   },
   {
     q: "How firm are the credits?",
-    a: "It is a commitment we are putting in writing on a public page, not a signed contract - and we will not attach a date to it, because 1.0.0 and Cloud do not have one. What is fixed is who qualifies: the first 50 members accepted, in the order they were accepted, and that list stops at 50.",
+    a: "It is a commitment we are putting in writing on a public page, not a signed contract - and we will not attach a date to it, because Cloud and 1.0.0 do not have one. What is fixed is who qualifies: the first 50 members accepted, in the order they were accepted, and that list stops at 50.",
   },
   {
     q: "Do I have to build on Cosmonapse?",
