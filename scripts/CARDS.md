@@ -1,7 +1,7 @@
 # Cosmonapse cards
 
 `cards.py` renders content cards - a code snippet, a terminal transcript, a
-comparison table, a before/after split, a single statement, or a small
+comparison table, a before/after split, a single statement, a title card, or a small
 node-and-edge diagram - on the same ground the Open Graph images use.
 
 It is a companion to `make-og.py`, not a replacement: `make-og.py` renders the
@@ -120,6 +120,36 @@ posts and section breaks.
 `body` is a single string and wraps on its own. Keep it under about 90
 characters or the type gets small enough to defeat the point.
 
+### `hero`
+
+The title card: centred mark, gradient wordmark, tagline, pills. The one
+layout with no left-aligned lockup and no footer - it *is* the lockup, at
+size, and everything hangs off the centre line. The block is measured and
+then vertically centred, so a hero with no `sub` or no `pills` still sits on
+the optical centre.
+
+```json
+{ "kind": "hero",
+  "tagline": "A distributed agent-to-agent protocol",
+  "sub": "Agents are peers. Coordination is messages on a shared bus.",
+  "pills": [{"label": "Apache 2.0"}, {"label": "Python"},
+            {"label": "$ pip install cosmonapse", "accent": true}],
+  "strip": "Neurons think  ·  Engrams remember  ·  Effectors act  ·  Receptors listen" }
+```
+
+`accent: true` on a pill outlines it in the accent instead of the border
+colour - use it on exactly one pill, the call to action.
+
+The wordmark is **set in Michroma**, the same face `globals.css .brand-word`
+uses, at its `letter-spacing: 0.06em`. It is live type rather than a paste of
+`wordwork.png`, so a size change re-renders instead of resampling and the
+`--grad-1 -> --grad-2 -> --grad-3` ramp lands on the glyphs at full
+resolution. Michroma ships in one weight; there is no bold.
+
+`wordmark` sets the string (default `"COSMONAPSE"`), `word_size` its point
+size, and `mark_h` / `top` override the logo height and vertical origin. The
+wordmark auto-shrinks if it would reach the card edges.
+
 ### `diagram`
 
 Nodes and edges, using the Prism silhouettes and per-primitive colours.
@@ -138,18 +168,31 @@ Nodes and edges, using the Prism silhouettes and per-primitive colours.
 `col` places a node left-to-right, `row` orders it within its column. Layout is
 otherwise automatic and columns are centred vertically. Shapes:
 
-| `shape` | silhouette | colour source |
+Shapes and colours match `cosmonapse-core/assets/diagrams/primitives-*.svg`,
+the canonical figure, whose own comment is the rule: *"Neurons accent, Engrams
+--p-engram, Effectors accent-3, Receptors accent-2. A component wears one
+colour across the suite."*
+
+| `shape` | silhouette | colour (`palette: "suite"`) |
 | --- | --- | --- |
-| `neuron` / `axon` | circle | `theme.ts` `neuron` |
-| `engram` | rounded square | `theme.ts` `engram` |
-| `effector` | hexagon | `theme.ts` `effector` |
-| `receptor` | a cup, open at the top | `theme.ts` `receptor` |
-| `synapse` | a ring | `theme.ts` `synapse` |
+| `neuron` / `axon` | circle | `--accent` |
+| `engram` | diamond | `--p-engram` |
+| `effector` | triangle | `--accent-3` |
+| `receptor` | a cup, open at the top | `--accent-2` |
+| `synapse` | the bus bar | `--accent-2` |
 
 The receptor cup is open upward on purpose - it collects from outside the
 fabric rather than servicing something inside it.
 
-Edges take an optional third element, drawn as a label above the arrow.
+**Two palettes.** `"palette": "suite"` (the default) is the mapping above, and
+is right for any figure that *explains* the primitives. `"palette": "prism"`
+switches to the hues the live Constellation paints nodes with
+(`prism-ui/src/theme.ts` - amber effectors, lime receptors) and should only be
+used when the card depicts an actual Prism view. Do not mix them on one card.
+
+Edges take an optional third element, drawn as a label - above a horizontal
+arrow, beside a vertical one. A node with an edge dropping straight down is
+labelled above itself so the arrow does not run through its own caption.
 
 ## Importing it
 

@@ -69,6 +69,7 @@ THEMES: dict[str, dict[str, Any]] = {
         p_neuron=_rgb("#8b5cf6"), p_engram=_rgb("#a78bfa"),
         p_effector=_rgb("#f59e0b"), p_receptor=_rgb("#a3e635"),
         p_synapse=_rgb("#22d3ee"),
+        grad=(_rgb("#a78bfa"), _rgb("#c084fc"), _rgb("#f472b6")),
         mark="logowork.png", word_tint=None,
         glows=((250, 340, 380, "accent", 0.20),
                (1420, 780, 360, "accent_2", 0.12),
@@ -90,6 +91,7 @@ THEMES: dict[str, dict[str, Any]] = {
         p_neuron=_rgb("#6d28d9"), p_engram=_rgb("#6d28d9"),
         p_effector=_rgb("#b45309"), p_receptor=_rgb("#4d7c0f"),
         p_synapse=_rgb("#0e7490"),
+        grad=(_rgb("#25507a"), _rgb("#3a76ad"), _rgb("#e25539")),
         mark="logowork-light.png", word_tint=_rgb("#25507a"),
         glows=((250, 340, 380, "accent", 0.10),
                (1420, 780, 360, "accent_3", 0.07)),
@@ -97,10 +99,22 @@ THEMES: dict[str, dict[str, Any]] = {
     ),
 }
 
-PRIMITIVE_KEY = {
-    "neuron": "p_neuron", "axon": "p_neuron",
-    "engram": "p_engram", "effector": "p_effector",
-    "receptor": "p_receptor", "synapse": "p_synapse",
+# Two palettes, because two things are being drawn.
+#
+# "suite" is what assets/diagrams/*.svg and the Genesis page use, and its
+# comment is the rule: "Neurons accent, Engrams --p-engram, Effectors
+# accent-3, Receptors accent-2. A component wears one colour across the
+# suite." Use it for any figure that explains the primitives.
+#
+# "prism" is what the live Constellation paints nodes with (prism-ui/src/
+# theme.ts). Use it only when the card is depicting an actual Prism view.
+PALETTES = {
+    "suite": {"neuron": "accent", "axon": "accent", "engram": "p_engram",
+              "effector": "accent_3", "receptor": "accent_2",
+              "synapse": "accent_2"},
+    "prism": {"neuron": "p_neuron", "axon": "p_neuron", "engram": "p_engram",
+              "effector": "p_effector", "receptor": "p_receptor",
+              "synapse": "p_synapse"},
 }
 
 
@@ -178,6 +192,69 @@ def tint(im: Image.Image, colour: tuple[int, int, int] | None) -> Image.Image:
     solid = Image.new("RGBA", im.size, colour + (255,))
     solid.putalpha(im.getchannel("A"))
     return solid
+
+
+def gradient(im: Image.Image, stops: list[tuple[int, int, int]]) -> Image.Image:
+    """Fill an alpha-masked asset with a left-to-right gradient. The site's
+    wordmark gradient is --grad-1 -> --grad-2 -> --grad-3; the asset ships as
+    a white silhouette, so the colour has to be painted on here."""
+    w, h = im.size
+    ramp = Image.new("RGB", (w, 1))
+    px = ramp.load()
+    seg = max(1, len(stops) - 1)
+    for x in range(w):
+        t = x / max(1, w - 1) * seg
+        i = min(int(t), seg - 1)
+        f = t - i
+        px[x, 0] = tuple(round(stops[i][c] + (stops[i + 1][c] - stops[i][c]) * f)
+                         for c in range(3))
+    out = ramp.resize((w, h), Image.NEAREST).convert("RGBA")
+    out.putalpha(im.getchannel("A"))
+    return out
+
+
+def wordmark(text: str, size: int, stops: list[tuple[int, int, int]],
+             tracking_em: float = 0.06) -> Image.Image:
+    """Set the wordmark in the site's brand face.
+
+    globals.css `.brand-word` is Michroma at `letter-spacing: 0.06em`, supplied
+    as the --font-brand next/font variable. Setting it here rather than pasting
+    wordwork.png means the type stays live: a size change re-renders instead of
+    resampling, and the gradient lands on the glyphs at full resolution.
+    """
+    fnt = ImageFont.truetype(_FONTS_get("michroma"), size)
+    tracking = size * tracking_em
+    probe = ImageDraw.Draw(Image.new("L", (1, 1)))
+    width = sum(probe.textlength(c, font=fnt) + tracking for c in text)
+    mask = Image.new("L", (int(width) + size, int(size * 2)), 0)
+    md = ImageDraw.Draw(mask)
+    x = size * 0.25
+    for ch in text:
+        md.text((x, size * 0.25), ch, font=fnt, fill=255)
+        x += md.textlength(ch, font=fnt) + tracking
+    mask = mask.crop(mask.getbbox())
+    out = Image.new("RGBA", mask.size, (0, 0, 0, 0))
+    out.putalpha(mask)
+    return gradient(out, stops)
+
+
+def _FONTS_get(name: str) -> str:
+    global _FONTS
+    if not _FONTS:
+        _FONTS = _extract_fonts()
+    return _FONTS[name]
+
+
+def pill(d, T, x, y, text, accent=False, pad=22, height=52):
+    """A bordered capsule, as used under the hero wordmark."""
+    fnt = f("mono-500", 22)
+    w = d.textlength(text, font=fnt) + pad * 2
+    edge = T["accent"] if accent else T["border"]
+    d.rounded_rectangle([x, y, x + w, y + height], radius=height // 2,
+                        outline=edge, width=1, fill=T["bg_card"])
+    d.text((x + pad, y + (height - 28) // 2), text, font=fnt,
+           fill=T["accent_soft"] if accent else T["text_dim"])
+    return w
 
 
 def tracked(d, xy, text, font, fill, tracking=0.0):
@@ -316,26 +393,27 @@ def draw_term(d, T, x, y, lines, size=27, lh=40):
 # -------------------------------------------------------------- diagrams
 def _node_shape(d, T, cx, cy, r, shape, label_colour):
     """One primitive silhouette, matching what Prism draws on the canvas."""
-    w = r * 1.15
-    if shape in ("neuron", "axon"):
+    if shape in ("neuron", "axon"):                       # circle
         d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=label_colour, width=3)
-    elif shape == "engram":
-        d.rounded_rectangle([cx - w, cy - r, cx + w, cy + r], radius=10,
-                            outline=label_colour, width=3)
-    elif shape == "effector":
-        pts = [(cx + w * 1.0, cy), (cx + w * 0.5, cy - r), (cx - w * 0.5, cy - r),
-               (cx - w * 1.0, cy), (cx - w * 0.5, cy + r), (cx + w * 0.5, cy + r)]
-        d.polygon(pts, outline=label_colour, width=3)
+    elif shape == "engram":                               # diamond
+        d.polygon([(cx, cy - r), (cx + r, cy), (cx, cy + r), (cx - r, cy)],
+                  outline=label_colour, width=3)
+    elif shape == "effector":                             # triangle
+        d.polygon([(cx, cy - r), (cx + r * 0.866, cy + r * 0.5),
+                   (cx - r * 0.866, cy + r * 0.5)], outline=label_colour, width=3)
     elif shape == "receptor":
-        # a cup: open at the top, because a Receptor collects from outside.
-        d.arc([cx - w, cy - r, cx + w, cy + r * 1.5], start=0, end=180,
+        # A cup, open at the top: a Receptor collects from outside the fabric
+        # rather than servicing something inside it.
+        d.arc([cx - r, cy - r, cx + r, cy + r], start=0, end=180,
               fill=label_colour, width=3)
-        d.line([(cx - w, cy - r), (cx - w, cy + r * 0.25)], fill=label_colour, width=3)
-        d.line([(cx + w, cy - r), (cx + w, cy + r * 0.25)], fill=label_colour, width=3)
-    else:                                   # synapse - a ring
-        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=label_colour, width=3)
-        d.ellipse([cx - r * 0.45, cy - r * 0.45, cx + r * 0.45, cy + r * 0.45],
-                  outline=label_colour, width=2)
+        d.arc([cx - r * 0.62, cy - r * 0.62, cx + r * 0.62, cy + r * 0.62],
+              start=0, end=180, fill=label_colour, width=3)
+        for sx in (-1, 1):
+            d.line([(cx + sx * r, cy), (cx + sx * r * 0.62, cy)],
+                   fill=label_colour, width=3)
+    else:                                                 # synapse - the bar
+        d.rounded_rectangle([cx - r * 1.9, cy - 9, cx + r * 1.9, cy + 9],
+                            radius=9, outline=label_colour, width=3)
 
 
 def _arrow(d, T, a, b, colour, label=None):
@@ -349,9 +427,12 @@ def _arrow(d, T, a, b, colour, label=None):
                fill=colour, width=2)
     if label:
         fnt = f("mono", 19)
-        mx, my = (x0 + x1) / 2, (y0 + y1) / 2 - 26
-        d.text((mx - d.textlength(label, font=fnt) / 2, my), label,
-               font=fnt, fill=T["text_faint"])
+        mx, my = (x0 + x1) / 2, (y0 + y1) / 2
+        wide = d.textlength(label, font=fnt)
+        if abs(y1 - y0) > abs(x1 - x0):      # vertical-ish: label to the side,
+            d.text((mx + 16, my - 10), label, font=fnt, fill=T["text_faint"])
+        else:                                # horizontal: label above the line
+            d.text((mx - wide / 2, my - 26), label, font=fnt, fill=T["text_faint"])
 
 
 # ------------------------------------------------------------------ layout
@@ -420,7 +501,7 @@ def _footer(d, T, note: str, right: str):
            font=fnt, fill=T["text_faint"])
 
 
-KINDS = ("code", "term", "table", "split", "quote", "diagram")
+KINDS = ("code", "term", "table", "split", "quote", "diagram", "hero")
 
 
 def render(spec: dict, out_path: str, theme: str = "dark") -> str:
@@ -429,6 +510,9 @@ def render(spec: dict, out_path: str, theme: str = "dark") -> str:
     kind = spec["kind"]
     if kind not in KINDS:
         raise ValueError(f"unknown card kind {kind!r}; expected one of {KINDS}")
+
+    if kind == "hero":
+        return _hero(spec, T, out_path)
 
     two_line = len(_wrap(ImageDraw.Draw(Image.new("RGB", (1, 1))),
                          spec.get("headline", ""), f("inter-600", 44),
@@ -456,6 +540,7 @@ def render(spec: dict, out_path: str, theme: str = "dark") -> str:
         d = ImageDraw.Draw(img)
         y0 = chrome(d, T, box, spec.get("title", ""), dots=False,
                     tone=T["accent2_soft"]) if spec.get("title") else top + 30
+        pal = PALETTES[spec.get("palette", "suite")]
         nodes, cols = spec["nodes"], {}
         for n in nodes:
             cols.setdefault(n.get("col", 0), []).append(n)
@@ -479,12 +564,17 @@ def render(spec: dict, out_path: str, theme: str = "dark") -> str:
             a = (x0 + (r + 8) * math.cos(ang), yy0 + (r + 8) * math.sin(ang))
             b = (x1 - (r + 14) * math.cos(ang), yy1 - (r + 14) * math.sin(ang))
             _arrow(d, T, a, b, T["text_faint"], lbl[0] if lbl else None)
+        # A node with an edge dropping straight down would have that arrow
+        # run through its own label, so label those above instead.
+        label_above = {a for a, b, *_ in spec.get("edges", [])
+                       if abs(pos[b][0] - pos[a][0]) < r and pos[b][1] > pos[a][1]}
         for n in nodes:
             cx, cy = pos[n["id"]]
-            colour = T[PRIMITIVE_KEY.get(n.get("shape", "neuron"), "p_neuron")]
+            colour = T[pal.get(n.get("shape", "neuron"), "accent")]
             _node_shape(d, T, cx, cy, r, n.get("shape", "neuron"), colour)
             fnt = f("mono-500", 22)
-            d.text((cx - d.textlength(n["label"], font=fnt) / 2, cy + r + 16),
+            ly = cy - r - 38 if n["id"] in label_above else cy + r + 16
+            d.text((cx - d.textlength(n["label"], font=fnt) / 2, ly),
                    n["label"], font=fnt, fill=T["text"])
 
     elif kind == "split":
@@ -540,6 +630,80 @@ def render(spec: dict, out_path: str, theme: str = "dark") -> str:
 
     _footer(d, T, spec.get("note", "pip install cosmonapse"),
             spec.get("note_right", "cosmonapse  ·  Apache 2.0"))
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
+    img.save(out_path, optimize=True)
+    return out_path
+
+
+def _hero(spec: dict, T: dict, out_path: str) -> str:
+    """The title card: centred mark, gradient wordmark, tagline, pills.
+
+    Deliberately the one layout with no left-aligned lockup - it *is* the
+    lockup, at size. Everything else on the card hangs off the centre line.
+    """
+    img = ground(T)
+    d = ImageDraw.Draw(img)
+    cx = W // 2
+
+    mark_h = spec.get("mark_h", 188)
+    mark = fit(os.path.join(ASSETS, T["mark"]), mark_h)
+
+    # Measure first, then centre. A hero with no sub-line or no pills should
+    # still sit on the optical centre rather than drift upward.
+    probe = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    block = mark.height + 40 + round(spec.get("word_size", 92) * 0.72) + 46
+    if spec.get("tagline"):
+        block += 58 * len(_wrap(probe, spec["tagline"], f("inter-600", 44), W - 320)) + 8
+    if spec.get("sub"):
+        block += 38 * len(_wrap(probe, spec["sub"], f("inter-500", 27), W - 380))
+    if spec.get("pills"):
+        block += 86
+    if spec.get("strip"):
+        block += 68
+    y = spec.get("top", max(60, (H - block) // 2))
+    img.paste(mark, (cx - mark.width // 2, y), mark)
+    y += mark.height + 40
+
+    word = wordmark(spec.get("wordmark", "COSMONAPSE"),
+                    spec.get("word_size", 92), list(T["grad"]))
+    if word.width > W - 220:                 # never let it touch the edges
+        h = round(word.height * (W - 220) / word.width)
+        word = word.resize((W - 220, h), Image.LANCZOS)
+    img.paste(word, (cx - word.width // 2, y), word)
+    y += word.height + 46
+
+    d = ImageDraw.Draw(img)
+    if spec.get("tagline"):
+        fnt = f("inter-600", 44)
+        for line in _wrap(d, spec["tagline"], fnt, W - 320):
+            d.text((cx - d.textlength(line, font=fnt) / 2, y), line,
+                   font=fnt, fill=T["text"])
+            y += 58
+        y += 8
+    if spec.get("sub"):
+        fnt = f("inter-500", 27)
+        for line in _wrap(d, spec["sub"], fnt, W - 380):
+            d.text((cx - d.textlength(line, font=fnt) / 2, y), line,
+                   font=fnt, fill=T["text_dim"])
+            y += 38
+
+    pills = spec.get("pills", [])
+    if pills:
+        y += 34
+        gap, fnt = 16, f("mono-500", 22)
+        widths = [d.textlength(p["label"], font=fnt) + 44 for p in pills]
+        x = cx - (sum(widths) + gap * (len(pills) - 1)) / 2
+        for p, w in zip(pills, widths):
+            pill(d, T, x, y, p["label"], accent=p.get("accent", False))
+            x += w + gap
+        y += 52
+
+    if spec.get("strip"):
+        fnt = f("mono-500", 22)
+        y += 40
+        d.text((cx - d.textlength(spec["strip"], font=fnt) / 2, y),
+               spec["strip"], font=fnt, fill=T["text_faint"])
+
     os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
     img.save(out_path, optimize=True)
     return out_path

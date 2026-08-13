@@ -31,6 +31,9 @@ const graph = {
         "https://github.com/Cosmonapse",
         "https://www.reddit.com/r/cosmonapse/",
         "https://www.producthunt.com/products/cosmonapse",
+        "https://www.youtube.com/channel/UCj_wZY6OiIRUaeKzxytHlPw",
+        "https://www.instagram.com/cosmonapse/",
+        "https://www.tiktok.com/@cosmonapse",
       ],
     },
     {

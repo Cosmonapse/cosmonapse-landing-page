@@ -122,6 +122,21 @@ export default function Footer() {
                   Discussions
                 </a>
               </li>
+              <li>
+                <a href="https://www.youtube.com/channel/UCj_wZY6OiIRUaeKzxytHlPw" target="_blank" rel="noopener noreferrer">
+                  YouTube
+                </a>
+              </li>
+              <li>
+                <a href="https://www.instagram.com/cosmonapse/" target="_blank" rel="noopener noreferrer">
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a href="https://www.tiktok.com/@cosmonapse" target="_blank" rel="noopener noreferrer">
+                  TikTok
+                </a>
+              </li>
             </ul>
           </div>
         </div>
