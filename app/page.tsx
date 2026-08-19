@@ -22,9 +22,10 @@ const INSTALL = [
   { cmd: "cosmo genesis", note: "opens the designer at 127.0.0.1:7072" },
 ];
 
-// The two bets, as one row each: what everyone else does, and what we do
-// instead. Kept to a sentence a side on purpose - the long version of the
-// argument lives on /core/concepts.
+// The three bets, as one row each: what everyone else does, and what we do
+// instead. Two are about the systems people are building today; the third is
+// about the ones they cannot build yet. Kept short on purpose - the long
+// version of the argument lives on /core/concepts.
 const BETS: { num: string; claim: string; problem: string; solution: string }[] = [
   {
     num: "Bet 01",
@@ -41,6 +42,14 @@ const BETS: { num: string; claim: string; problem: string; solution: string }[] 
       "A prompt, a vector store and a UI over somebody else's model is cheap to clone and hard to price. The teams stuck here have already solved which model to use; what they cannot do is get from a demo to something with a shape - observable, ownable, operable by a team, and defensible enough to charge for.",
     solution:
       "Build the system instead of the wrapper: domain memory that is yours, tools that touch real systems, interfaces people actually use, and an explicit policy for when a human steps in. Boutique AI, assembled from parts you own and running on an open protocol you can read.",
+  },
+  {
+    num: "Bet 03",
+    claim: "The domains that are coming have no prompt to wait for.",
+    problem:
+      "Physical intelligence, AI-native software and operating systems, communities of agents that outlive any one session - all of it is continuous and concurrent. A robot revises its picture of the world many times a second. An AI-native OS has to answer a file changing, a process dying, a peer coming online. A community of agents has members joining, disagreeing and dropping offline while the work carries on. None of it begins with a person typing, and none of it fits a request, a traversal and an answer. So every team working in these areas writes its own bus, its own scheduler and its own trace format before it gets near the actual domain problem.",
+    solution:
+      "For those systems an event substrate is not an optimisation, it is the only shape they have. Cosmonapse is that layer with agent semantics already in the envelope: a Signal knows whether it is a tool call, a memory write or a model output, so a sensor loop, an OS event stream and a community's membership churn are the same primitive rather than three bespoke integrations. Change the transport URL and what you prototyped on a laptop runs across a fleet. We are not building those products. The bet is that the substrate they need does not exist yet, and that whoever builds them should not have to build it twice.",
   },
 ];
 
@@ -234,10 +243,11 @@ export default function HomePage() {
       <section className="section">
         <div className="container">
           <div className="section-eyebrow">// Why this exists</div>
-          <h2 className="section-title">Two bets.</h2>
+          <h2 className="section-title">Three bets.</h2>
           <p className="section-sub">
-            Cosmonapse is not a nicer wrapper around the same idea. It starts from two positions
-            that most of the current tooling disagrees with.
+            Cosmonapse is not a nicer wrapper around the same idea. It starts from three positions
+            that most of the current tooling disagrees with: two about the systems people are
+            building today, and one about the ones they cannot build yet.
           </p>
 
           <div className="bets">
