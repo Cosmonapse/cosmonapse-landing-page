@@ -283,19 +283,19 @@ export const NODES: Record<
   },
   rag: {
     name: "rag-node",
-    role: "orchestrator",
+    role: "thinks",
     hosts: "the rag Axon",
-    tip: "Hosts the one Neuron, and doubles as the CLI's orchestrator. A Dendrite that both originates and hosts work is supported, so there is no fourth node.",
+    tip: "Hosts the one Neuron, and is also where your question enters the system. A Dendrite that both originates work and hosts work is supported, so there is no fourth node.",
   },
   engram: {
     name: "engram-host",
-    role: "worker",
+    role: "remembers",
     hosts: "web-memory",
     tip: "Hosts the Engram - a BM25 index over page chunks. It answers RECALL and IMPRINT and does nothing else.",
   },
   web: {
     name: "web-node",
-    role: "worker",
+    role: "acts",
     hosts: "the web Effector",
     tip: "Hosts the Effector - search and fetch, backed by an MCP server. It answers TOOL_CALL and does nothing else.",
   },

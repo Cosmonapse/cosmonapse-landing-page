@@ -114,7 +114,7 @@ posts and section breaks.
 ```json
 { "kind": "quote",
   "body": "Neurons think. Engrams remember. Effectors act. Receptors listen.",
-  "attribution": "cosmonapse 0.1.11 - the interface primitive" }
+  "attribution": "cosmonapse 0.1.12 - the interface primitive" }
 ```
 
 `body` is a single string and wraps on its own. Keep it under about 90

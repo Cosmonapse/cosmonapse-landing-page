@@ -140,7 +140,7 @@ export default function GenesisPage() {
               { cmd: "pip install cosmonapse", note: "the cosmo CLI ships with it" },
               { cmd: "cosmo genesis", note: "opens on 127.0.0.1:7072" },
             ]}
-            caption="ships in 0.1.11 · no separate download, no runtime dependency on Genesis"
+            caption="ships in 0.1.12 · no separate download, no runtime dependency on Genesis"
           />
         </div>
       </header>
@@ -151,7 +151,7 @@ export default function GenesisPage() {
           <div className="section-eyebrow">// Demos</div>
           <h2 className="section-title">Genesis, running.</h2>
           <p className="section-sub">
-            All three views ship today in 0.1.11. These are the three moments worth watching: a
+            All three views ship today in 0.1.12. These are the three moments worth watching: a
             component being created, that same component edited as source, and the finished brain
             answering through its own interface.
           </p>

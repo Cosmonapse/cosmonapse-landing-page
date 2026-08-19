@@ -20,9 +20,9 @@ export default function RoadmapPage() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Roadmap</div>
-          <h1 className="page-title">From 0.1.11 to a Stable 1.0.0.</h1>
+          <h1 className="page-title">From 0.1.12 to a Stable 1.0.0.</h1>
           <p className="page-sub">
-            0.1.11 is out  -  the protocol and SDK shapes are in place, and Effector joins them as the
+            0.1.12 is out  -  the protocol and SDK shapes are in place, and Effector joins them as the
             action layer. Everything between 0.1.12 and 0.2.0 goes into one thing: making tool calling
             dependable across models. 0.2.0 keeps Cosmonapse a local product but ships it as a
             container, and every envelope and protocol freeze lands in that line. 0.3.0 opens
@@ -37,11 +37,11 @@ export default function RoadmapPage() {
         <div className="container container-narrow">
           <div className="timeline">
             <div className="timeline-item current">
-              <div className="timeline-version">0.1.11 · shipped  -  the start</div>
+              <div className="timeline-version">0.1.12 · shipped  -  the start</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>
-                  Out now as 0.1.11. The developer reads the envelope spec, writes an Axon and
+                  Out now as 0.1.12. The developer reads the envelope spec, writes an Axon and
                   Dendrite using the SDK primitives, chooses a Synapse adapter, and wires their own
                   orchestration logic. Full control, full complexity, appropriate for early adopters. The
                   Python SDK is the complete reference implementation.
@@ -258,9 +258,9 @@ export default function RoadmapPage() {
 
       <section className="section-sm">
         <div className="container container-narrow">
-          <div className="sub-eyebrow">Known limitations  -  0.1.11</div>
+          <div className="sub-eyebrow">Known limitations  -  0.1.12</div>
           <p className="prose">
-            0.1.11 is a 0.1: the protocol and SDK shapes are in place, and nothing is frozen until
+            0.1.12 is a 0.1: the protocol and SDK shapes are in place, and nothing is frozen until
             0.2.0. These are the edges we know about  -  each one points at the milestone that
             closes it.
           </p>
@@ -295,10 +295,10 @@ export default function RoadmapPage() {
 
       <section className="section-sm">
         <div className="container container-narrow">
-          <div className="sub-eyebrow">Priority order  -  0.1.11 → 1.0.0</div>
+          <div className="sub-eyebrow">Priority order  -  0.1.12 → 1.0.0</div>
           <p className="prose">The order matters. Each milestone lands on the baseline the last one established.</p>
           <ol className="prose" style={{ paddingLeft: 24 }}>
-            <li>0.1.11  -  shipped: protocol drafted, the Python SDK and the CLI released, every primitive present</li>
+            <li>0.1.12  -  shipped: protocol drafted, the Python SDK and the CLI released, every primitive present</li>
             <li>0.1.12 → 0.2.0  -  one theme: tool calling. Hardened parsers, the Axon output repair contract, provider-side structured output</li>
             <li>0.2.0  -  still local, now containerized. The envelope, the cognition signals, and the trace model freeze here; heavy testing against NATS / Kafka; real agents stress-testing the protocol before the freeze closes</li>
             <li>0.3.0  -  Cosmonapse Cloud: managed Synapse, hosted Engram, Prism as a service, on the frozen protocol. Moves when the project gets full-time attention</li>

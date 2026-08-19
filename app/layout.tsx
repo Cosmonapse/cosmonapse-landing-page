@@ -32,12 +32,12 @@ const michroma = Michroma({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Cosmonapse - Platform Suite for Event-Driven AI",
+    default: "Cosmonapse - The Platform to Build Proactive Agents",
     // Every child page renders as "<page title> | Cosmonapse".
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Design, run and observe event-driven AI systems. Genesis to build them, the open Apache 2.0 Core protocol to run them, Prism to watch them. No orchestrator loop.",
+    "Build proactive agents that act when something happens, not when someone types. Genesis to design them, the open Apache 2.0 Core protocol to run them, Prism to watch them. No orchestrator loop.",
   applicationName: SITE_NAME,
   keywords: KEYWORDS_ALL,
   authors: [{ name: "Cosmonapse", url: SITE_URL }],
@@ -57,9 +57,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Cosmonapse - Platform Suite for Event-Driven AI",
+    title: "Cosmonapse - The Platform to Build Proactive Agents",
     description:
-      "Design them in Genesis, run them on the open Core protocol, watch them in Prism. Build domain-specialised AI systems, not another model wrapper. Apache 2.0.",
+      "Proactive agents react to events instead of waiting for a prompt. Design them in Genesis, run them on the open Core protocol, watch them in Prism. Apache 2.0.",
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "en_US",
@@ -68,9 +68,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cosmonapse - Platform Suite for Event-Driven AI",
+    title: "Cosmonapse - The Platform to Build Proactive Agents",
     description:
-      "Design them in Genesis, run them on the open Core protocol, watch them in Prism. Build domain-specialised AI systems, not another model wrapper.",
+      "Proactive agents react to events instead of waiting for a prompt. Design them in Genesis, run them on the open Core protocol, watch them in Prism.",
     site: TWITTER,
     creator: TWITTER,
     images: [`${SITE_URL}${OG_IMAGE}`],

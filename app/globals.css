@@ -2666,53 +2666,6 @@ code.inline {
   transform: translateX(3px);
 }
 
-/* ── Thesis blocks (the two bets on the homepage) ───────────────────────── */
-
-.thesis {
-  display: grid;
-  gap: 20px;
-  margin-top: 40px;
-}
-@media (min-width: 900px) {
-  .thesis {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.thesis-card {
-  border: 1px solid var(--border-strong);
-  border-radius: 12px;
-  background: var(--bg-card);
-  padding: 30px 30px 26px;
-}
-.thesis-num {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: var(--accent-soft);
-  margin-bottom: 12px;
-}
-.thesis-card h3 {
-  font-size: 21px;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--text);
-  margin: 0 0 16px;
-}
-.thesis-card p {
-  font-size: 14px;
-  line-height: 1.75;
-  color: var(--text-dim);
-  margin: 0 0 14px;
-}
-.thesis-card p:last-child {
-  margin-bottom: 0;
-}
-.thesis-turn {
-  border-left: 2px solid var(--accent);
-  padding-left: 16px;
-  color: var(--text) !important;
-}
-
 /* ── Lifecycle strip (Design → Run → Observe) ───────────────────────────── */
 
 .lifecycle {
@@ -3190,4 +3143,163 @@ code.inline {
 @media (max-width: 560px) {
   .install-note { display: none; }
   .install-row { font-size: 12.5px; }
+}
+
+/* ── Bets (homepage) ─────────────────────────────────────────────────────
+   One row per bet: the claim across the top, then the problem and what we
+   do instead side by side, so the turn is a glance rather than a read. */
+
+.bets {
+  display: grid;
+  gap: 18px;
+  margin-top: 40px;
+}
+.bet {
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--bg-card);
+  padding: 26px 30px 28px;
+  display: grid;
+  gap: 18px;
+}
+@media (min-width: 900px) {
+  .bet {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 32px;
+  }
+  .bet-head {
+    grid-column: 1 / -1;
+  }
+}
+.bet-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.bet-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--accent-soft);
+  flex-shrink: 0;
+}
+.bet-head h3 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  margin: 0;
+}
+.bet-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.bet-problem .bet-label {
+  color: var(--status-none);
+}
+.bet-solution .bet-label {
+  color: var(--accent-soft);
+}
+.bet-side p {
+  font-size: 13.5px;
+  line-height: 1.75;
+  margin: 0;
+  color: var(--text-dim);
+}
+.bet-solution {
+  border-left: 2px solid var(--accent);
+  padding-left: 18px;
+}
+.bet-solution p {
+  color: var(--text);
+}
+@media (max-width: 899px) {
+  .bet-solution {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 2px solid var(--accent);
+    padding-top: 16px;
+  }
+}
+
+/* ── Editions (open source vs commercial) ───────────────────────────────── */
+
+.editions {
+  display: grid;
+  gap: 18px;
+  margin-top: 36px;
+}
+@media (min-width: 900px) {
+  .editions {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+.edition-col {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.edition-col-head {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.edition {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card-soft);
+  padding: 20px 22px;
+}
+.edition-open {
+  border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+}
+.edition-paid {
+  border-style: dashed;
+}
+.edition-name {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.edition-status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+.edition-body {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  margin: 0;
+}
+.edition-items {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 7px;
+}
+.edition-items li {
+  display: flex;
+  gap: 9px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
 }

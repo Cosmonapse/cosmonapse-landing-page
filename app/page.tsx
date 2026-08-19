@@ -5,6 +5,7 @@ import CallStackVsBus from "@/components/diagrams/CallStackVsBus";
 import HeroBus from "@/components/diagrams/HeroBus";
 import DesignRunObserve from "@/components/diagrams/DesignRunObserve";
 import SuiteStream from "@/components/diagrams/SuiteStream";
+import SuiteEditions from "@/components/diagrams/SuiteEditions";
 import DemoFrame from "@/components/DemoFrame";
 import InstallCommands from "@/components/InstallCommands";
 import ProductGrid from "@/components/ProductGrid";
@@ -19,6 +20,100 @@ const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 const INSTALL = [
   { cmd: "pip install cosmonapse", note: "the cosmo CLI ships with it" },
   { cmd: "cosmo genesis", note: "opens the designer at 127.0.0.1:7072" },
+];
+
+// The two bets, as one row each: what everyone else does, and what we do
+// instead. Kept to a sentence a side on purpose - the long version of the
+// argument lives on /core/concepts.
+const BETS: { num: string; claim: string; problem: string; solution: string }[] = [
+  {
+    num: "Bet 01",
+    claim: "A graph is a diagram. It is not a program.",
+    problem:
+      "Graph and loop frameworks make you declare control flow before you know what the system does - nodes, edges, branches, and a supervisor that turns the crank. Then something arrives that you did not draw: a tool returns late, a human answers halfway through, a second model disagrees with the first. Every new case is a new edge, and the supervisor becomes the thing you cannot change.",
+    solution:
+      "Components emit Signals and react to Signals on one bus. Nobody holds the loop, so an agent can act the moment something happens rather than waiting for its turn in a graph. Concurrency, fan-out, retries, ordering and backpressure are properties of the transport - the same ones that have run distributed systems for twenty years.",
+  },
+  {
+    num: "Bet 02",
+    claim: "Wrappers do not have moats. Systems do.",
+    problem:
+      "A prompt, a vector store and a UI over somebody else's model is cheap to clone and hard to price. The teams stuck here have already solved which model to use; what they cannot do is get from a demo to something with a shape - observable, ownable, operable by a team, and defensible enough to charge for.",
+    solution:
+      "Build the system instead of the wrapper: domain memory that is yours, tools that touch real systems, interfaces people actually use, and an explicit policy for when a human steps in. Boutique AI, assembled from parts you own and running on an open protocol you can read.",
+  },
+];
+
+// Where the open source line falls. Left column is what you get for free and
+// keep; right column is what gets sold. Nothing here is shipping yet except
+// the two free tiers, and the status labels say so.
+const EDITIONS: {
+  side: "open" | "commercial";
+  name: string;
+  status: string;
+  body: string;
+  items: string[];
+}[] = [
+  {
+    side: "open",
+    name: "Core",
+    status: "Ships today",
+    body:
+      "The protocol, the Python SDK and the runtime. Apache 2.0, and it stays that way - the substrate your system is built on is not something we intend to sell you back later.",
+    items: [
+      "Signal envelope spec and the reference SDK",
+      "Neuron, Axon, Dendrite, Engram, Effector, Receptor",
+      "In-process, NATS and Kafka transports behind one URL",
+    ],
+  },
+  {
+    side: "open",
+    name: "Genesis + Prism, essential builds",
+    status: "Ships today",
+    body:
+      "Enough of the designer and the observability plane to build, run and debug a real system on your own machine, free, in the same pip install. No account, no key, no seat count.",
+    items: [
+      "Genesis: canvas, code editing through the AST, run and test a brain",
+      "Prism: live brain view, signal tree, the raw stream and core metrics",
+      "Local only, single developer, your source on your disk",
+    ],
+  },
+  {
+    side: "commercial",
+    name: "Pro",
+    status: "Planned",
+    body:
+      "The deeper end of Genesis and Prism for people doing this full time - the surface that pays for itself in a working week rather than the surface you need to get started.",
+    items: [
+      "Advanced Genesis workflows and larger-system tooling",
+      "Retained history, comparison and analysis in Prism",
+      "Per-seat, self-serve",
+    ],
+  },
+  {
+    side: "commercial",
+    name: "Cloud",
+    status: "Planned",
+    body:
+      "The hosted version of the same loop. Design and observe in a browser, deploy a brain as a service, and let a team work on one project at once.",
+    items: [
+      "Managed deploy with quotas and scoped credentials",
+      "Shared projects, presence and a persistent Signal history",
+      "Usage-based",
+    ],
+  },
+  {
+    side: "commercial",
+    name: "Enterprise",
+    status: "Planned",
+    body:
+      "What a regulated buyer needs before any of this is allowed near production, distributed as a licensed wheel off a private index.",
+    items: [
+      "RBAC, audit trails, multi-tenancy and HA",
+      "Offline-verifiable licensing, airgap friendly",
+      "Support, SLA and architecture review",
+    ],
+  },
 ];
 
 // The lifecycle strip: which product you are in at each stage of the work.
@@ -74,24 +169,29 @@ const USE_CASES: { title: string; body: string; shape: string }[] = [
 ];
 
 export default function HomePage() {
+  const openEditions = EDITIONS.filter((e) => e.side === "open");
+  const paidEditions = EDITIONS.filter((e) => e.side === "commercial");
+
   return (
     <>
       <header className="hero">
         <div className="container">
           <div className="badge">
             <span className="dot" />
-            v0.1.11 · Research preview
+            v0.1.12 · Research preview
           </div>
           <h1 className="hero-title">
-            AI systems don&rsquo;t run on graphs.
+            The platform to build
             <br />
-            They run on <span className="gradient-text">events</span>.
+            <span className="gradient-text">proactive agents</span>.
           </h1>
           <p className="hero-lead">
-            Cosmonapse is a platform suite for building event-driven AI systems. Design them on a
-            canvas in <strong>Genesis</strong>, run them on the open <strong>Core</strong> protocol
-            and runtime, and watch them think in <strong>Prism</strong>. No supervisor loop, no
-            control-flow graph to maintain - just components reacting to Signals on one bus.
+            A proactive agent acts when something happens - a document lands, a threshold trips,
+            another agent disagrees - not when someone types. That is an event problem, not a graph
+            problem. Cosmonapse gives you the substrate: design the system on a canvas in{" "}
+            <strong>Genesis</strong>, run it on the open <strong>Core</strong> protocol and runtime,
+            and watch it think in <strong>Prism</strong>. No supervisor loop, no control-flow graph
+            to maintain - just components reacting to Signals on one bus.
           </p>
           <div className="hero-ctas">
             <Link href="/core/quickstart" className="btn btn-primary">
@@ -140,52 +240,23 @@ export default function HomePage() {
             that most of the current tooling disagrees with.
           </p>
 
-          <div className="thesis">
-            <div className="thesis-card">
-              <div className="thesis-num">// Bet 01</div>
-              <h3>A graph is a diagram. It is not a program.</h3>
-              <p>
-                Graph and loop frameworks ask you to declare control flow before you know what the
-                system does - nodes, edges, conditional branches, and a supervisor that turns the
-                crank. That holds until something arrives that you didn&rsquo;t draw: a tool returns
-                late, a human answers halfway through, a second model disagrees with the first.
-              </p>
-              <p>
-                Real systems are concurrent and only partially ordered. Encoding them as a graph
-                means encoding <em>time</em> as topology, and you end up maintaining a state machine
-                larger than the problem it solves. Every new branch is a new edge, and the supervisor
-                becomes the thing you can&rsquo;t change.
-              </p>
-              <p className="thesis-turn">
-                Cosmonapse takes the other side. Components emit Signals and react to Signals on one
-                bus. Nobody holds the loop. Concurrency, fan-out, retries, ordering and backpressure
-                are properties of the transport - the same properties that have run distributed
-                systems for twenty years - rather than branches you drew in advance.
-              </p>
-            </div>
-
-            <div className="thesis-card">
-              <div className="thesis-num">// Bet 02</div>
-              <h3>Wrappers don&rsquo;t have moats. Systems do.</h3>
-              <p>
-                Most AI products are a prompt, a vector store and a UI over somebody else&rsquo;s
-                model - which is exactly why they are so cheap to clone and so hard to price. The
-                teams getting past that are building something narrower and deeper: a system that
-                knows one domain properly, with its own memory, its own tools, its own escalation
-                paths and its own opinion about the work.
-              </p>
-              <p>
-                That is an architecture problem, and it is the one we keep hearing about from
-                founders, early adopters and enterprise architects alike. Not &ldquo;which model&rdquo; -
-                they solved that. They can&rsquo;t get from a demo to something with a shape:
-                observable, ownable, operable by a team, and defensible enough to charge for.
-              </p>
-              <p className="thesis-turn">
-                Cosmonapse is the substrate for those systems. Boutique AI - domain-specialised,
-                built from parts you own, running on an open protocol, and legible enough that you
-                can sell it with a straight face.
-              </p>
-            </div>
+          <div className="bets">
+            {BETS.map((b) => (
+              <div className="bet" key={b.num}>
+                <div className="bet-head">
+                  <span className="bet-num">// {b.num}</span>
+                  <h3>{b.claim}</h3>
+                </div>
+                <div className="bet-side bet-problem">
+                  <div className="bet-label">The problem</div>
+                  <p>{b.problem}</p>
+                </div>
+                <div className="bet-side bet-solution">
+                  <div className="bet-label">What we do instead</div>
+                  <p>{b.solution}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
           <CallStackVsBus />
@@ -238,6 +309,60 @@ export default function HomePage() {
           </div>
 
           <SuiteStream />
+        </div>
+      </section>
+
+      {/* ── Open source line ─────────────────────────────────────────────── */}
+      <section className="section">
+        <div className="container">
+          <div className="section-eyebrow">// What is free, what gets sold</div>
+          <h2 className="section-title">Where the open source line falls.</h2>
+          <p className="section-sub">
+            Core is Apache 2.0 and always will be. The essential builds of Genesis and Prism are
+            free with it, in the same pip install, and they are enough to build and run a real
+            system on your own machine. What gets sold later is Pro, Cloud and Enterprise - the
+            deeper product surface and the operating burden around it, never the protocol.
+          </p>
+
+          <div className="editions">
+            <div className="edition-col">
+              <div className="edition-col-head" style={{ color: "var(--accent)" }}>
+                Open source · Apache 2.0 · forever
+              </div>
+              {openEditions.map((e) => (
+                <EditionCard key={e.name} edition={e} />
+              ))}
+            </div>
+            <div className="edition-col">
+              <div className="edition-col-head" style={{ color: "var(--accent-3)" }}>
+                Commercial · none of it shipping yet
+              </div>
+              {paidEditions.map((e) => (
+                <EditionCard key={e.name} edition={e} />
+              ))}
+            </div>
+          </div>
+
+          <SuiteEditions />
+
+          <p
+            style={{
+              marginTop: 8,
+              fontSize: 13.5,
+              color: "var(--text-dim)",
+              lineHeight: 1.75,
+              maxWidth: 760,
+            }}
+          >
+            The rule we are holding ourselves to: nothing on the paid side is load-bearing for
+            anything on the free side. A system you build today keeps running on an open protocol,
+            an open runtime and a local toolchain whether or not you ever pay us.{" "}
+            <Link href={EARLY_ACCESS_HREF} className="inline-link">
+              Early access
+            </Link>{" "}
+            is where the commercial tiers get shaped, so if you have an opinion about what belongs
+            on which side, that is the room.
+          </p>
         </div>
       </section>
 
@@ -339,7 +464,7 @@ export default function HomePage() {
           <div className="cta-card">
             <h2>Build a system, not a demo.</h2>
             <p>
-              Core 0.1.11 is a research preview: the envelope is drafted, the Python SDK implements
+              Core 0.1.12 is a research preview: the envelope is drafted, the Python SDK implements
               it, and Genesis and Prism run locally today off the same CLI. It is open source under Apache
               2.0 - read the spec, disagree with it in public, and build on it either way.
             </p>
@@ -357,5 +482,34 @@ export default function HomePage() {
         </div>
       </section>
     </>
+  );
+}
+
+function EditionCard({ edition: e }: { edition: (typeof EDITIONS)[number] }) {
+  const open = e.side === "open";
+  const color = open ? "var(--accent)" : "var(--accent-3)";
+  return (
+    <div className={`edition ${open ? "edition-open" : "edition-paid"}`}>
+      <div className="edition-name">
+        <span>{e.name}</span>
+        <span
+          className="edition-status"
+          style={{ color: open ? "var(--ok-strong)" : "var(--status-none)" }}
+        >
+          {e.status}
+        </span>
+      </div>
+      <p className="edition-body">{e.body}</p>
+      <ul className="edition-items">
+        {e.items.map((i) => (
+          <li key={i}>
+            <span style={{ color }} aria-hidden>
+              ▸
+            </span>
+            {i}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

@@ -103,7 +103,7 @@ export default function PrismPage() {
               { cmd: "pip install cosmonapse", note: "the cosmo CLI ships with it" },
               { cmd: "cosmo prism", note: "opens on 127.0.0.1:7071" },
             ]}
-            caption="ships in 0.1.11 · runs on your machine, connects out to a Synapse"
+            caption="ships in 0.1.12 · runs on your machine, connects out to a Synapse"
           />
         </div>
       </header>

@@ -80,7 +80,7 @@ const FIT = [
   {
     name: "Probably not yet if",
     items: [
-      "You need a production SLA today - Core is 0.1.11-alpha and the protocol is not frozen until 0.2.0",
+      "You need a production SLA today - Core is 0.1.12-alpha and the protocol is not frozen until 0.2.0",
       "You are looking for a managed hosted service right now - Cloud is a 0.3.0 target, not a thing you can buy",
       "You want an agent that is one model behind a chat box - you do not need a protocol for that",
       "You cannot share anything at all about what you are building, which makes an architecture session hard to run",
