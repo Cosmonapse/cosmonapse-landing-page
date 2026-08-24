@@ -451,12 +451,13 @@ export default function HomePage() {
           <div className="ea-band">
             <div className="ea-band-copy">
               <div className="ea-band-eyebrow">// Early Access Program</div>
-              <h3>Building something real on this? Come talk to us.</h3>
+              <h3>Running an enterprise team or startup building something real on this? Come talk to us.</h3>
               <p>
-                We run architecture sessions with early adopters on the system they are actually
-                building - free, framework-agnostic, and with the people writing the protocol.
-                The first 50 members accepted also get credits and a standing discount on
-                Cosmonapse Cloud when it launches.
+                This round is scoped to enterprise teams and funded startups. We run architecture
+                sessions with early adopters on the system they are actually building - free,
+                framework-agnostic, and with the people writing the protocol. The first 10 members
+                accepted also get credits, a standing discount on Cosmonapse Cloud, and the option
+                to form a Letter of Intent with us.
               </p>
             </div>
             <div className="ea-band-actions">

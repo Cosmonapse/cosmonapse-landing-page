@@ -6,7 +6,7 @@ import { EARLY_ACCESS_FORM_URL } from "@/lib/early-access";
 export const metadata: Metadata = pageMetadata({
   title: "Early Access Program",
   description:
-    "Build on Cosmonapse before 1.0. Early access members get architecture sessions with the team, and the first 50 accepted members get credits and a standing discount on Cosmonapse Cloud when it goes live. No cost, no exclusivity.",
+    "Build on Cosmonapse before 1.0. This round of early access is for enterprise teams and funded startups. Members get architecture sessions with the team, and the first 10 accepted also get credits, a standing discount on Cosmonapse Cloud when it goes live, and the option to form a Letter of Intent with us. No cost, no exclusivity.",
   path: "/early-access",
   image: "/og/early-access.png",
   keywords: [
@@ -23,9 +23,9 @@ export const metadata: Metadata = pageMetadata({
 /** What a member gets out of it. */
 const PERKS = [
   {
-    name: "Credits and discounts - first 50 only",
+    name: "Credits and discounts - first 10 only",
     body:
-      "Core, Genesis and Prism are Apache 2.0 and free to run locally - that does not change. Cosmonapse Cloud is the part that will eventually be paid, and the first 50 members accepted into the programme get launch credits plus a standing discount on it. Member 51 onward is welcome and gets everything else; the concessions are capped at 50 so they mean something.",
+      "Core, Genesis and Prism are Apache 2.0 and free to run locally - that does not change. Cosmonapse Cloud is the part that will eventually be paid, and the first 10 members accepted into the programme get launch credits, a standing discount on it, and the option to formalize the relationship with a Letter of Intent. Member 11 onward is welcome and gets everything else; the concessions are capped at 10 so they mean something.",
   },
   {
     name: "Architecture sessions with the team",
@@ -45,7 +45,7 @@ const STEPS = [
     n: "01",
     title: "Apply through the form",
     body:
-      "Two minutes. What you are building, the stack you are on, and how far along you are. There is no bar to clear on company size or funding - a solo project with a real problem behind it is exactly the profile.",
+      "Two minutes. What you are building, your team or company, the stack you are on, and how far along you are. This round is scoped to enterprise teams and funded startups - if that is not you yet, the roadmap and quickstart are open to everyone in the meantime.",
   },
   {
     n: "02",
@@ -63,7 +63,7 @@ const STEPS = [
     n: "04",
     title: "Credits land when the platform does",
     body:
-      "Your slot, join date and member number are on record from the day you are accepted. If your number is 50 or below, the credits and the standing discount are applied when Cosmonapse Cloud launches - no re-application, no window to miss.",
+      "Your slot, join date and member number are on record from the day you are accepted. If your number is 10 or below, the credits and the standing discount are applied when Cosmonapse Cloud launches - no re-application, no window to miss. If we signed a Letter of Intent together, that is honored on the same timeline.",
   },
 ];
 
@@ -71,15 +71,17 @@ const FIT = [
   {
     name: "A good fit if",
     items: [
-      "You have a real system in mind - a product, an internal tool, a research setup - not a tutorial to follow",
+      "You are an enterprise team or a funded startup with a real system in mind - a product, an internal platform, a research setup - not a tutorial to follow",
       "Multiple models, tools or services have to coordinate, and a single prompt-and-response is clearly not enough",
       "You are comfortable on alpha software and can work around a rough edge instead of being stopped by it",
+      "You are open to a Letter of Intent once the architecture session shows a real fit - non-binding, but a genuine signal",
       "You are willing to say what broke, in enough detail that it can be fixed",
     ],
   },
   {
     name: "Probably not yet if",
     items: [
+      "You are an individual or solo hobbyist project - this round is scoped to enterprise teams and startups",
       "You need a production SLA today - Core is 0.1.12-alpha and the protocol is not frozen until 0.2.0",
       "You are looking for a managed hosted service right now - Cloud is a 0.3.0 target, not a thing you can buy",
       "You want an agent that is one model behind a chat box - you do not need a protocol for that",
@@ -95,7 +97,7 @@ const FAQ = [
   },
   {
     q: "How firm are the credits?",
-    a: "It is a commitment we are putting in writing on a public page, not a signed contract - and we will not attach a date to it, because Cloud and 1.0.0 do not have one. What is fixed is who qualifies: the first 50 members accepted, in the order they were accepted, and that list stops at 50.",
+    a: "It is a commitment we are putting in writing on a public page, not a signed contract - and we will not attach a date to it, because Cloud and 1.0.0 do not have one. What is fixed is who qualifies: the first 10 members accepted, in the order they were accepted, and that list stops at 10.",
   },
   {
     q: "Do I have to build on Cosmonapse?",
@@ -106,8 +108,12 @@ const FAQ = [
     a: "You do. No NDA, no exclusivity, no claim on your code. You are free to talk publicly about the sessions, the product and where it fell short.",
   },
   {
-    q: "What happens after the 50 are taken?",
-    a: "The programme stays open and the sessions keep running - they are limited by how many hours exist in a week, not by a headcount. What closes at 50 is the credits and the launch discount. Applying early is the only way to be inside that number, which is also why the form asks what you are building rather than just for an email.",
+    q: "What happens after the 10 are taken?",
+    a: "The programme stays open and the sessions keep running - they are limited by how many hours exist in a week, not by a headcount. What closes at 10 is the credits and the launch discount. Applying early is the only way to be inside that number, which is also why the form asks what you are building rather than just for an email.",
+  },
+  {
+    q: "What is the Letter of Intent about?",
+    a: "A Letter of Intent is a short, non-binding statement that you would seriously consider becoming a paying Cosmonapse Cloud customer once it ships. It commits you to nothing legally and costs nothing to sign. We ask for it because the credits and discount mean more when they go to teams that are genuinely evaluating this, not just collecting a coupon - and it is only relevant if the architecture session shows the fit is real.",
   },
   {
     q: "What happens to my form response?",
@@ -123,15 +129,16 @@ export default function EarlyAccessPage() {
           <div className="page-eyebrow">// Early Access Program</div>
           <div className="badge">
             <span className="dot" />
-            First 50 members only
+            Enterprise teams and startups - first 10 only
           </div>
           <h1 className="page-title">Build on Cosmonapse before 1.0.</h1>
           <p className="page-sub">
-            Cosmonapse is a research preview being taken to a stable 1.0.0. Early access is for
-            people pointing it at a real problem while that happens. You get working sessions with
-            the team on your architecture, and the first 50 members accepted also get credits plus
-            a standing discount on Cosmonapse Cloud when it goes live. Free to join, sessions
-            subject to availability.
+            Cosmonapse is a research preview being taken to a stable 1.0.0. This round of early
+            access is for enterprise teams and funded startups pointing it at a real problem while
+            that happens. You get working sessions with the team on your architecture, and the
+            first 10 members accepted also get credits, a standing discount on Cosmonapse Cloud,
+            and the option to form a Letter of Intent with us. Free to join, sessions subject to
+            availability.
           </p>
           <div className="hero-ctas" style={{ marginTop: 28 }}>
             <a
@@ -156,9 +163,9 @@ export default function EarlyAccessPage() {
           <h2 className="section-title">Sessions now, credits at launch.</h2>
           <p className="section-sub">
             Two things are on the table. One is worth something today; the other is worth something
-            the day the platform ships, and only to the first 50 through the door. Both are aimed
-            at the same person - someone building a system that is hard enough to be worth
-            designing properly.
+            the day the platform ships, and only to the first 10 through the door. Both are aimed
+            at the same kind of team - one building a system that is hard enough to be worth
+            designing properly, and serious enough to consider a Letter of Intent.
           </p>
           <div className="grid-3" style={{ marginTop: 32 }}>
             {PERKS.map((p) => (
@@ -176,9 +183,11 @@ export default function EarlyAccessPage() {
         <div className="container container-narrow">
           <div className="sub-eyebrow">What we ask in return</div>
           <p className="prose">
-            Nothing that costs money and nothing that ties your hands. Build something you actually
-            need. When it breaks - and at 0.1.x it will - tell us exactly where, with enough detail
-            that it can be reproduced. That is the whole arrangement. There is no NDA, no
+            Nothing that costs money and nothing that ties your hands. This round is scoped to
+            enterprise teams and startups, and we ask that you come in open to a Letter of Intent
+            if the architecture session shows a real fit - non-binding, but a genuine signal.
+            Build something you actually need. When it breaks - and at 0.1.x it will - tell us
+            exactly where, with enough detail that it can be reproduced. There is no NDA, no
             exclusivity clause and no requirement to say nice things in public; a blunt write-up of
             what did not work is more useful to us than a testimonial.
           </p>
@@ -278,8 +287,8 @@ export default function EarlyAccessPage() {
                 color: "var(--text-faint)",
               }}
             >
-              Concessions are capped at the first 50 members; sessions are subject to
-              availability. Prefer email?{" "}
+              This round is scoped to enterprise teams and startups. Concessions are capped at
+              the first 10 members; sessions are subject to availability. Prefer email?{" "}
               <a href="mailto:dev@cosmonapse.com" className="inline-link">
                 dev@cosmonapse.com
               </a>
