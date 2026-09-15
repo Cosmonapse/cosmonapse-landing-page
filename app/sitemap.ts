@@ -24,6 +24,10 @@ const EXAMPLE_SLUGS = [
   "rag-mcp",
   "retry",
   "agent",
+  "claude-harness",
+  "rag-cli",
+  "receptors",
+  "simple-chat",
   "tutorials",
 ];
 

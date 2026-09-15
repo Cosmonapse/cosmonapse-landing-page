@@ -91,15 +91,15 @@ cosmo prism --tail <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span
 cosmo prism <span class="tk-op">--url</span>=cosmo://127.0.0.1:7070 <span class="tk-op">--namespace</span>=demo`,
       },
       {
-        html: `<span class="tk-cm"># worker.py  -  one URL change, everything else identical</span>
-<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> connect_synapse, Axon, Dendrite
+        html: `<span class="tk-cm"># a cosmo init project reads SYNAPSE_URL - unset is the in-process bus</span>
+<span class="tk-op">$</span> cosmo init demo <span class="tk-op">-n</span> demo <span class="tk-op">&amp;&amp;</span> cd demo
+<span class="tk-op">$</span> SYNAPSE_URL=cosmo://127.0.0.1:7070 python brain.py
 
-synapse = <span class="tk-kw">await</span> connect_synapse(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
-worker = Dendrite(synapse=synapse, namespace=<span class="tk-str">"demo"</span>, role=<span class="tk-str">"worker"</span>)
-worker.attach_axon(Axon(neuron_id=<span class="tk-str">"greeter"</span>, neuron_fn=greet))
+<span class="tk-cm"># in your own code - one URL change, everything else identical</span>
+<span class="tk-kw">from</span> cosmonapse <span class="tk-kw">import</span> connect_synapse, run_brain
 
-<span class="tk-kw">async with</span> worker:
-    <span class="tk-kw">await</span> asyncio.sleep(<span class="tk-fn">float</span>(<span class="tk-str">"inf"</span>))  <span class="tk-cm"># stay alive</span>`,
+synapse = <span class="tk-kw">await</span> <span class="tk-fn">connect_synapse</span>(<span class="tk-str">"cosmo://127.0.0.1:7070"</span>)
+<span class="tk-kw">await</span> <span class="tk-fn">run_brain</span>(<span class="tk-fn">build_worker</span>(synapse), <span class="tk-fn">build_terminal</span>(synapse))`,
       },
     ],
     deeperLink: { href: "/core/quickstart", label: "Quickstart  -  install and first 5 minutes" },
@@ -483,9 +483,9 @@ type CliCard = {
 const cliCards: CliCard[] = [
   {
     title: "cosmo init",
-    commands: [{ html: "cosmo init" }],
+    commands: [{ html: "cosmo init my-brain" }],
     description:
-      "Scaffold a standard-skeleton project: config.py, neurons/, brain.py (wiring), demo.py, README. python demo.py runs a full round-trip in one process; SYNAPSE_URL swaps the transport.",
+      "Scaffold a standard-skeleton project: config.py, neurons/, engram/, effector/, receptors/ and brain.py, the only entry. python brain.py runs the brain plus a terminal REPL in one process; SYNAPSE_URL swaps the transport.",
   },
   {
     title: "cosmo synapse start",
@@ -549,15 +549,15 @@ const cliCards: CliCard[] = [
   {
     title: "typical dev loop",
     commands: [
-      { html: "cosmo init" },
+      { html: "cosmo init my-brain" },
       { html: `cosmo synapse start memory <span class="tk-op">--namespace</span>=dev` },
       { html: `cosmo prism --tail <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># separate terminal</span>` },
       { html: `cosmo prism <span class="tk-op">--namespace</span>=dev  <span class="tk-cm"># …or in the browser</span>` },
-      { html: `python worker.py  <span class="tk-cm"># separate terminal</span>` },
+      { html: `SYNAPSE_URL=cosmo://127.0.0.1:7070 python brain.py  <span class="tk-cm"># separate terminal</span>` },
       { html: `cosmo validate <span class="tk-op">--namespace</span>=dev` },
     ],
     description:
-      "Four terminals: broker, watcher, worker, validator. The Doppler and validator are read-only  -  you can attach and detach them at any time.",
+      "Four terminals: broker, watcher, brain, validator. Prism and the validator are read-only  -  you can attach and detach them at any time.",
   },
 ];
 

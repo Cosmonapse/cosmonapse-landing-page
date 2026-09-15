@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS, KW_REACTIVE } from "@/lib/seo";
 import ExamplesCatalog from "./ExamplesCatalog";
 
 export const metadata: Metadata = pageMetadata({
   title: "Event-Driven Multi-Agent Examples",
   description:
-    "Runnable agent topologies: capability routing, task bidding, orchestrator-free choreography, RAG pipelines, MCP tool agents, retries and rollback.",
+    "Runnable agent topologies: capability routing, bidding, choreography, RAG, MCP tool agents, retries, a coding harness, CLI / API / chat Receptors.",
   path: "/examples",
   keywords: [
     ...KW_EVENT_DRIVEN,
@@ -16,30 +17,36 @@ export const metadata: Metadata = pageMetadata({
     "agent topology patterns",
     "RAG example code",
     "MCP agent example",
+    "agent CLI and chat interface",
   ],
 });
 
-// NOTE: The examples catalog and CTA are intentionally hidden while the
-// Cosmonapse primitives/SDK undergo a rework. The underlying example pages
-// and code (ExamplesCatalog, subpage routes, client components) are left
-// untouched so this can be reverted by restoring the catalog + CTA sections
-// below once examples are redone.
 export default function ExamplesPage() {
   return (
     <>
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Examples</div>
-          <h1 className="page-title">Examples Are Being Reworked.</h1>
+          <h1 className="page-title">Runnable Examples.</h1>
           <p className="page-sub">
-            The Cosmonapse primitives and SDK are currently going through a
-            rework. The examples on this page are out of date and are being
-            redone to match the new APIs. Check back soon.
+            Every example is a folder in{" "}
+            <a
+              href="https://github.com/Cosmonapse/cosmonapse-examples"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-link"
+            >
+              cosmonapse-examples
+            </a>{" "}
+            with the layout <code className="inline">cosmo init</code> scaffolds: components under{" "}
+            <code className="inline">neurons/</code>, <code className="inline">engram/</code>,{" "}
+            <code className="inline">effector/</code> and <code className="inline">receptors/</code>,
+            and one entry, <code className="inline">python brain.py</code>. The code on each page is
+            the code in the repo.
           </p>
         </div>
       </header>
 
-      {/* Hidden while primitives/SDK rework is in progress:
       <section className="section-sm">
         <div className="container">
           <ExamplesCatalog />
@@ -50,12 +57,11 @@ export default function ExamplesPage() {
         <div className="container">
           <Link href="/examples/tutorials" className="ex-cat-cta">
             <div>
-              <div className="ex-cat-cta-eyebrow">// New</div>
+              <div className="ex-cat-cta-eyebrow">// Guided track</div>
               <h3 className="ex-cat-cta-title">Prefer a guided track?</h3>
               <p className="ex-cat-cta-desc">
-                Ten tutorials from hello-world in twelve lines to the production
-                switch to NATS / Kafka, plus the full cosmo CLI reference, in
-                one expandable page.
+                Short tutorials from hello-world to the production switch to NATS / Kafka, plus
+                the full cosmo CLI reference, in one expandable page.
               </p>
             </div>
             <span className="ex-cat-cta-arrow" aria-hidden>
@@ -64,7 +70,6 @@ export default function ExamplesPage() {
           </Link>
         </div>
       </section>
-      */}
 
       <style>{`
         .ex-cat-cta {
