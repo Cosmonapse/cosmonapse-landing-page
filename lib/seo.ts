@@ -9,7 +9,13 @@
 
 import type { Metadata } from "next";
 
-export const SITE_URL = "https://cosmonapse.dev";
+/**
+ * The one public origin. Every canonical, og:url, sitemap <loc> and the
+ * robots.txt Host line derive from this. It must be the domain the site is
+ * actually served on: a canonical pointing at another domain tells Google to
+ * index that domain instead, and this page drops out of results.
+ */
+export const SITE_URL = "https://cosmonapse.com";
 export const SITE_NAME = "Cosmonapse";
 export const TWITTER = "@Cosmonapse";
 
@@ -32,7 +38,18 @@ export function ogImage(path: string = OG_IMAGE, alt: string = SITE_NAME) {
 }
 
 /** Head term. Everything else on the site orbits this phrase. */
-export const PRIMARY_KEYWORD = "event-driven AI agents";
+export const PRIMARY_KEYWORD = "framework to build proactive agents";
+
+/** Cluster 0 - proactive agents, the positioning since 2026-08. */
+export const KW_PROACTIVE = [
+  "framework to build proactive agents",
+  "proactive agents",
+  "proactive AI agents",
+  "proactive agent framework",
+  "build proactive AI agents",
+  "event-driven AI agent framework",
+  "open source AI agent framework",
+];
 
 /** Cluster 1 - event-driven / signal-based agent architecture. */
 export const KW_EVENT_DRIVEN = [
@@ -105,6 +122,7 @@ export const KW_PLATFORM = [
 ];
 
 export const KEYWORDS_ALL = [
+  ...KW_PROACTIVE,
   ...KW_EVENT_DRIVEN,
   ...KW_REACTIVE,
   ...KW_HARNESS,

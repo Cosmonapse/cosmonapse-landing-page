@@ -206,7 +206,7 @@ CARDS = {
             "Genesis to design them. The open Core protocol to run",
             "them. Prism to watch them. Apache 2.0.",
         ],
-        url="cosmonapse.dev",
+        url="cosmonapse.com",
     ),
     "early-access": dict(
         eyebrow="// EARLY ACCESS PROGRAM",
@@ -215,7 +215,7 @@ CARDS = {
             "Architecture sessions with the team. First 50 members",
             "get credits when the platform goes live.",
         ],
-        url="cosmonapse.dev/early-access",
+        url="cosmonapse.com/early-access",
     ),
 }
 

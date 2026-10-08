@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import YcClient from "../ycombinator/YcClient";
 
 /**
@@ -9,11 +10,14 @@ import YcClient from "../ycombinator/YcClient";
  * attributable. The demo itself lives in app/ycombinator/ and is imported
  * rather than copied, so the three can never drift apart.
  */
-export const metadata: Metadata = {
-  title: "The smallest useful agent  -  Cosmonapse",
+// All three demo URLs canonicalise to /ycombinator so Google sees one page,
+// not three duplicates competing with each other.
+export const metadata: Metadata = pageMetadata({
+  title: "The smallest useful agent",
   description:
     "One Neuron, one Engram, one Effector. Replay a real RAG trace Signal by Signal, then read the code that produced it - every primitive annotated.",
-};
+  path: "/ycombinator",
+});
 
 export default function SpeedrunPage() {
   return <YcClient />;

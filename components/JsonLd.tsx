@@ -18,13 +18,14 @@ const graph = {
       "@type": "Organization",
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
+      alternateName: "Cosmonapse AI",
       url: SITE_URL,
       logo: {
         "@type": "ImageObject",
         url: `${SITE_URL}/icon.png`,
       },
       description:
-        "Cosmonapse builds the platform for proactive agents: the open Core protocol and SDKs, the Genesis designer, and the Prism observability plane.",
+        "Cosmonapse builds the open-source framework for proactive, event-driven AI agents: the open Core protocol and SDKs, the Genesis designer, and the Prism observability plane.",
       email: "dev@cosmonapse.com",
       sameAs: [
         "https://x.com/Cosmonapse",
@@ -42,7 +43,7 @@ const graph = {
       url: SITE_URL,
       name: SITE_NAME,
       description:
-        "The platform to build proactive agents - Core protocol and SDKs, Genesis designer, Prism observability.",
+        "The framework to build proactive, event-driven AI agents - Core protocol and SDKs, Genesis designer, Prism observability.",
       publisher: { "@id": `${SITE_URL}/#organization` },
       inLanguage: "en-US",
     },
@@ -51,7 +52,7 @@ const graph = {
       "@id": `${SITE_URL}/#software`,
       name: SITE_NAME,
       applicationCategory: "DeveloperApplication",
-      applicationSubCategory: "AI agent platform",
+      applicationSubCategory: "Event-driven AI agent framework",
       operatingSystem: "Linux, macOS, Windows",
       url: SITE_URL,
       downloadUrl: GITHUB,
@@ -59,7 +60,7 @@ const graph = {
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       programmingLanguage: "Python",
       description:
-        "Cosmonapse is the platform to build proactive agents - agents that act when an event arrives rather than when a user prompts them. Core is the open protocol, SDKs and runtime: components communicate as Neurons over a single Signal envelope on one channel, so systems are choreographed reactively instead of driven by an orchestrator loop. Genesis is the designer that lays a system out on a canvas and writes real source into your project. Prism is the read-only observability plane over the same Signal stream.",
+        "Cosmonapse is the open-source framework to build proactive, event-driven AI agents - agents that act when an event arrives rather than when a user prompts them. Core is the open protocol, SDKs and runtime: components communicate as Neurons over a single Signal envelope on one channel, so systems are choreographed reactively instead of driven by an orchestrator loop. Genesis is the designer that lays a system out on a canvas and writes real source into your project. Prism is the read-only observability plane over the same Signal stream.",
       featureList: [
         "Event-driven signal envelope shared by every agent",
         "Reactive choreography with no central orchestrator loop",

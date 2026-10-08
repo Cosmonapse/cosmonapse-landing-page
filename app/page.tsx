@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/seo";
 import BuildOnCosmonapse from "@/components/BuildOnCosmonapse";
 import BoutiqueSystem from "@/components/diagrams/BoutiqueSystem";
 import CallStackVsBus from "@/components/diagrams/CallStackVsBus";
@@ -177,6 +179,12 @@ const USE_CASES: { title: string; body: string; shape: string }[] = [
   },
 ];
 
+// The home canonical lives here, not in the root layout, so pages that
+// forget to set their own never inherit "I am the home page".
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL },
+};
+
 export default function HomePage() {
   const openEditions = EDITIONS.filter((e) => e.side === "open");
   const paidEditions = EDITIONS.filter((e) => e.side === "commercial");
@@ -197,7 +205,7 @@ export default function HomePage() {
           <p className="hero-lead">
             A proactive agent acts when something happens - a document lands, a threshold trips,
             another agent disagrees - not when someone types. That is an event problem, not a graph
-            problem. Cosmonapse gives you the substrate: design the system on a canvas in{" "}
+            problem. Cosmonapse is the open-source framework for event-driven AI agents: design the system on a canvas in{" "}
             <strong>Genesis</strong>, run it on the open <strong>Core</strong> protocol and runtime,
             and watch it think in <strong>Prism</strong>. No supervisor loop, no control-flow graph
             to maintain - just components reacting to Signals on one bus.

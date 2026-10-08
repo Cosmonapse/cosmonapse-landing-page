@@ -32,19 +32,18 @@ const michroma = Michroma({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Cosmonapse - The Platform to Build Proactive Agents",
+    default: "Cosmonapse - Framework for Proactive, Event-Driven AI Agents",
     // Every child page renders as "<page title> | Cosmonapse".
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Build proactive agents that act when something happens, not when someone types. Genesis to design them, the open Apache 2.0 Core protocol to run them, Prism to watch them. No orchestrator loop.",
+    "Cosmonapse is the open-source framework to build proactive, event-driven AI agents that act when something happens, not when someone types. Apache 2.0.",
   applicationName: SITE_NAME,
   keywords: KEYWORDS_ALL,
   authors: [{ name: "Cosmonapse", url: SITE_URL }],
   creator: "Cosmonapse",
   publisher: "Cosmonapse",
   category: "technology",
-  alternates: { canonical: SITE_URL },
   robots: {
     index: true,
     follow: true,
@@ -57,9 +56,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Cosmonapse - The Platform to Build Proactive Agents",
+    title: "Cosmonapse - Framework for Proactive, Event-Driven AI Agents",
     description:
-      "Proactive agents react to events instead of waiting for a prompt. Design them in Genesis, run them on the open Core protocol, watch them in Prism. Apache 2.0.",
+      "The open-source framework to build proactive, event-driven AI agents. Design them in Genesis, run them on the open Core protocol, watch them in Prism.",
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "en_US",
@@ -68,9 +67,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cosmonapse - The Platform to Build Proactive Agents",
+    title: "Cosmonapse - Framework for Proactive, Event-Driven AI Agents",
     description:
-      "Proactive agents react to events instead of waiting for a prompt. Design them in Genesis, run them on the open Core protocol, watch them in Prism.",
+      "The open-source framework to build proactive, event-driven AI agents. Design them in Genesis, run them on Core, watch them in Prism.",
     site: TWITTER,
     creator: TWITTER,
     images: [`${SITE_URL}${OG_IMAGE}`],
