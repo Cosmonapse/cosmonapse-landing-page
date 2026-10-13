@@ -15,16 +15,25 @@ const nextConfig = {
       { source: "/quickstart", destination: "/core/quickstart", permanent: true },
       { source: "/observability", destination: "/prism", permanent: true },
 
+      // Docs index URLs. The page.tsx files under app/docs also redirect, but
+      // with a temporary 307 and sometimes two hops. These run first and send
+      // every one straight to its final page with a single permanent 308, which
+      // is what Google wants to see.
+      { source: "/docs", destination: "/docs/python/installation", permanent: true },
+      { source: "/docs/python", destination: "/docs/python/installation", permanent: true },
+      { source: "/docs/cli", destination: "/docs/cli/overview", permanent: true },
+      { source: "/docs/engram", destination: "/docs/python/engram", permanent: true },
+
       // The TypeScript SDK was retired in 2026-07; Python is the single
       // reference implementation. Point every /docs/typescript URL at the
       // matching Python section so external links keep landing on real docs.
-      { source: "/docs/typescript", destination: "/docs/python", permanent: true },
+      { source: "/docs/typescript", destination: "/docs/python/installation", permanent: true },
       // `cosmo doppler` was renamed `cosmo prism`; the old stdout-stream page
       // is now the --tail section.
       { source: "/docs/cli/doppler", destination: "/docs/cli/tail", permanent: true },
 
-      // /parity has no Python counterpart - send it to the reference index.
-      { source: "/docs/typescript/parity", destination: "/docs/python", permanent: true },
+      // /parity has no Python counterpart - send it to the first reference page.
+      { source: "/docs/typescript/parity", destination: "/docs/python/installation", permanent: true },
       { source: "/docs/typescript/:section", destination: "/docs/python/:section", permanent: true },
     ];
   },
