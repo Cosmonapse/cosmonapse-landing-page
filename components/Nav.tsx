@@ -14,6 +14,7 @@ const learnLinks = [
   { href: "/core/quickstart", label: "Quickstart" },
   { href: "/core/protocol", label: "Envelope spec" },
   { href: "/core/concepts", label: "Concepts" },
+  { href: "/core/glia", label: "Glia policies" },
   { href: "/examples", label: "Examples" },
   { href: "/community-examples", label: "Community Examples" },
 ];

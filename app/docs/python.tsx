@@ -354,7 +354,7 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_final</span>(self, *, trace_id, parent_id, result, meta<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> Signal: ...
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_error</span>(self, *, trace_id, parent_id, code, message, recoverable<span class="tk-op">=</span><span class="tk-kw">False</span>, meta<span class="tk-op">=</span><span class="tk-kw">None</span>) <span class="tk-op">-></span> Signal: ...
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_plan</span>(self, *, trace_id, parent_id, steps, rationale<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
-    <span class="tk-kw">async def</span> <span class="tk-fn">emit_thought_delta</span>(self, *, trace_id, parent_id, delta, seq<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
+    <span class="tk-kw">async def</span> <span class="tk-fn">emit_audit</span>(self, *, trace_id, parent_id, kind, domain, outcome, attempt<span class="tk-op">=</span><span class="tk-num">1</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_tool_call</span>(self, *, trace_id, parent_id, tool, args, call_id<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_tool_result</span>(self, *, trace_id, parent_id, tool, result<span class="tk-op">=</span><span class="tk-kw">None</span>, error<span class="tk-op">=</span><span class="tk-kw">None</span>, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
     <span class="tk-kw">async def</span> <span class="tk-fn">emit_memory_append</span>(self, *, trace_id, parent_id, key, value, <span class="tk-op">**</span>kw) <span class="tk-op">-></span> Signal: ...
@@ -385,7 +385,7 @@ const dendriteClassSnippet = `<span class="tk-kw">class</span> <span class="tk-f
 
     <span class="tk-cm"># Cognition</span>
     <span class="tk-op">@</span>dendrite.on_plan
-    <span class="tk-op">@</span>dendrite.on_thought_delta
+    <span class="tk-op">@</span>dendrite.on_audit                         <span class="tk-cm"># Glia + repair-loop records</span>
     <span class="tk-op">@</span>dendrite.on_tool_call
     <span class="tk-op">@</span>dendrite.on_tool_result
     <span class="tk-op">@</span>dendrite.on_memory_append
@@ -636,7 +636,7 @@ const signalTypeSnippet = `<span class="tk-kw">class</span> <span class="tk-fn">
     TASK_DECLINED   <span class="tk-op">=</span> <span class="tk-str">"TASK_DECLINED"</span>
 
     <span class="tk-cm"># Cognition</span>
-    THOUGHT_DELTA   <span class="tk-op">=</span> <span class="tk-str">"THOUGHT_DELTA"</span>
+    AUDIT           <span class="tk-op">=</span> <span class="tk-str">"AUDIT"</span>
     PLAN            <span class="tk-op">=</span> <span class="tk-str">"PLAN"</span>
     TOOL_CALL       <span class="tk-op">=</span> <span class="tk-str">"TOOL_CALL"</span>
     TOOL_RESULT     <span class="tk-op">=</span> <span class="tk-str">"TOOL_RESULT"</span>
@@ -1181,7 +1181,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             <tr><td>@dendrite.on_error_signal</td><td>Every ERROR. (@dendrite.on_error is a deprecated alias.)</td></tr>
             <tr><td>@dendrite.on_task_offer</td><td>Every TASK_OFFER. Registering one suppresses the default auto-bidder.</td></tr>
             <tr><td>@dendrite.on_bid / on_task_awarded / on_task_declined</td><td>The bidding flow  -  market observability.</td></tr>
-            <tr><td>@dendrite.on_plan / on_thought_delta / on_tool_call / on_tool_result</td><td>The cognition stream.</td></tr>
+            <tr><td>@dendrite.on_plan / on_audit / on_tool_call / on_tool_result</td><td>The cognition stream.</td></tr>
             <tr><td>@dendrite.on_memory_append / on_critique / on_escalation / on_consensus / on_context_sync</td><td>The remaining cognition / coordination types.</td></tr>
             <tr><td>@dendrite.on_clarification</td><td>Every CLARIFICATION. Reply with answer_clarification (discrete) or respond_to_clarification (re-dispatch).</td></tr>
             <tr><td>@dendrite.on_permission</td><td>Every PERMISSION request. Reply with grant_permission / deny_permission / respond_to_permission.</td></tr>
@@ -1227,7 +1227,7 @@ export default function PythonDocs({ section }: { section?: string }) {
             </tr>
             <tr>
               <td><code className="inline">@pw.on(SignalType.X)</code></td>
-              <td>Reactive trace-scoped callbacks. Useful for streams like THOUGHT_DELTA or PLAN/TOOL_CALL.</td>
+              <td>Reactive trace-scoped callbacks. Useful for streams like PLAN/TOOL_CALL or AUDIT.</td>
             </tr>
             <tr>
               <td><code className="inline">async for sig in pw:</code></td>

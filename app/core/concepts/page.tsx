@@ -7,7 +7,7 @@ import { pageMetadata, KW_EVENT_DRIVEN, KW_HARNESS, KW_REACTIVE } from "@/lib/se
 export const metadata: Metadata = pageMetadata({
   title: "Event-Driven Agent Concepts",
   description:
-    "The vocabulary of Cosmonapse Core - Signal, Synapse, Neuron, Engram, Effector, Receptor, Axon, Dendrite, Pathway - grouped by the job each one does.",
+    "The vocabulary of Cosmonapse Core - Signal, Synapse, Neuron, Engram, Effector, Receptor, Axon, Dendrite, Pathway, Glia - grouped by the job each one does.",
   path: "/core/concepts",
   keywords: [
     ...KW_EVENT_DRIVEN,
@@ -146,6 +146,31 @@ const GROUPS: Group[] = [
     ],
   },
   {
+    id: "governance",
+    title: "The governance layer",
+    heading: "Each component carries its own rules.",
+    purpose:
+      "What a component will accept and emit, enforced at the component, and recorded every time it acts.",
+    color: "var(--p-immune)",
+    concepts: [
+      {
+        name: "Glia",
+        map: "Policy gate · sidecar policy",
+        desc: "A card inserted into an Axon, an Effector or an Engram. It reads every signal entering and leaving that component and applies the card's policies: refuse, redact or escalate. A component carries at most one card. There is no orchestrator and no central policy process, and a card is never consulted over the wire. Mode defaults to off; audit records what would have been blocked; enforce applies it. A Dendrite's card is read for trace-wide limits only.",
+      },
+      {
+        name: "Policy",
+        map: "Rule · guardrail",
+        desc: "One entry on a card, declared in the card's JSON or as an @card.on_signal decorator. It has a direction (inbound, outbound or both), the signal types it reads, a verdict (allow, deny, redact, escalate), and a retry: reask re-runs the Neuron with the refusal as a correction, resend repeats the request behind a bad TOOL_RESULT or RECALLED, none refuses now. A handler gets a read-only view of the whole envelope.",
+      },
+      {
+        name: "Audit",
+        map: "Audit log · AUDIT signal",
+        desc: "A signal type of its own, one record per policy or repair event, emitted at the event. Seven kinds roll up to five domains: security, eval, tool, reliability and governance. A compliance consumer subscribes to cosmonapse.<ns>.AUDIT and nothing else. The verdict also rides the reply as meta.glia, and the matched text stays in the card's local journal.",
+      },
+    ],
+  },
+  {
     id: "observation",
     title: "The read-only seat",
     heading: "Watch everything. Take nothing.",
@@ -184,13 +209,13 @@ export default function ConceptsPage() {
       <section className="section-sm">
         <div className="container">
           <div className="sub-eyebrow">One vocabulary</div>
-          <h2 className="sub-title">Five jobs. One package.</h2>
+          <h2 className="sub-title">Six jobs. One package.</h2>
           <p className="prose">
             There is no separate memory product, no separate observability product and no separate
             tooling vocabulary. <code className="inline">pip install cosmonapse</code> gives you
             every term on this page. What differs between them is not where they ship from but what
             they are for: agreeing on a format, doing work, connecting that work to the bus, being
-            called, and being watched.
+            called, being governed, and being watched.
           </p>
           <p className="prose">
             <Link href="/genesis" className="inline-link">Genesis</Link> and{" "}
@@ -292,6 +317,12 @@ export default function ConceptsPage() {
             to events on that trace, or stream them - and can walk away entirely, because the work
             proceeds whether or not anyone is listening.
           </p>
+          <p className="prose">
+            Nothing in it is a central gatekeeper either. Each Axon, Effector and Engram can carry a{" "}
+            <Link href="/core/glia" className="inline-link">Glia</Link> card that reads what crosses
+            into and out of that one component. A refusal becomes a typed reply on the same trace,
+            and an <code className="inline">AUDIT</code> record says which policy fired.
+          </p>
 
           <NobodyHoldsTheLoop />
 
@@ -366,7 +397,7 @@ export default function ConceptsPage() {
             or an interactive <code className="inline">CLARIFICATION</code> /{" "}
             <code className="inline">PERMISSION</code> the caller must answer. With{" "}
             <code className="inline">{`scope: "terminal"`}</code> only those are delivered; with{" "}
-            <code className="inline">{`scope: "all"`}</code> the cognition stream (THOUGHT_DELTA, PLAN,
+            <code className="inline">{`scope: "all"`}</code> the cognition stream (PLAN, AUDIT,
             TOOL_CALL…) flows past first and the terminal still closes it.
           </p>
           <p className="prose">

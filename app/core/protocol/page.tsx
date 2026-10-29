@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { pageMetadata, KW_EVENT_DRIVEN, KW_PRODUCT } from "@/lib/seo";
 import CodeBlock from "@/components/CodeBlock";
 import EnvelopeAnatomy from "@/components/diagrams/EnvelopeAnatomy";
@@ -25,12 +26,14 @@ const envelopeSnippet = `{
   <span class="tk-fn">"id"</span>:        <span class="tk-str">"evt_01JVBCDEF1234567890ABCDEF"</span>,
   <span class="tk-fn">"trace_id"</span>:  <span class="tk-str">"trc_01JVBCDEF0000000000000000"</span>,
   <span class="tk-fn">"parent_id"</span>: <span class="tk-str">"evt_01JVBCDEF0000000000000001"</span>,
-  <span class="tk-fn">"type"</span>:      <span class="tk-str">"THOUGHT_DELTA"</span>,
+  <span class="tk-fn">"type"</span>:      <span class="tk-str">"AUDIT"</span>,
   <span class="tk-fn">"directed"</span>:  { <span class="tk-fn">"id"</span>: <span class="tk-str">"claude-debug"</span> },
   <span class="tk-fn">"ts"</span>:        <span class="tk-str">"2026-05-16T14:22:01.391Z"</span>,
   <span class="tk-fn">"payload"</span>: {
-    <span class="tk-fn">"delta"</span>: <span class="tk-str">"reading the traceback..."</span>,
-    <span class="tk-fn">"seq"</span>:   <span class="tk-num">1</span>
+    <span class="tk-fn">"kind"</span>:    <span class="tk-str">"GUARD_RETRY"</span>,
+    <span class="tk-fn">"domain"</span>:  <span class="tk-str">"security"</span>,
+    <span class="tk-fn">"outcome"</span>: <span class="tk-str">"re_asked"</span>,
+    <span class="tk-fn">"attempt"</span>: <span class="tk-num">1</span>
   },
   <span class="tk-fn">"meta"</span>: {
     <span class="tk-fn">"model"</span>:  <span class="tk-str">"claude-sonnet-4-6"</span>,
@@ -155,7 +158,7 @@ export default function ProtocolPage() {
               { label: "Core", color: "var(--accent)", desc: "Lifecycle · Cognition · Agent management" },
               { label: "Engram", color: "var(--p-engram)", desc: "Memory · Context" },
               { label: "Doppler", color: "var(--p-doppler)", desc: "Observability surface" },
-              { label: "Immune", color: "var(--p-immune)", desc: "Identity · Security (planned)" },
+              { label: "Glia", color: "var(--p-immune)", desc: "Policy · Audit" },
             ].map((p) => (
               <span
                 key={p.label}
@@ -453,10 +456,6 @@ export default function ProtocolPage() {
             TASK → FINAL with no intermediate events is fully compliant.
           </p>
           <div className="msg-grid">
-            <Msg name="THOUGHT_DELTA" by="Dendrite">
-              A chunk of streaming reasoning. <code className="inline">meta.seq</code> must be monotonic per
-              (trace_id, agent). Payload: <code className="inline">{`{ delta, final? }`}</code>
-            </Msg>
             <Msg name="PLAN" by="Dendrite">
               Structured plan the agent has decided to follow. Supervisors may interrupt before execution.
               Payload: <code className="inline">{`{ steps, revision }`}</code>
@@ -710,48 +709,39 @@ export default function ProtocolPage() {
             envelope types required.
           </div>
 
-          {/* Future / planned */}
+          {/* Glia governance */}
           <div style={{ marginTop: 56 }}>
-            <ProductTag label="Cosmonapse Immune" color="var(--p-immune)" status="Not Planned" statusColor="var(--status-none)" />
+            <ProductTag label="Cosmonapse Core · Glia" color="var(--p-immune)" status="Shipped in 0.1.14" statusColor="var(--ok-strong)" />
           </div>
-          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Future signal extensions</div>
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Message types  -  Governance</div>
           <p style={{ color: "var(--text-dim)", maxWidth: 720, marginBottom: 32 }}>
-            These signal types are reserved for future Cosmonapse products. They are not part of the
-            current envelope spec but are documented here for planning purposes.
+            Glia gates read signals on the component and add one type of their own. The verdict a
+            gate reaches also rides the reply it shaped as <code className="inline">meta.glia</code>,
+            correlated by <code className="inline">parent_id</code>. See{" "}
+            <Link href="/core/glia" className="inline-link">Glia</Link>.
           </p>
-          <div
-            style={{
-              padding: "16px 20px",
-              borderRadius: 10,
-              border: "1px solid var(--border)",
-              background: "var(--surface)",
-              opacity: 0.65,
-              fontSize: 13,
-              lineHeight: 1.75,
-              color: "var(--text-dim)",
-            }}
-          >
-            <div style={{ marginBottom: 12 }}>
-              <strong style={{ color: "var(--p-immune)", fontFamily: "var(--font-mono)" }}>Immune</strong>{" "}
-                -  Genome · Myelin · Reflex · AntiBody
-            </div>
-            <div>
-              Planned signal types include{" "}
-              <code className="inline">IDENTITY_ASSERT</code> (Genome  -  neuron identity proof),{" "}
-              <code className="inline">KEY_ROTATE</code> (Myelin  -  in-band key refresh), and{" "}
-              <code className="inline">THREAT_SIGNAL</code> (Reflex/AntiBody  -  anomaly broadcast).
-              These will extend the envelope spec in a future revision and remain backwards-compatible
-              with v1 consumers.
-            </div>
-            <div style={{ marginTop: 16 }}>
-              <strong style={{ color: "var(--p-cloud)", fontFamily: "var(--font-mono)" }}>Cloud</strong>{" "}
-                -  Membrane
-            </div>
-            <div style={{ marginTop: 4 }}>
-              Membrane isolation signals are infrastructure-layer only and will not appear on the
-              application Synapse. They operate below the envelope boundary.
-            </div>
+          <div className="msg-grid">
+            <Msg name="AUDIT" by="Dendrite (gate or repair loop data)">
+              A record, not an instruction. Nothing waits on it, nothing routes on it, and dropping
+              one changes no behaviour. One per policy or repair event, emitted at the event, so no
+              AUDIT on a trace means nothing fired. It counts against no trace limit. The matched
+              content never rides here; <code className="inline">hash</code> joins the record to the
+              component&rsquo;s local journal. Payload:{" "}
+              <code className="inline">{`{ kind, domain, outcome, attempt, component?, direction?, signal?, policy_id?, policy_version?, card_id?, reason?, hash?, took_ms? }`}</code>
+            </Msg>
           </div>
+
+          {/* Next */}
+          <div style={{ marginTop: 56 }}>
+            <ProductTag label="Glia · signing" color="var(--p-immune)" status="Planned" statusColor="var(--status-none)" />
+          </div>
+          <div className="sub-eyebrow" style={{ marginTop: 0 }}>Not in the envelope yet</div>
+          <p style={{ color: "var(--text-dim)", maxWidth: 720 }}>
+            Envelopes are not signed. <code className="inline">directed.id</code> is a claim, so a
+            policy on identity stops mistakes and misrouted traffic, not an attacker on a shared
+            broker. Per-component keys and envelope signatures are the next phase of Glia. No
+            signal types or fields are committed for it, and none are listed here until they are.
+          </p>
         </div>
       </section>
 

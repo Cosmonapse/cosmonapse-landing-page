@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { pageMetadata, KW_PRODUCT } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Roadmap",
   description:
-    "Where Cosmonapse is heading: the 0.1.12 line fixes tool calling, 0.2.0 containerizes the local product and freezes the envelope, 0.3.0 opens Cosmonapse Cloud, 1.0.0 lands Brainwaves and stable infra.",
+    "Where Cosmonapse is heading: 0.1.14 adds Glia policy cards and AUDIT, the 0.1.x line fixes tool calling, 0.2.0 containerizes the local product and freezes the envelope, 0.3.0 opens Cosmonapse Cloud, 1.0.0 lands Brainwaves and stable infra.",
   path: "/roadmap",
   keywords: [
     ...KW_PRODUCT,
@@ -20,11 +21,12 @@ export default function RoadmapPage() {
       <header className="page-header">
         <div className="container">
           <div className="page-eyebrow">// Roadmap</div>
-          <h1 className="page-title">From 0.1.12 to a Stable 1.0.0.</h1>
+          <h1 className="page-title">From 0.1.14 to a Stable 1.0.0.</h1>
           <p className="page-sub">
-            0.1.12 is out  -  the protocol and SDK shapes are in place, and Effector joins them as the
-            action layer. Everything between 0.1.12 and 0.2.0 goes into one thing: making tool calling
-            dependable across models. 0.2.0 keeps Cosmonapse a local product but ships it as a
+            0.1.14 is out. The protocol and SDK shapes are in place, Effector is the action layer,
+            and Glia puts a policy card on each component with an AUDIT record for everything it
+            does. The rest of the 0.1.x line goes into one thing: making tool calling dependable
+            across models. 0.2.0 keeps Cosmonapse a local product but ships it as a
             container, and every envelope and protocol freeze lands in that line. 0.3.0 opens
             Cosmonapse Cloud on top of a frozen wire format. 1.0.0 is the stable foundation  -  the six
             primitives solid, Prism deepened, Brainwaves captured and replayed, Brain architectures
@@ -36,12 +38,12 @@ export default function RoadmapPage() {
       <section className="section-sm">
         <div className="container container-narrow">
           <div className="timeline">
-            <div className="timeline-item current">
+            <div className="timeline-item">
               <div className="timeline-version">0.1.12 · shipped  -  the start</div>
               <h2 className="timeline-title">Read the spec. Build the Dendrite by hand.</h2>
               <div className="timeline-body">
                 <p>
-                  Out now as 0.1.12. The developer reads the envelope spec, writes an Axon and
+                  Shipped as 0.1.12. The developer reads the envelope spec, writes an Axon and
                   Dendrite using the SDK primitives, chooses a Synapse adapter, and wires their own
                   orchestration logic. Full control, full complexity, appropriate for early adopters. The
                   Python SDK is the complete reference implementation.
@@ -113,18 +115,66 @@ export default function RoadmapPage() {
               </div>
             </div>
 
+            <div className="timeline-item current">
+              <div className="timeline-version">0.1.14 · shipped  -  governance</div>
+              <h2 className="timeline-title">A policy card on every component.</h2>
+              <div className="timeline-body">
+                <p>
+                  Out now as 0.1.14: the tool, guardrail and eval layer. A{" "}
+                  <Link href="/core/glia" className="inline-link">Glia</Link> card mounts on an Axon, an
+                  Effector or an Engram and reads every signal crossing that component, both ways.
+                  There is no orchestrator and no central policy process.
+                </p>
+                <p>What 0.1.14 ships:</p>
+                <ul>
+                  <li>
+                    <strong>Glia policy cards</strong>  -  each policy has a direction, the signal
+                    types it reads, a verdict (allow, deny, redact, escalate) and a retry (reask,
+                    resend, none). Declared as JSON or as decorators on the card
+                  </li>
+                  <li>
+                    <strong>Modes</strong>  -  off by default, audit to record what would have been
+                    blocked, enforce to apply it. Existing brains are unaffected
+                  </li>
+                  <li>
+                    <strong>AUDIT</strong>  -  a new signal type, one record per policy or repair
+                    event, across security, eval, tool, reliability and governance domains
+                  </li>
+                  <li>
+                    <strong>The correction repair loop</strong>  -  one bounded loop in the Axon for
+                    policy refusals, tool arguments that fail their schema, and unclaimed output
+                    under the opt-in <code className="inline">strict_output</code>
+                  </li>
+                  <li>
+                    <strong>Trace-wide limits</strong> on the Dendrite, in component and trace modes
+                  </li>
+                  <li>
+                    <strong>Removed</strong>  -  <code className="inline">THOUGHT_DELTA</code>. Nothing
+                    in the SDK produced it. Observe repair progress with{" "}
+                    <code className="inline">@dendrite.on_audit</code> instead
+                  </li>
+                </ul>
+                <p>
+                  Not in 0.1.14: signing. Envelopes are not signed, so a policy on{" "}
+                  <code className="inline">directed.id</code> stops mistakes, not an attacker on a
+                  shared broker. Per-component keys are the next phase of Glia and are not yet
+                  scheduled.
+                </p>
+              </div>
+            </div>
+
             <div className="timeline-item">
-              <div className="timeline-version">0.1.12 → 0.2.0 · next  -  tool calling</div>
+              <div className="timeline-version">0.1.x → 0.2.0 · next  -  tool calling</div>
               <h2 className="timeline-title">Every release in this line fixes tool calls.</h2>
               <div className="timeline-body">
                 <p>
                   A single theme for the whole patch line. Tool calling is where open models break
                   first: a harness asks for an action object and gets shorthand keys, prose around the
-                  JSON, or a truncated tail. Every release from 0.1.12 up to 0.2.0 goes at the parsers
+                  JSON, or a truncated tail. Every release up to 0.2.0 goes at the parsers
                   and the contract around them, so that a Neuron that drifts is corrected at the Axon
                   instead of by every harness downstream.
                 </p>
-                <p>What the 0.1.12 line means:</p>
+                <p>What the 0.1.x line means:</p>
                 <ul>
                   <li>
                     <strong>Tool-call parsing, hardened</strong>  -  the shorthand variants, wrapped
@@ -132,13 +182,13 @@ export default function RoadmapPage() {
                     thrown away
                   </li>
                   <li>
-                    <strong>Axon output contract</strong>  -  a reject-and-repair path:{" "}
-                    <code className="inline">@detects_output</code> raises{" "}
-                    <code className="inline">InvalidOutput(reason, hint)</code> and the Axon re-asks
-                    its Neuron with the hint (bounded{" "}
-                    <code className="inline">output_retries</code>, CRITIQUE signals for Prism), with
-                    provider truncation (<code className="inline">finish_reason=&quot;length&quot;</code>)
-                    retried the same way
+                    <strong>Axon output contract</strong>  -  the reject-and-repair path shipped in
+                    0.1.14: under <code className="inline">strict_output</code>, unclaimed output
+                    raises <code className="inline">InvalidOutput</code> and the Axon re-asks its
+                    Neuron, bounded, with an <code className="inline">EVAL_RETRY</code> AUDIT record
+                    per attempt. Still to come: provider truncation
+                    (<code className="inline">finish_reason=&quot;length&quot;</code>) retried the
+                    same way
                   </li>
                   <li>
                     <strong>Structured output at the source</strong>  -  <code className="inline">response_format</code>{" "}
@@ -258,9 +308,9 @@ export default function RoadmapPage() {
 
       <section className="section-sm">
         <div className="container container-narrow">
-          <div className="sub-eyebrow">Known limitations  -  0.1.12</div>
+          <div className="sub-eyebrow">Known limitations  -  0.1.14</div>
           <p className="prose">
-            0.1.12 is a 0.1: the protocol and SDK shapes are in place, and nothing is frozen until
+            0.1.14 is a 0.1: the protocol and SDK shapes are in place, and nothing is frozen until
             0.2.0. These are the edges we know about  -  each one points at the milestone that
             closes it.
           </p>
@@ -268,13 +318,16 @@ export default function RoadmapPage() {
             <li>
               <strong>Open models drift from strict action schemas.</strong> A harness that asks a
               plain-chat LLM for <code className="inline">{"{"}&quot;tool&quot;, &quot;args&quot;{"}"}</code>{" "}
-              JSON will eventually get shorthand variants or truncated objects back; today{" "}
-              <code className="inline">@detects_output</code> can only transform or error, so every
-              harness carries its own fallback parsing. This is the whole point of the 0.1.12 line:
-              hardened tool-call parsing, the Axon output contract
-              (<code className="inline">InvalidOutput</code> + bounded{" "}
-              <code className="inline">output_retries</code>), and provider-side{" "}
-              <code className="inline">response_format</code> / <code className="inline">tools</code>
+              JSON will eventually get shorthand variants or truncated objects back. 0.1.14&apos;s repair
+              loop re-asks the Neuron when output or tool arguments fail, but the parsers still miss
+              some shapes. Hardened parsing and provider-side{" "}
+              <code className="inline">response_format</code> / <code className="inline">tools</code>{" "}
+              are the rest of the 0.1.x line
+            </li>
+            <li>
+              <strong>Signals are not signed.</strong> Glia policies read{" "}
+              <code className="inline">directed.id</code> as a claim. Treat a shared broker as a
+              trusted zone until signing ships
             </li>
             <li>
               <strong>Traces and Pathways are not yet frozen.</strong> The per-trace model
@@ -295,11 +348,12 @@ export default function RoadmapPage() {
 
       <section className="section-sm">
         <div className="container container-narrow">
-          <div className="sub-eyebrow">Priority order  -  0.1.12 → 1.0.0</div>
+          <div className="sub-eyebrow">Priority order  -  0.1.14 → 1.0.0</div>
           <p className="prose">The order matters. Each milestone lands on the baseline the last one established.</p>
           <ol className="prose" style={{ paddingLeft: 24 }}>
             <li>0.1.12  -  shipped: protocol drafted, the Python SDK and the CLI released, every primitive present</li>
-            <li>0.1.12 → 0.2.0  -  one theme: tool calling. Hardened parsers, the Axon output repair contract, provider-side structured output</li>
+            <li>0.1.14  -  shipped: Glia policy cards, AUDIT, the correction repair loop, trace-wide limits</li>
+            <li>0.1.x → 0.2.0  -  one theme: tool calling. Hardened parsers, provider-side structured output</li>
             <li>0.2.0  -  still local, now containerized. The envelope, the cognition signals, and the trace model freeze here; heavy testing against NATS / Kafka; real agents stress-testing the protocol before the freeze closes</li>
             <li>0.3.0  -  Cosmonapse Cloud: managed Synapse, hosted Engram, Prism as a service, on the frozen protocol. Moves when the project gets full-time attention</li>
             <li>1.0.0  -  strong foundation: Prism deepened with cognition analytics, Brains and Brainwaves, deployment and infra integration, complex RAG / agent systems built consistently</li>

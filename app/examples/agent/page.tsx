@@ -176,7 +176,26 @@ code   : report/solution.py`}
             ],
           },
           {
-            eyebrow: "06 · The brain",
+            eyebrow: "06 · Glia cards",
+            title: "One policy card per guarded component.",
+            prose: (
+              <p>
+                Each guarded component carries its own{" "}
+                <Link href="/core/glia" className="inline-link">Glia</Link> card. The files card
+                reads every TOOL_CALL arriving at the filesystem Effector, whoever sent it, and
+                refuses anything but <code className="inline">write_file</code> into report/. The
+                research card redacts phrases addressed to the model from fetched web text before
+                it reaches the prompt. A regex list is not an injection detector; it shows where
+                one goes. Every refusal and redaction emits an AUDIT record, and{" "}
+                <code className="inline">COSMONAPSE_POLICY_MODE=audit</code> shadows all of them.
+              </p>
+            ),
+            snippets: [
+              { name: "glia/files.py", code: stripDocstring(CODE["glia/files.py"]) },
+            ],
+          },
+          {
+            eyebrow: "07 · The brain",
             title: "Deployment only.",
             prose: (
               <p>

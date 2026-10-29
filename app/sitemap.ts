@@ -45,6 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/core/quickstart`, priority: 0.9, changeFrequency: "weekly" },
     { url: `${SITE_URL}/core/protocol`, priority: 0.9, changeFrequency: "monthly" },
     { url: `${SITE_URL}/core/concepts`, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${SITE_URL}/core/glia`, priority: 0.85, changeFrequency: "monthly" },
     { url: `${SITE_URL}/examples`, priority: 0.8, changeFrequency: "weekly" },
     { url: `${SITE_URL}/roadmap`, priority: 0.6, changeFrequency: "monthly" },
     { url: `${SITE_URL}${EARLY_ACCESS_HREF}`, priority: 0.8, changeFrequency: "monthly" },

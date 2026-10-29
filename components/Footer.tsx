@@ -65,6 +65,9 @@ export default function Footer() {
                 <Link href="/core/concepts">Concepts</Link>
               </li>
               <li>
+                <Link href="/core/glia">Glia policies</Link>
+              </li>
+              <li>
                 <Link href="/examples">Examples</Link>
               </li>
               <li>
@@ -142,7 +145,7 @@ export default function Footer() {
         </div>
         <div className="footer-bottom">
           <span>© 2026 Cosmonapse  -  Research preview</span>
-          <span>v0.1.12-alpha</span>
+          <span>v0.1.14-alpha</span>
         </div>
       </div>
     </footer>

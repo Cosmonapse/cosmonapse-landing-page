@@ -56,7 +56,7 @@ const graph = {
       operatingSystem: "Linux, macOS, Windows",
       url: SITE_URL,
       downloadUrl: GITHUB,
-      softwareVersion: "0.1.12",
+      softwareVersion: "0.1.14",
       license: "https://www.apache.org/licenses/LICENSE-2.0",
       programmingLanguage: "Python",
       description:

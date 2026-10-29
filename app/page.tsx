@@ -195,7 +195,7 @@ export default function HomePage() {
         <div className="container">
           <div className="badge">
             <span className="dot" />
-            v0.1.12 · Research preview
+            v0.1.14 · Research preview
           </div>
           <h1 className="hero-title">
             The platform to build
@@ -246,6 +246,29 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ── Release callout: 0.1.14 ─────────────────────────────────────── */}
+      <section className="section-sm">
+        <div className="container">
+          <div className="ea-band">
+            <div className="ea-band-copy">
+              <div className="ea-band-eyebrow">// New in 0.1.14</div>
+              <h3>Glia: a policy card on every Axon, Effector and Engram.</h3>
+              <p>
+                A card reads the signals entering and leaving its component and refuses, redacts or
+                escalates what its policies match. Every violation emits an AUDIT record on its own
+                subject, so no AUDIT on a trace means nothing fired. Cards default to off, run in
+                audit first, and enforce when you switch them.
+              </p>
+            </div>
+            <div className="ea-band-actions">
+              <Link href="/core/glia" className="btn btn-primary">
+                How Glia works <span className="arrow">→</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── The two bets ─────────────────────────────────────────────────── */}
       <section className="section">
@@ -483,8 +506,9 @@ export default function HomePage() {
           <div className="cta-card">
             <h2>Build a system, not a demo.</h2>
             <p>
-              Core 0.1.12 is a research preview: the envelope is drafted, the Python SDK implements
-              it, and Genesis and Prism run locally today off the same CLI. It is open source under Apache
+              Core 0.1.14 is a research preview: the envelope is drafted, the Python SDK implements
+              it, Glia governs each component, and Genesis and Prism run locally today off the same
+              CLI. It is open source under Apache
               2.0 - read the spec, disagree with it in public, and build on it either way.
             </p>
             <div className="hero-ctas" style={{ marginBottom: 0 }}>

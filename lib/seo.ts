@@ -121,6 +121,17 @@ export const KW_PLATFORM = [
   "Cosmonapse Core",
 ];
 
+/** Cluster 5 - governance. Added with Glia in 0.1.14. */
+export const KW_GOVERNANCE = [
+  "AI agent guardrails",
+  "agent governance",
+  "agent policy enforcement",
+  "auditable AI agents",
+  "AI audit trail",
+  "LLM guardrails",
+  "Cosmonapse Glia",
+];
+
 export const KEYWORDS_ALL = [
   ...KW_PROACTIVE,
   ...KW_EVENT_DRIVEN,

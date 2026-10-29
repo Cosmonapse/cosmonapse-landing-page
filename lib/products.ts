@@ -52,13 +52,13 @@ export const PRODUCTS: Product[] = [
     short: "Core",
     role: "The protocol, SDK and runtime engine",
     desc:
-      "The open Apache 2.0 protocol and the runtime that speaks it. One Signal envelope, one Synapse, replaceable Neurons. Memory (Engram), tools (Effector) and interfaces (Receptor) are first-class primitives, not framework add-ons - and the transport swaps from in-process to NATS or Kafka by changing a URL.",
+      "The open Apache 2.0 protocol and the runtime that speaks it. One Signal envelope, one Synapse, replaceable Neurons. Memory (Engram), tools (Effector) and interfaces (Receptor) are first-class primitives, not framework add-ons. Glia puts a policy card on each Axon, Effector and Engram. The transport swaps from in-process to NATS or Kafka by changing a URL.",
     command: "pip install cosmonapse",
     color: "var(--accent)",
     status: "ships",
     bullets: [
       "Signal envelope spec + the Python reference SDK",
-      "Neuron, Axon, Dendrite, Engram, Effector, Receptor primitives",
+      "Six primitives, with Glia policy cards on Axons, Effectors and Engrams",
       "Memory, NATS and Kafka transports behind one URL",
     ],
   },

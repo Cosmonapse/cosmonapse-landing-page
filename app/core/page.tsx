@@ -77,8 +77,8 @@ export default function CorePage() {
           <h1 className="page-title">The protocol and the runtime.</h1>
           <p className="page-sub">
             Core is the open, Apache 2.0 licensed foundation the rest of the suite is built on: a
-            Signal envelope, a Synapse to carry it, and six primitives that cover work, identity,
-            transport, memory, tools and interfaces. Genesis writes against it and Prism reads from
+            Signal envelope, a Synapse to carry it, six primitives that cover work, identity,
+            transport, memory, tools and interfaces, and a policy card that governs each of them. Genesis writes against it and Prism reads from
             it, but Core stands on its own - and always will.
           </p>
           <div className="hero-ctas" style={{ marginTop: 28 }}>
@@ -168,6 +168,49 @@ export default function CorePage() {
                 Prism can show you a user-initiated run and an internal one side by side.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Glia ─────────────────────────────────────────────────────────── */}
+      <section className="section">
+        <div className="container">
+          <div className="section-eyebrow">// Governance · new in 0.1.14</div>
+          <h2 className="section-title">Glia: a policy card on each component.</h2>
+          <p className="section-sub">
+            An Axon, an Effector or an Engram can carry one Glia card. The card reads every signal
+            entering and leaving its component and refuses, redacts or escalates what its policies
+            match. Every violation emits an AUDIT record. There is no central policy process to
+            route through.
+          </p>
+          <div className="grid-3">
+            <div className="card">
+              <h3>Two-way</h3>
+              <p>
+                Each policy picks a direction (inbound, outbound or both) and the signal types it
+                reads. The default is everything, both ways. The same IMPRINT can be checked by the
+                Axon sending it and the Engram receiving it.
+              </p>
+            </div>
+            <div className="card">
+              <h3>Retry is the policy&apos;s call</h3>
+              <p>
+                A deny can re-ask the Neuron with the refusal as a correction, resend the request
+                behind a bad TOOL_RESULT or RECALLED, or refuse outright. Refusal is the default.
+              </p>
+            </div>
+            <div className="card">
+              <h3>Off until you say so</h3>
+              <p>
+                Cards default to off. Run them in audit to see what would have been blocked, then
+                switch to enforce. Existing brains are unaffected until a deployment opts in.
+              </p>
+            </div>
+          </div>
+          <div style={{ textAlign: "center", marginTop: 32 }}>
+            <Link href="/core/glia" className="btn btn-ghost">
+              How Glia works <span className="arrow">→</span>
+            </Link>
           </div>
         </div>
       </section>

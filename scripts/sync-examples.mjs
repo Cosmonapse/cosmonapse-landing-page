@@ -39,7 +39,7 @@ export const EXAMPLES = {
 };
 
 // Folders whose modules are components, plus root files worth showing.
-const DIRS = ["neurons", "engram", "effector", "receptors"];
+const DIRS = ["neurons", "engram", "effector", "receptors", "glia"];
 const ROOT_FILES = ["brain.py", "config.py", "helpers.py", "index.py", "embeddings.py",
   "demo.py", "cli.py", "flask_app.py", "wsgi_app.py", "handlers_reference.py"];
 const SKIP = new Set(["__init__.py"]);
