@@ -249,7 +249,7 @@ export default function RoadmapPage() {
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-version">0.3.0 · future  -  Cosmonapse Cloud</div>
+              <div className="timeline-version">0.3.0 · in closed testing  -  Cosmonapse Cloud</div>
               <h2 className="timeline-title">The same fabric, hosted.</h2>
               <div className="timeline-body">
                 <p>
@@ -267,8 +267,8 @@ export default function RoadmapPage() {
                   <li><strong>Local stays local</strong>  -  the same code runs against a self-hosted Synapse or a managed one, by URL</li>
                 </ul>
                 <p>
-                  Timing here is honest rather than precise: Cloud moves when the project gets
-                  full-time attention.
+                  Cloud is live now in closed testing, alongside the Pro and Enterprise tiers. 0.3.0
+                  is when it opens beyond that group.
                 </p>
               </div>
             </div>
@@ -355,7 +355,7 @@ export default function RoadmapPage() {
             <li>0.1.14  -  shipped: Glia policy cards, AUDIT, the correction repair loop, trace-wide limits</li>
             <li>0.1.x → 0.2.0  -  one theme: tool calling. Hardened parsers, provider-side structured output</li>
             <li>0.2.0  -  still local, now containerized. The envelope, the cognition signals, and the trace model freeze here; heavy testing against NATS / Kafka; real agents stress-testing the protocol before the freeze closes</li>
-            <li>0.3.0  -  Cosmonapse Cloud: managed Synapse, hosted Engram, Prism as a service, on the frozen protocol. Moves when the project gets full-time attention</li>
+            <li>0.3.0  -  Cosmonapse Cloud: managed Synapse, hosted Engram, Prism as a service, on the frozen protocol. Live now in closed testing</li>
             <li>1.0.0  -  strong foundation: Prism deepened with cognition analytics, Brains and Brainwaves, deployment and infra integration, complex RAG / agent systems built consistently</li>
           </ol>
         </div>

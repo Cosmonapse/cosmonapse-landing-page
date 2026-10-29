@@ -14,13 +14,13 @@ export default function SuiteEditions() {
       width={900}
       height={380}
       title="A dashed vertical line divides the suite. On the open source side, Core sits under a free Genesis and Prism build. On the commercial side, a Pro tier sits beside them, with Cloud and Enterprise stacked above."
-      caption="Core is Apache 2.0 and always will be. The essential Genesis and Prism builds are free with it. Pro, Cloud and Enterprise are the commercial layers, and none of them are shipping yet."
+      caption="Core is Apache 2.0 and always will be. The essential Genesis and Prism builds are free with it. Pro, Cloud and Enterprise are the commercial layers, live now in closed testing."
     >
       <Tag x={60} y={40} anchor="start" tone="accent">
         OPEN SOURCE · APACHE 2.0 · FOREVER
       </Tag>
       <Tag x={548} y={40} anchor="start" tone="accent3">
-        COMMERCIAL · PLANNED
+        COMMERCIAL · CLOSED TESTING
       </Tag>
 
       <line x1={520} y1={22} x2={520} y2={342} className="fig-hair fig-dash" />

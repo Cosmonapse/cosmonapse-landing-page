@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/seo";
-import BuildOnCosmonapse from "@/components/BuildOnCosmonapse";
-import BoutiqueSystem from "@/components/diagrams/BoutiqueSystem";
 import CallStackVsBus from "@/components/diagrams/CallStackVsBus";
 import HeroBus from "@/components/diagrams/HeroBus";
 import DesignRunObserve from "@/components/diagrams/DesignRunObserve";
@@ -12,9 +10,9 @@ import DemoFrame from "@/components/DemoFrame";
 import InstallCommands from "@/components/InstallCommands";
 import ProductGrid from "@/components/ProductGrid";
 import { NEXT_UP } from "@/lib/products";
-import { EARLY_ACCESS_HREF } from "@/lib/early-access";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
+const BOOK_A_CALL = "https://cal.com/aqib-khan-rujxh2/30min";
 
 // One package, two commands: install it, then open the designer. Repeated
 // verbatim in the closing CTA rather than varied, so the thing you scrolled
@@ -56,8 +54,8 @@ const BETS: { num: string; claim: string; problem: string; solution: string }[] 
 ];
 
 // Where the open source line falls. Left column is what you get for free and
-// keep; right column is what gets sold. Nothing here is shipping yet except
-// the two free tiers, and the status labels say so.
+// keep; right column is what gets sold. The free tiers ship today; the
+// commercial tiers are live in closed testing, and the status labels say so.
 const EDITIONS: {
   side: "open" | "commercial";
   name: string;
@@ -92,7 +90,7 @@ const EDITIONS: {
   {
     side: "commercial",
     name: "Pro",
-    status: "Planned",
+    status: "Closed testing",
     body:
       "The deeper end of Genesis and Prism for people doing this full time - the surface that pays for itself in a working week rather than the surface you need to get started.",
     items: [
@@ -104,7 +102,7 @@ const EDITIONS: {
   {
     side: "commercial",
     name: "Cloud",
-    status: "Planned",
+    status: "Closed testing",
     body:
       "The hosted version of the same loop. Design and observe in a browser, deploy a brain as a service, and let a team work on one project at once.",
     items: [
@@ -116,7 +114,7 @@ const EDITIONS: {
   {
     side: "commercial",
     name: "Enterprise",
-    status: "Planned",
+    status: "Closed testing",
     body:
       "What a regulated buyer needs before any of this is allowed near production, distributed as a licensed wheel off a private index.",
     items: [
@@ -149,33 +147,6 @@ const LIFECYCLE: { verb: string; product: string; color: string; body: string }[
     color: "var(--accent-2)",
     body:
       "Attach a read-only tap to the same bus and watch the system think: the live graph, the causal tree behind a single task, where a task's wall clock actually went. Tracing is free because the bus already saw it.",
-  },
-];
-
-const USE_CASES: { title: string; body: string; shape: string }[] = [
-  {
-    title: "Claims triage",
-    body:
-      "A first-notice-of-loss intake that reads the document, pulls policy history, flags the fraud signals a generalist model would miss, and escalates to a human with the reasoning attached.",
-    shape: "Receptor (API) → classifier Neuron → policy Engram → fraud Effector → adjuster escalation",
-  },
-  {
-    title: "Clinical intake",
-    body:
-      "A patient-facing conversation that gathers history, checks it against a coded protocol, and hands a structured summary to a clinician - with every step in the record.",
-    shape: "Receptor (chat) → intake Neuron → protocol Engram → summariser → clinician review",
-  },
-  {
-    title: "Research desk",
-    body:
-      "Several models working the same question in parallel from different sources, disagreeing on the record, with the reconciliation step doing real work instead of a supervisor picking one.",
-    shape: "fan-out TASK → n Neurons → competing AGENT_OUTPUTs → reconciler → FINAL",
-  },
-  {
-    title: "Contract review",
-    body:
-      "Clause-by-clause analysis against a firm's own precedent library, where the value is the precedent and the escalation policy - not the model underneath it.",
-    shape: "Receptor (upload) → splitter → clause Neurons → precedent Engram → risk report",
   },
 ];
 
@@ -214,9 +185,9 @@ export default function HomePage() {
             <Link href="/core/quickstart" className="btn btn-primary">
               Get started <span className="arrow">→</span>
             </Link>
-            <Link href="/genesis" className="btn btn-ghost">
-              See Genesis
-            </Link>
+            <a href={BOOK_A_CALL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+              Book a call
+            </a>
             <a href={GITHUB} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
               <span aria-hidden>★</span> Star on GitHub
             </a>
@@ -361,8 +332,9 @@ export default function HomePage() {
           <p className="section-sub">
             Core is Apache 2.0 and always will be. The essential builds of Genesis and Prism are
             free with it, in the same pip install, and they are enough to build and run a real
-            system on your own machine. What gets sold later is Pro, Cloud and Enterprise - the
-            deeper product surface and the operating burden around it, never the protocol.
+            system on your own machine. What we sell is Pro, Cloud and Enterprise, live now in
+            closed testing - the deeper product surface and the operating burden around it, never
+            the protocol.
           </p>
 
           <div className="editions">
@@ -376,7 +348,7 @@ export default function HomePage() {
             </div>
             <div className="edition-col">
               <div className="edition-col-head" style={{ color: "var(--accent-3)" }}>
-                Commercial · none of it shipping yet
+                Commercial · live in closed testing
               </div>
               {paidEditions.map((e) => (
                 <EditionCard key={e.name} edition={e} />
@@ -397,12 +369,12 @@ export default function HomePage() {
           >
             The rule we are holding ourselves to: nothing on the paid side is load-bearing for
             anything on the free side. A system you build today keeps running on an open protocol,
-            an open runtime and a local toolchain whether or not you ever pay us.{" "}
-            <Link href={EARLY_ACCESS_HREF} className="inline-link">
-              Early access
-            </Link>{" "}
-            is where the commercial tiers get shaped, so if you have an opinion about what belongs
-            on which side, that is the room.
+            an open runtime and a local toolchain whether or not you ever pay us. If you have an
+            opinion about what belongs on which side,{" "}
+            <a href={BOOK_A_CALL} target="_blank" rel="noopener noreferrer" className="inline-link">
+              book a call
+            </a>
+            .
           </p>
         </div>
       </section>
@@ -432,95 +404,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Proof: the code ──────────────────────────────────────────────── */}
-      <BuildOnCosmonapse />
-
-      {/* ── Boutique systems ─────────────────────────────────────────────── */}
-      <section className="section">
-        <div className="container">
-          <div className="section-eyebrow">// What you build with it</div>
-          <h2 className="section-title">Boutique AI systems, not another wrapper.</h2>
-          <p className="section-sub">
-            The shape is always the same: an interface people actually use, domain memory that is
-            yours, tools that touch real systems, and a policy for when a human gets involved. The
-            model is the cheapest part. Everything around it is the product.
-          </p>
-          <div className="usecases">
-            {USE_CASES.map((u) => (
-              <div className="usecase" key={u.title}>
-                <div className="usecase-title">{u.title}</div>
-                <div className="usecase-body">{u.body}</div>
-                <div className="usecase-shape">{u.shape}</div>
-              </div>
-            ))}
-          </div>
-          <p
-            style={{
-              marginTop: 28,
-              fontSize: 13.5,
-              color: "var(--text-dim)",
-              lineHeight: 1.75,
-              maxWidth: 760,
-            }}
-          >
-            None of these are graphs. Each one is a set of independent components reacting to
-            Signals, where the interesting behaviour - escalation, disagreement, a late tool result,
-            a human in the middle - is a Signal arriving rather than an edge you drew.{" "}
-            <Link href="/examples" className="inline-link">
-              Fourteen runnable examples
-            </Link>{" "}
-            show the patterns end to end.
-          </p>
-
-          <BoutiqueSystem />
-        </div>
-      </section>
-
-      {/* ── Early access ─────────────────────────────────────────────────── */}
-      <section className="section-sm">
-        <div className="container">
-          <div className="ea-band">
-            <div className="ea-band-copy">
-              <div className="ea-band-eyebrow">// Early Access Program</div>
-              <h3>Running an enterprise team or startup building something real on this? Come talk to us.</h3>
-              <p>
-                This round is scoped to enterprise teams and funded startups. We run architecture
-                sessions with early adopters on the system they are actually building - free,
-                framework-agnostic, and with the people writing the protocol. The first 10 members
-                accepted also get credits, a standing discount on Cosmonapse Cloud, and the option
-                to form a Letter of Intent with us.
-              </p>
-            </div>
-            <div className="ea-band-actions">
-              <Link href={EARLY_ACCESS_HREF} className="btn btn-primary">
-                Early access <span className="arrow">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      {/* ── Book a call ──────────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
           <div className="cta-card">
-            <h2>Build a system, not a demo.</h2>
+            <h2>Get started.</h2>
             <p>
-              Core 0.1.14 is a research preview: the envelope is drafted, the Python SDK implements
-              it, Glia governs each component, and Genesis and Prism run locally today off the same
-              CLI. It is open source under Apache
-              2.0 - read the spec, disagree with it in public, and build on it either way.
+              Install the package and follow the quickstart to run your first brain on your own
+              machine. If you are building something real on Cosmonapse, book a call and we will
+              go through the system with you.
             </p>
             <div className="hero-ctas" style={{ marginBottom: 0 }}>
               <Link href="/core/quickstart" className="btn btn-primary">
                 Get started <span className="arrow">→</span>
               </Link>
-              <Link href="/core/protocol" className="btn btn-ghost">
-                Read the envelope spec
-              </Link>
+              <a href={BOOK_A_CALL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+                Book a call
+              </a>
             </div>
-
-            <InstallCommands commands={INSTALL} center />
           </div>
         </div>
       </section>
@@ -537,7 +438,7 @@ function EditionCard({ edition: e }: { edition: (typeof EDITIONS)[number] }) {
         <span>{e.name}</span>
         <span
           className="edition-status"
-          style={{ color: open ? "var(--ok-strong)" : "var(--status-none)" }}
+          style={{ color: open ? "var(--ok-strong)" : "var(--warn)" }}
         >
           {e.status}
         </span>

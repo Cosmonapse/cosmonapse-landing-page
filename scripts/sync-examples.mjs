@@ -57,6 +57,10 @@ function walk(dir) {
   });
 }
 
+// Credentials that must never reach the public site. Matching a pattern
+// stops the sync for that file with a non-zero exit, rather than copying it.
+const SECRET = /hf_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{36,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----/;
+
 let total = 0;
 for (const [folder, slug] of Object.entries(EXAMPLES)) {
   const base = path.join(repo, folder);
@@ -73,7 +77,13 @@ for (const [folder, slug] of Object.entries(EXAMPLES)) {
   for (const f of files.sort()) {
     const rel = path.relative(base, f).split(path.sep).join("/");
     if ((EXCLUDE[folder] ?? []).includes(rel)) continue;
-    code[rel] = fs.readFileSync(f, "utf8").replace(/\r\n/g, "\n");
+    const text = fs.readFileSync(f, "utf8").replace(/\r\n/g, "\n");
+    if (SECRET.test(text)) {
+      console.error(`refusing ${folder}/${rel}: it contains what looks like a credential`);
+      process.exitCode = 1;
+      continue;
+    }
+    code[rel] = text;
   }
   const out = slug.includes("/")
     ? path.join(site, "app", slug, "code.ts")
