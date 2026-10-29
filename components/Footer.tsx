@@ -1,7 +1,7 @@
 import Link from "next/link";
 import BrandMark from "@/components/BrandMark";
 import { PRODUCTS } from "@/lib/products";
-import { EARLY_ACCESS_HREF, EARLY_ACCESS_LABEL } from "@/lib/early-access";
+import { BOOK_A_CALL_HREF, BOOK_A_CALL_LABEL } from "@/lib/book-a-call";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
 
@@ -100,7 +100,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <Link href={EARLY_ACCESS_HREF}>{EARLY_ACCESS_LABEL}</Link>
+                <a href={BOOK_A_CALL_HREF} target="_blank" rel="noopener noreferrer">
+                  {BOOK_A_CALL_LABEL}
+                </a>
               </li>
               <li>
                 <a href="mailto:dev@cosmonapse.com">Contact</a>

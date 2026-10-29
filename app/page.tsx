@@ -10,9 +10,9 @@ import DemoFrame from "@/components/DemoFrame";
 import InstallCommands from "@/components/InstallCommands";
 import ProductGrid from "@/components/ProductGrid";
 import { NEXT_UP } from "@/lib/products";
+import { BOOK_A_CALL_HREF as BOOK_A_CALL } from "@/lib/book-a-call";
 
 const GITHUB = "https://github.com/Cosmonapse/cosmonapse-core";
-const BOOK_A_CALL = "https://cal.com/aqib-khan-rujxh2/30min";
 
 // One package, two commands: install it, then open the designer. Repeated
 // verbatim in the closing CTA rather than varied, so the thing you scrolled
